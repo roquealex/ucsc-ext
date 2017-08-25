@@ -27,7 +27,7 @@ Calculating the correlation of the features vs median house price
 corBos <- cor(Boston)
 # All cols except mediam value
 indBosColNamesIdx <- colnames(corBos)!="medv"
-indBosColNamesIdx
+#indBosColNamesIdx
 
 corMedv <- corBos["medv",indBosColNamesIdx]
 ```
@@ -37,12 +37,13 @@ corMedv <- corBos["medv",indBosColNamesIdx]
 Arranging by absolute value of correlation closer to 1
 
 ```{r order_importance}
-sort(abs(corMedv))
 orderCorMedv <- order(-abs(corMedv))
 knitr::kable(corMedv[orderCorMedv])
 ```
 
 **Divide the data into training and testing.  Fit a linear model.**
+
+Tried to fir using the subset of the highest significance and the subset of highest correlation but the whole set of features gave better RMSE
 
 ```{r sample_training}
 #subBoston <- head(Boston,100)
@@ -54,9 +55,9 @@ subBoston <- Boston
 
 #knitr::kable(subBoston)
 numEntries <- nrow(subBoston)
-numEntries
+#numEntries
 set.seed(1)
-# Selectiong 80% of the dataset for training
+# Selecting 80% of the dataset for training
 trainingSamp <- sample(c(1:numEntries),0.8*numEntries,replace=FALSE)
 # which not required but easier to visialize
 testingSamp <- which(!(c(1:numEntries) %in% trainingSamp))
@@ -70,18 +71,13 @@ testingSet <- subBoston[testingSamp,]
 #knitr::kable(trainingSet)
 #knitr::kable(testingSet)
 
-indTrainingSet <- trainingSet[,colnames(trainingSet) != "medv"]
-#knitr::kable(indTrainingSet)
-
+# medv is a function of everything else
 bostonModel <- lm(medv~.,data=trainingSet)
 
 summary(bostonModel)
 
-#attributes(bostonModel$terms)
-#attr(bostonModel$terms,"term.labels")
-
+# Apply the model to the testing set
 vals <- predict(bostonModel,testingSet[,attr(bostonModel$terms,"term.labels")])
-#vals
 
 testingSetPred <- data.frame(testingSet,predicted=vals)
 knitr::kable(testingSetPred,row.names=FALSE)
