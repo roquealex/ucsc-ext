@@ -47,6 +47,10 @@ knitr::kable(corMedv[orderCorMedv])
 ```{r sample_training}
 #subBoston <- head(Boston,100)
 subBoston <- Boston
+# Highest significance:
+#subBoston <- subset(Boston, select=c("lstat","dis","ptratio","rm","nox","medv"))
+# Highest correlation: 
+#subBoston <- subset(Boston, select=c("lstat","rm","ptratio","indus","tax","medv"))
 
 #knitr::kable(subBoston)
 numEntries <- nrow(subBoston)
@@ -80,8 +84,11 @@ vals <- predict(bostonModel,testingSet[,attr(bostonModel$terms,"term.labels")])
 #vals
 
 testingSetPred <- data.frame(testingSet,predicted=vals)
-knitr::kable(testingSetPred)
+knitr::kable(testingSetPred,row.names=FALSE)
 
+#Quickly get rmse
+RMSE <- sqrt(mean((testingSetPred$medv-testingSetPred$predicted)^2))
+RMSE
 
 ```
 
@@ -98,23 +105,3 @@ abline(a=0,b=1,col="red")
 ```
 
 **Changed the submission data**
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
