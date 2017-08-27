@@ -264,7 +264,7 @@ print(plt)
 ```
 
 # Conclusions
-```{r, include=TRUE}
+```{r, include=FALSE}
 monthRankByWind <- monthSum[order(-monthSum$gteq15),]
 monthRankByStr <- monthSum[order(-monthSum$gteq25),]
 
@@ -282,6 +282,26 @@ It is a safe bet to take a medium (9m) and a large (12m) kites since most of the
 # Appendix
 
 ## A. How to Run
+
+This is the list of source files and directories needed to run, all of them need to be present **in the same directory**:
+
+__WeatherTest.R__ : This is where most of the processing and plotting functions are implemented. It is included in the markdown documents.
+
+__Report.Rmd__ : This report.
+
+__Final_preso_wind.Rmd__ : Presentation.
+
+__weatherc__ : A directo  ry containing all the cvs files with the daily information. It is organized in several subdirectories first the station ID, then the year and then the month.
+
+To do the processing open the source file of this report and click on knit.
+
+The library weatherData has been commented out from the code. This will make the code fail when the weather cache (directory weatherc) doesn’t exist:
+
+Quitting from lines 67-82 (Report.Rmd) 
+Error in getPWSData(stationID, as.Date(sampleDate, "%B %d, %Y")) : 
+  could not find function “getDetailedWeather"
+
+The current version from CRAN is old and it doesn’t read the weather data from the page correctly. The one from github is better but it has an issue related to the hidden <br> tags present in the page.
 
 ## B. Remaining calendar plots
 

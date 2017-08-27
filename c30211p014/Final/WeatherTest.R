@@ -387,7 +387,9 @@ exploreRawData <- function(stationName, startDate, endDate=startDate) {
 
 
 
-
+# This is just debug code, the report and presentation is based on this code.
+# If you want to execute chance the FALSE to TRUE and make sure the weatherc
+# exists in the current working directory
 if (FALSE) {
 
 stationID <- "IYUCATNT2"
