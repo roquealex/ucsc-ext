@@ -30,6 +30,7 @@ source('WeatherTest.R')
 # General variables:
 stationID <- "IYUCATNT2"
 loc <- getPWSLocation(stationID)
+
 startDateStr <- "2012/01/01"
 #startDateStr <- "2016/01/01"
 endDateStr <- "2016/12/31"
@@ -248,7 +249,7 @@ calendarDailySummary(daySum,targetDate)
 ```
 
 ## Monthly Report
-```{r monthly_summary}
+```{r monthly_summary, include=FALSE}
 monthSum  <- computeMontlySummary(daySum)
 
 ```
@@ -257,7 +258,7 @@ Finally we process the daily information to find out how many windy days we have
 
 The following overlapping bar charts were created as the final report:
 
-```{r monthly_plot}
+```{r monthly_plot, echo=FALSE}
 plt <- ggplotMontlySummary(monthSum,startDateStr,endDateStr)
 print(plt)
 ```
@@ -272,6 +273,33 @@ Write something.
 
 ## B. Remaining calendar plots
 
+_Note_ : No color on a day represents a missing record.
+
+```{r calendars, echo=FALSE, warning=FALSE, fig.align='center'}
+
+currYear <- targetDate-1
+
+# Loop unrolling because the for puts the calendars next to each other
+if (currYear >= year(startDateStr)) {
+  calendarDailySummary(daySum,currYear)
+  currYear <- currYear - 1
+}
+if (currYear >= year(startDateStr)) {
+  calendarDailySummary(daySum,currYear)
+  currYear <- currYear - 1
+}
+if (currYear >= year(startDateStr)) {
+  calendarDailySummary(daySum,currYear)
+  currYear <- currYear - 1
+}
+if (currYear >= year(startDateStr)) {
+  calendarDailySummary(daySum,currYear)
+  currYear <- currYear - 1
+}
+
+#calendarDailySummary(daySum,2014)
+
+```
 
 ## C. Runtime
 

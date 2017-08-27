@@ -292,7 +292,7 @@ calendarDailySummary <- function(dailySummary, targetYear) {
     year=targetYear,
     breaks=c(0,14,19,24,100),
     labels=c("Poor wind","Low [15,20) mph","Mid [20,25) mph","High 25mph+"),
-    main=sprintf("Kiting days in %s",targetDate)
+    main=sprintf("Kiting days in %s",targetYear)
   )
 }
 
@@ -392,7 +392,7 @@ if (FALSE) {
 
 stationID <- "IYUCATNT2"
 loc <- getPWSLocation(stationID)
-startDateStr <- "2012/01/01"
+startDateStr <- "2014/01/01"
 #startDateStr <- "2016/01/01"
 endDateStr <- "2016/12/31"
 
@@ -438,6 +438,9 @@ monthSum  <- computeMontlySummary(daySum)
 plt <- ggplotMontlySummary(monthSum,startDateStr,endDateStr)
 print(plt)
 
+# Appendix code:
+
+dates <- seq(targetDate-1,year(startDateStr))
 
 #print(df)
 write.csv(df, "test.csv")
