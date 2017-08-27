@@ -246,9 +246,9 @@ computeDailySummary <- function(wholeDF,location,thresHourPeriod ) {
 }
 
 
-computeMontlySummary <- function(dailySummary) {
+computeMonthlySummary <- function(dailySummary) {
   #sumarizing by month
-  monthySummary <- dailySummary %>%
+  monthlySummary <- dailySummary %>%
   #  mutate(month=as.factor(months(date))) %>%
     mutate(month=(month(date,label=TRUE,abbr=FALSE))) %>%
   #  rename(target=avgDlWindSpeedMPH) %>%
@@ -259,7 +259,7 @@ computeMontlySummary <- function(dailySummary) {
       gteq20=(sum(target>=20,na.rm=TRUE)/n()),
       gteq25=(sum(target>=25,na.rm=TRUE)/n()),
       total=n())
-  return(monthySummary)
+  return(monthlySummary)
 
 }
 
@@ -296,7 +296,7 @@ calendarDailySummary <- function(dailySummary, targetYear) {
   )
 }
 
-ggplotMontlySummary <- function(monthlySummary,startDateString,endDateString) {
+ggplotMonthlySummary <- function(monthlySummary,startDateString,endDateString) {
   startYear <- year(startDateString)
   endYear <- year(endDateString)
   if (startYear > endYear) {
@@ -435,16 +435,16 @@ calendarDailySummary(daySum,targetDate)
 # The whole period of time:
 #windRose(rename(df,date=Time,ws=WindSpeedMPH,wd=WindDirectionDegrees),cols='heat',angle=10,paddle=FALSE,ws.int=5,breaks=6,key.footer='mph')
 
-monthSum  <- computeMontlySummary(daySum)
+monthSum  <- computeMonthlySummary(daySum)
 
-plt <- ggplotMontlySummary(monthSum,startDateStr,endDateStr)
+plt <- ggplotMonthlySummary(monthSum,startDateStr,endDateStr)
 print(plt)
 
 # Appendix code:
 #dates <- seq(targetDate-1,year(startDateStr))
 
 print(monthSum)
-#print(rankMontlySummary(monthSum,"gteq15"))
+#print(rankMonthlySummary(monthSum,"gteq15"))
 
 # Order by best windy month
 monthRankByWind <- monthSum[order(-monthSum$gteq15),]
