@@ -264,8 +264,20 @@ print(plt)
 ```
 
 # Conclusions
+```{r, include=TRUE}
+monthRankByWind <- monthSum[order(-monthSum$gteq15),]
+monthRankByStr <- monthSum[order(-monthSum$gteq25),]
 
-Write something.
+#monthRank$month[1]
+#round(monthRank$gteq15[1]*100)
+
+```
+
+In the period from `r startYear` to `r endYear` the best month is `r monthRankByWind$month[1]` with `r round(monthRankByWind$gteq15[1]*100)`% of windy days and `r round(monthRankByWind$gteq20[1]*100)`% of windy days with at least 20mph speeds. This is followed by `r monthRankByWind$month[2]` with `r round(monthRankByWind$gteq15[2]*100)`% of windy days and `r monthRankByWind$month[3]` with `r round(monthRankByWind$gteq15[3]*100)`% of windy days.
+
+The highest winds could typically be found in `r monthRankByStr$month[1]` with `r round(monthRankByStr$gteq25[1]*100)`% of windy days with speeds of 25mph and above.
+
+It is a safe bet to take a medium (9m) and a large (12m) kites since most of the windy days are in the range of 15mph to less than 25mph.
 
 # Appendix
 

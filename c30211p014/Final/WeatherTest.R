@@ -240,7 +240,7 @@ computeDailySummary <- function(wholeDF,location,thresHourPeriod ) {
       avgDlWindSpeedMPHGt15=ifelse(periodLength15>0,
         mean(ifelse(WindSpeedMPH>=15,WindSpeedMPH,NA),na.rm=TRUE),
         NA),
-      high=max(WindSpeedMPH,na.rm=TRUE)
+      high=max(WindSpeedMPH,na.rm=TRUE) # Not used
       )
   return(dailySummary)
 }
@@ -392,8 +392,8 @@ if (FALSE) {
 
 stationID <- "IYUCATNT2"
 loc <- getPWSLocation(stationID)
-startDateStr <- "2014/01/01"
-#startDateStr <- "2016/01/01"
+#startDateStr <- "2012/01/01"
+startDateStr <- "2016/01/01"
 endDateStr <- "2016/12/31"
 
 startRunTime <- Sys.time() 
@@ -439,8 +439,17 @@ plt <- ggplotMontlySummary(monthSum,startDateStr,endDateStr)
 print(plt)
 
 # Appendix code:
+#dates <- seq(targetDate-1,year(startDateStr))
 
-dates <- seq(targetDate-1,year(startDateStr))
+print(monthSum)
+#print(rankMontlySummary(monthSum,"gteq15"))
+
+# Order by best windy month
+monthRankByWind <- monthSum[order(-monthSum$gteq15),]
+print(monthRankByWind)
+monthRankByStr <- monthSum[order(-monthSum$gteq25),]
+print(monthRankByStr)
+#round(monthRank$gteq15[1]*100)
 
 #print(df)
 write.csv(df, "test.csv")
