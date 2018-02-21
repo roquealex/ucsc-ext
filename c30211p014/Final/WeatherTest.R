@@ -240,15 +240,15 @@ computeDailySummary <- function(wholeDF,location,thresHourPeriod ) {
       avgDlWindSpeedMPHGt15=ifelse(periodLength15>0,
         mean(ifelse(WindSpeedMPH>=15,WindSpeedMPH,NA),na.rm=TRUE),
         NA),
-      high=max(WindSpeedMPH,na.rm=TRUE)
+      high=max(WindSpeedMPH,na.rm=TRUE) # Not used
       )
   return(dailySummary)
 }
 
 
-computeMontlySummary <- function(dailySummary) {
+computeMonthlySummary <- function(dailySummary) {
   #sumarizing by month
-  monthySummary <- dailySummary %>%
+  monthlySummary <- dailySummary %>%
   #  mutate(month=as.factor(months(date))) %>%
     mutate(month=(month(date,label=TRUE,abbr=FALSE))) %>%
   #  rename(target=avgDlWindSpeedMPH) %>%
@@ -259,7 +259,7 @@ computeMontlySummary <- function(dailySummary) {
       gteq20=(sum(target>=20,na.rm=TRUE)/n()),
       gteq25=(sum(target>=25,na.rm=TRUE)/n()),
       total=n())
-  return(monthySummary)
+  return(monthlySummary)
 
 }
 
@@ -292,11 +292,11 @@ calendarDailySummary <- function(dailySummary, targetYear) {
     year=targetYear,
     breaks=c(0,14,19,24,100),
     labels=c("Poor wind","Low [15,20) mph","Mid [20,25) mph","High 25mph+"),
-    main=sprintf("Kiting days in %s",targetDate)
+    main=sprintf("Kiting days in %s",targetYear)
   )
 }
 
-ggplotMontlySummary <- function(monthlySummary,startDateString,endDateString) {
+ggplotMonthlySummary <- function(monthlySummary,startDateString,endDateString) {
   startYear <- year(startDateString)
   endYear <- year(endDateString)
   if (startYear > endYear) {
@@ -387,13 +387,15 @@ exploreRawData <- function(stationName, startDate, endDate=startDate) {
 
 
 
-
+# This is just debug code, the report and presentation is based on this code.
+# If you want to execute chance the FALSE to TRUE and make sure the weatherc
+# exists in the current working directory
 if (FALSE) {
 
 stationID <- "IYUCATNT2"
 loc <- getPWSLocation(stationID)
-startDateStr <- "2012/01/01"
-#startDateStr <- "2016/01/01"
+#startDateStr <- "2012/01/01"
+startDateStr <- "2016/01/01"
 endDateStr <- "2016/12/31"
 
 startRunTime <- Sys.time() 
@@ -433,11 +435,23 @@ calendarDailySummary(daySum,targetDate)
 # The whole period of time:
 #windRose(rename(df,date=Time,ws=WindSpeedMPH,wd=WindDirectionDegrees),cols='heat',angle=10,paddle=FALSE,ws.int=5,breaks=6,key.footer='mph')
 
-monthSum  <- computeMontlySummary(daySum)
+monthSum  <- computeMonthlySummary(daySum)
 
-plt <- ggplotMontlySummary(monthSum,startDateStr,endDateStr)
+plt <- ggplotMonthlySummary(monthSum,startDateStr,endDateStr)
 print(plt)
 
+# Appendix code:
+#dates <- seq(targetDate-1,year(startDateStr))
+
+print(monthSum)
+#print(rankMonthlySummary(monthSum,"gteq15"))
+
+# Order by best windy month
+monthRankByWind <- monthSum[order(-monthSum$gteq15),]
+print(monthRankByWind)
+monthRankByStr <- monthSum[order(-monthSum$gteq25),]
+print(monthRankByStr)
+#round(monthRank$gteq15[1]*100)
 
 #print(df)
 write.csv(df, "test.csv")

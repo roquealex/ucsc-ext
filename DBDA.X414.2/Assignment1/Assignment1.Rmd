@@ -1,0 +1,112 @@
+---
+title: "ASSIGNMENT 1"
+author: "Roque Arcudia"
+date: "February 20, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+**1.What is machine learning? What is the difference between data mining and machine learning? (2 points)**
+
+**2. What is supervised and unsupervised learning? Give examples and applications where each can be used (2 points)**
+
+**3.What is normalization and why do you perform? Explain with examples. What are the different techniques used? (2 points)**
+
+**4.What does K stand in K-nearest neighbor algorithm? How do you determine the optimal value of K. Take Wisconsin cancer data (provided), determine the optimal
+value of K. Plot misclassification error for test as well as training data. ( 4 points)**
+
+The parameter *k* is the number of nearest neighbors to be found by the algorithm given an input test point. The majority class label will be assigned to the test point.
+
+```{r data_setup, include=FALSE}
+source('KNN.r')
+```
+
+The parameter is typically chosen to be an odd number to avoid a tie. As a rule of thumb we can pick *k* to be the square root of the number of elements in the training set:
+
+```{r k_size}
+k_thumb <- sqrt(nrow(wbcd_train))
+k_thumb
+```
+
+Trying different values of *k*:
+
+```{r k_test}
+k_test <- seq(1,k_thumb*2,2)
+#k_test <- c(21)
+k_test
+```
+
+Calculating the misclassification using the testing set:
+
+```{r k_mis_test, include=FALSE}
+err_rate_test <- vector()
+for(i in 1:length(k_test)){
+  wbcd_test_pred <- knn(train = wbcd_train, test = wbcd_test,
+                      cl = wbcd_train_labels, k=k_test[i])
+  #CrossTable(x = wbcd_test_labels, y = wbcd_test_pred, prop.chisq=FALSE)
+  
+  acc_test <- sum(wbcd_test_pred == wbcd_test_labels)/length(wbcd_test_labels)
+  #print(acc_test)
+  err_rate_test[i] <- 1-acc_test
+}
+err_rate_test
+
+```
+
+```{r k_mis_test_nl}
+
+err_rate_test <- sapply(k_test,function(x){
+  wbcd_test_pred <- knn(train = wbcd_train, test = wbcd_test,
+                      cl = wbcd_train_labels, k=x)
+  1 - sum(wbcd_test_pred == wbcd_test_labels)/length(wbcd_test_labels)
+})
+
+err_rate_test
+```
+
+Plotting the value of k with the associated misclassification rate in the testing set:
+```{r k_mis_test_plot}
+plot(k_test,err_rate_test)
+```
+
+This plot shows that the value of 21 is a good choice.
+
+Calculating the misclassification using the training set:
+
+```{r k_mis_train, include=FALSE}
+err_rate_train <- vector()
+for(i in 1:length(k_test)){
+  wbcd_train_pred <- knn(train = wbcd_train, test = wbcd_train,
+                      cl = wbcd_train_labels, k=k_test[i])
+  #CrossTable(x = wbcd_test_labels, y = wbcd_test_pred, prop.chisq=FALSE)
+  
+  acc_test <- sum(wbcd_train_pred == wbcd_train_labels)/length(wbcd_train_labels)
+  #print(acc_test)
+  err_rate_train[i] <- 1-acc_test
+}
+err_rate_train
+
+```
+
+```{r k_mis_train_nl}
+
+err_rate_train <- sapply(k_test,function(x){
+  wbcd_train_pred <- knn(train = wbcd_train, test = wbcd_train,
+                      cl = wbcd_train_labels, k=x)
+  1 - sum(wbcd_train_pred == wbcd_train_labels)/length(wbcd_train_labels)
+})
+
+err_rate_train
+```
+
+Plotting the value of k with the associated misclassification rate in the training set:
+```{r k_mis_train_plot}
+plot(k_test,err_rate_train)
+```
+
+Although in this case it looks like the smaller the better picking those values may create a generalization problem. 21 still looks as a good value before the error goes high peaking around 31.
