@@ -1,5 +1,5 @@
 ---
-title: "Assignment 1"
+title: "ASSIGNMENT 1"
 author: "Roque Arcudia"
 date: "February 20, 2018"
 output: pdf_document
@@ -7,6 +7,32 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+**1.What is machine learning? What is the difference between data mining and machine learning? (2 points)**
+
+**2. What is supervised and unsupervised learning? Give examples and applications where each can be used (2 points)**
+
+**3.What is normalization and why do you perform? Explain with examples. What are the different techniques used? (2 points)**
+
+**4.What does K stand in K-nearest neighbor algorithm? How do you determine the optimal value of K. Take Wisconsin cancer data (provided), determine the optimal
+value of K. Plot misclassification error for test as well as training data. ( 4 points)**
+
+```{r code0}
+x <- c(0:10)
+y<-x*x
+y
+yp <- vector()
+for(i in 1:length(x)){
+  yp[i] <- x[i]*x[i]
+}
+yp
+
+ypp <- sapply(x,function(a){a*a})
+ypp
+
 ```
 
 ## R Markdown
