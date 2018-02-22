@@ -6,7 +6,7 @@ rm(list = ls())
 
 # import the CSV file
 #wbcd <- read.csv("/Users/home/Desktop/R_SCRIPTS/wisc_bc_data.csv", stringsAsFactors = FALSE)
-wbcd <- read.csv("wisc_bc_data.csv", stringsAsFactors = FALSE)
+wbcd <- read.csv("wisc_bc_data-2.csv", stringsAsFactors = FALSE)
 
 # examine the structure of the wbcd data frame
 str(wbcd)
