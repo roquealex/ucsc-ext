@@ -1,13 +1,140 @@
 ---
-title: "ASSIGNMENT 1"
+title: "ASSIGNMENT 2"
 author: "Roque Arcudia"
-date: "February 20, 2018"
+date: "February 26, 2018"
 output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+**1. What assumptions are made about the attributes in Naïve Bayes method of classification and why? What is Laplacian correction and why it is necessary?**
+
+**2.How can a decision tree be converted into a rule set? Illustrate with an example. What are the advantages of the rule set representation over the decision tree representation?**
+
+**3.Take the iris data. Use Naïve Bayes algorithm to find the species with the following two observations with attributes
+[4.5 3.0 5.6 2.1; 5.4 2.6 4.5 0.0] Don’t use the any R package. Show
+various steps involved and do as explained in the class.**
+
+```{r iris_extraction}
+library(datasets)
+data(iris)
+
+ntotal <- nrow(iris)
+setosa_total <- sum(iris$Species=="setosa")
+versicolor_total <- sum(iris$Species=="versicolor")
+virginica_total <- sum(iris$Species=="virginica")
+
+ntotal
+setosa_total
+versicolor_total
+virginica_total
+
+P_setosa<- setosa_total/ntotal
+P_versicolor<- versicolor_total/ntotal
+P_virginica<- virginica_total/ntotal
+
+P_setosa
+P_versicolor
+P_virginica
+
+feature_names <- names(iris)
+feature_names <- feature_names[feature_names!="Species"]
+feature_names
+#num_cols <- names(iris)!="Species"
+iris_setosa <- iris[iris$Species=="setosa",feature_names]
+iris_versicolor <- iris[iris$Species=="versicolor",feature_names]
+iris_virginica <- iris[iris$Species=="virginica",feature_names]
+  
+iris_setosa
+iris_versicolor
+iris_virginica
+summary(iris_setosa)
+summary(iris_versicolor)
+summary(iris_virginica)
+
+#iris_setosa_mean <-colMeans(iris_setosa)
+#iris_versicolor_mean <- colMeans(iris_versicolor)
+#iris_virginica_mean <- colMeans(iris_virginica)
+
+iris_setosa_mean <-sapply(iris_setosa,mean)
+iris_versicolor_mean <- sapply(iris_versicolor,mean)
+iris_virginica_mean <- sapply(iris_virginica,mean)
+
+iris_setosa_mean
+iris_versicolor_mean
+iris_virginica_mean
+
+iris_setosa_var <-sapply(iris_setosa,var)
+iris_versicolor_var <- sapply(iris_versicolor,var)
+iris_virginica_var <- sapply(iris_virginica,var)
+
+iris_setosa_var
+iris_versicolor_var
+iris_virginica_var
+
+#[4.5 3.0 5.6 2.1; 5.4 2.6 4.5 0.0]
+
+my_norm <- function(x,meanx,varx) {
+	return(exp((-(x-meanx)^2)/(2*varx))/sqrt(2*pi*varx))
+}
+#Sepal.Length
+p_Sepal.Length_setosa <- my_norm(4.5, iris_setosa_mean['Sepal.Length'],iris_setosa_var['Sepal.Length'])
+p_Sepal.Length_versicolor <- my_norm(4.5, iris_versicolor_mean['Sepal.Length'],iris_versicolor_var['Sepal.Length'])
+p_Sepal.Length_virginica <- my_norm(4.5, iris_virginica_mean['Sepal.Length'],iris_virginica_var['Sepal.Length'])
+
+p_Sepal.Length_setosa
+p_Sepal.Length_versicolor
+p_Sepal.Length_virginica
+
+#Sepal.Width
+p_Sepal.Width_setosa <- my_norm(3.0, iris_setosa_mean['Sepal.Width'],iris_setosa_var['Sepal.Width'])
+p_Sepal.Width_versicolor <- my_norm(3.0, iris_versicolor_mean['Sepal.Width'],iris_versicolor_var['Sepal.Width'])
+p_Sepal.Width_virginica <- my_norm(3.0, iris_virginica_mean['Sepal.Width'],iris_virginica_var['Sepal.Width'])
+
+p_Sepal.Width_setosa
+p_Sepal.Width_versicolor
+p_Sepal.Width_virginica
+
+
+
+
+#Petal.Length
+p_Petal.Length_setosa <- my_norm(5.6, iris_setosa_mean['Petal.Length'],iris_setosa_var['Petal.Length'])
+p_Petal.Length_versicolor <- my_norm(5.6, iris_versicolor_mean['Petal.Length'],iris_versicolor_var['Petal.Length'])
+p_Petal.Length_virginica <- my_norm(5.6, iris_virginica_mean['Petal.Length'],iris_virginica_var['Petal.Length'])
+
+p_Petal.Length_setosa
+p_Petal.Length_versicolor
+p_Petal.Length_virginica
+
+#Petal.Width
+p_Petal.Width_setosa <- my_norm(2.1, iris_setosa_mean['Petal.Width'],iris_setosa_var['Petal.Width'])
+p_Petal.Width_versicolor <- my_norm(2.1, iris_versicolor_mean['Petal.Width'],iris_versicolor_var['Petal.Width'])
+p_Petal.Width_virginica <- my_norm(2.1, iris_virginica_mean['Petal.Width'],iris_virginica_var['Petal.Width'])
+
+p_Petal.Width_setosa
+p_Petal.Width_versicolor
+p_Petal.Width_virginica
+
+#Goldens:
+## Sepal.Length  Sepal.Width Petal.Length  Petal.Width
+##        5.006        3.428        1.462        0.246
+## Sepal.Length  Sepal.Width Petal.Length  Petal.Width
+##        5.936        2.770        4.260        1.326
+## Sepal.Length  Sepal.Width Petal.Length  Petal.Width
+##        6.588        2.974        5.552        2.026
+
+## Sepal.Length  Sepal.Width Petal.Length  Petal.Width
+##   0.12424898   0.14368980   0.03015918   0.01110612
+## Sepal.Length  Sepal.Width Petal.Length  Petal.Width
+##   0.26643265   0.09846939   0.22081633   0.03910612
+## Sepal.Length  Sepal.Width Petal.Length  Petal.Width
+##   0.40434286 0.10400408 0.30458776 0.07543265
+
+```
+
 
 
 **1.What is machine learning? What is the difference between data mining and machine learning? (2 points)**
@@ -55,93 +182,19 @@ value of K. Plot misclassification error for test as well as training data. ( 4 
 The parameter *k* is the number of nearest neighbors to be found by the algorithm given an input test point. The majority class label will be assigned to the test point.
 
 ```{r data_setup, include=FALSE}
-source('KNN.r')
+#source('KNN.r')
 ```
 
 The parameter is typically chosen to be an odd number to avoid a tie. As a rule of thumb we can pick *k* to be the square root of the number of elements in the training set:
 
 ```{r k_size}
-k_thumb <- sqrt(nrow(wbcd_train))
-k_thumb
+#k_thumb <- sqrt(nrow(wbcd_train))
+#k_thumb
 ```
 
 Trying different values of *k*:
 
 ```{r k_test}
-k_test <- seq(1,k_thumb*2,2)
-k_test
+#k_test <- seq(1,k_thumb*2,2)
+#k_test
 ```
-
-Calculating the misclassification using the testing set:
-
-```{r k_mis_test, include=FALSE}
-err_rate_test <- vector()
-for(i in 1:length(k_test)){
-  wbcd_test_pred <- knn(train = wbcd_train, test = wbcd_test,
-                      cl = wbcd_train_labels, k=k_test[i])
-  #CrossTable(x = wbcd_test_labels, y = wbcd_test_pred, prop.chisq=FALSE)
-  
-  acc_test <- sum(wbcd_test_pred == wbcd_test_labels)/length(wbcd_test_labels)
-  #print(acc_test)
-  err_rate_test[i] <- 1-acc_test
-}
-err_rate_test
-
-```
-
-```{r k_mis_test_nl}
-
-err_rate_test <- sapply(k_test,function(x){
-  wbcd_test_pred <- knn(train = wbcd_train, test = wbcd_test,
-                      cl = wbcd_train_labels, k=x)
-  1 - sum(wbcd_test_pred == wbcd_test_labels)/length(wbcd_test_labels)
-})
-
-err_rate_test
-```
-
-Plotting the value of k with the associated misclassification rate in the testing set:
-```{r k_mis_test_plot}
-plot(k_test,err_rate_test,type="b",
-     main="Misclassification error for testing set",
-     xlab="k",ylab="Misclassification")
-```
-
-This plot shows that the value of 21 is a good choice.
-
-Calculating the misclassification using the training set:
-
-```{r k_mis_train, include=FALSE}
-err_rate_train <- vector()
-for(i in 1:length(k_test)){
-  wbcd_train_pred <- knn(train = wbcd_train, test = wbcd_train,
-                      cl = wbcd_train_labels, k=k_test[i])
-  #CrossTable(x = wbcd_test_labels, y = wbcd_test_pred, prop.chisq=FALSE)
-  
-  acc_test <- sum(wbcd_train_pred == wbcd_train_labels)/length(wbcd_train_labels)
-  #print(acc_test)
-  err_rate_train[i] <- 1-acc_test
-}
-err_rate_train
-
-```
-
-```{r k_mis_train_nl}
-
-err_rate_train <- sapply(k_test,function(x){
-  wbcd_train_pred <- knn(train = wbcd_train, test = wbcd_train,
-                      cl = wbcd_train_labels, k=x)
-  1 - sum(wbcd_train_pred == wbcd_train_labels)/length(wbcd_train_labels)
-})
-
-err_rate_train
-```
-
-Plotting the value of k with the associated misclassification rate in the training set:
-```{r k_mis_train_plot}
-plot(k_test,err_rate_train,type="b",
-     main="Misclassification error for training set",
-     xlab="k",ylab="Misclassification")
-```
-
-Although in this case it looks like the smaller the better picking those values may create a generalization problem. 21 still looks as a good value before the error goes high peaking around 31.
