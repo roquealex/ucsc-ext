@@ -27,19 +27,6 @@ data(iris)
 
 Calculating the mean and the variance for each feature for each class.
 
-Calculate the probability of each class.
-
-Preparing the input test vectors for classification.
-
-Calculating the PDFs using a normal distribution using the mean and variance previously calculated.
-
-Using the dnorm function in r to calculate the value in the normal PDF. It uses standard deviation so getting the square root of the variance before calling it.
-
-The table will be read the value of the PDF of “row name” given “column name” for instance p(Sepal.Length|setosa)=X 
-
-Multiplying the results of all the PDF values by the class probability too and picking up the class of the highest number.
-
-
 ```{r iris_summary}
 
 iris.gp.by.Species <- iris %>% group_by(Species)
@@ -54,12 +41,17 @@ knitr::kable(iris.var.gp.by.Species)
 
 ```
 
+Calculate the probability of each class.
+
 ```{r iris_prob}
 ntotal <- nrow(iris)
-iris.Prob.gp.by.Species <- iris.gp.by.Species %>% summarise(Prob=n()/ntotal)
+iris.Prob.gp.by.Species <- iris.gp.by.Species %>%
+  summarise(Prob=n()/ntotal)
 knitr::kable(iris.Prob.gp.by.Species)
 
 ```
+
+Preparing the input test vectors for classification.
 
 ```{r test_vectors}
 feature_names <- names(iris)
@@ -76,6 +68,8 @@ knitr::kable(test.data)
 #as.numeric(test.data[1,])
 ```
 
+Calculating the PDFs using a normal distribution using the mean and variance previously calculated.
+
 ```{r test_pdf}
 
 
@@ -88,23 +82,31 @@ knitr::kable(test.data)
 #input.data <- test.data[i,]  
 
 calculatePdfs <- function(input.data) {
-species_names <- iris.Prob.gp.by.Species$Species
-pdfs <- sapply(iris.Prob.gp.by.Species$Species, function(x) {
-	pdf <- dnorm(
-	as.numeric(input.data),
-	mean = as.numeric(iris.mean.gp.by.Species[iris.mean.gp.by.Species$Species==x,feature_names]),
-	sd = as.numeric(sqrt(iris.var.gp.by.Species[iris.mean.gp.by.Species$Species==x,feature_names]))
-	)
-	return(pdf)
-})
+  species_names <- iris.Prob.gp.by.Species$Species
+  pdfs <- sapply(iris.Prob.gp.by.Species$Species, function(x) {
+    this.mean <- iris.mean.gp.by.Species[
+      iris.mean.gp.by.Species$Species==x,
+      feature_names
+      ]
+    this.var <- iris.var.gp.by.Species[
+        iris.mean.gp.by.Species$Species==x,
+        feature_names
+        ]
+    pdf <- dnorm(
+      as.numeric(input.data),
+      mean = as.numeric(this.mean),
+      sd = as.numeric(sqrt(this.var))
+      )
+    return(pdf)
+  })
 
-#pdfs <- t(pdfs)
-rownames(pdfs) <- feature_names
-colnames(pdfs) <- species_names
-#species_names
-#str(pdfs)
+  #pdfs <- t(pdfs)
+  rownames(pdfs) <- feature_names
+  colnames(pdfs) <- species_names
+  #species_names
+  #str(pdfs)
 
-return(pdfs)
+  return(pdfs)
 }
 
 pdfs.per.vector <- list()
@@ -117,7 +119,6 @@ for(i in 1:nrow(test.data)){
   pdfs
   #pdfs.per.vector <- c(pdfs.per.vector,pdfs)
   pdfs.per.vector[[i]] <- pdfs
-
 }
 
 #knitr::kable(pdfs,caption=paste("PDF of rowname given colname for test vector",1))
@@ -127,6 +128,12 @@ pdfs.per.vector
 
 
 ```
+
+Using the dnorm function in r to calculate the value in the normal PDF. It uses standard deviation so getting the square root of the variance before calling it.
+
+The table will be read the value of the PDF of “row name” given “column name” for instance p(Sepal.Length|setosa)=X 
+
+Multiplying the results of all the PDF values by the class probability too and picking up the class of the highest number.
 
 ```{r iris_class}
 #posteriors.per.vector <- list()
@@ -139,20 +146,16 @@ pdfs.per.vector
 #i =1
 #input.pdfs <- pdfs.per.vector[[i]]
 posteriors.per.vector<- t(sapply(pdfs.per.vector, function(input.pdfs) {
-  
-probs <- rbind(input.pdfs,iris.Prob.gp.by.Species$Prob)
-
-
-posteriors <- as.data.frame(probs) %>% summarise_all(prod)
-#posteriors
-
-winner <- names(posteriors)[which.max(posteriors)]
-
-posteriors %>% mutate(winner=winner)
+  probs <- rbind(input.pdfs,iris.Prob.gp.by.Species$Prob)
+  posteriors <- as.data.frame(probs) %>% summarise_all(prod)
+  #posteriors
+  winner <- names(posteriors)[which.max(posteriors)]
+  return(posteriors %>% mutate(winner=winner))
 }))
 
 #posteriors.per.vector[[i]] <- posteriors %>% mutate(winner=winner)
 
+ 
 #}
 #i=1
 row.names(posteriors.per.vector)<-c("vector 1","vector 2")
@@ -160,21 +163,6 @@ knitr::kable(posteriors.per.vector)
 
 ```
 
-#test.pdfs <- data.frame(iris.Prob.gp.by.Species)
-
-probs <- rbind(pdfs,iris.Prob.gp.by.Species$Prob)
-
-posteriors <- as.data.frame(probs) %>% summarise_all(prod)
-posteriors
-
-winner <- names(posteriors)[which.max(posteriors)]
-
-posteriors %>% mutate(winner=winner)
-
-#test.pdfs %>% mutate(
-#tt = iris.mean.gp.by.Species[iris.mean.gp.by.Species$Species==Species,"Sepal.Width"]
-#)
-#iris.mean.gp.by.Species[iris.mean.gp.by.Species$Species=='setosa',"Sepal.Width"]
 
 
 
