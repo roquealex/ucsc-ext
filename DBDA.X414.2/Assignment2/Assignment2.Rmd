@@ -68,7 +68,7 @@ knitr::kable(test.data)
 #as.numeric(test.data[1,])
 ```
 
-Calculating the PDFs using a normal distribution using the mean and variance previously calculated.
+Calculating the PDFs using a normal distribution using the mean and variance previously calculated. Creating my own function taking the input vector and a vector of mean and variance.
 
 ```{r test_pdf}
 
@@ -81,6 +81,10 @@ Calculating the PDFs using a normal distribution using the mean and variance pre
 #print(i)
 #input.data <- test.data[i,]  
 
+calculateNorm <- function(x,input.mean,input.var) {
+  return(exp((-(x-input.mean)^2)/(2*input.var))/sqrt(2*pi*input.var))
+}
+
 calculatePdfs <- function(input.data) {
   species_names <- iris.Prob.gp.by.Species$Species
   pdfs <- sapply(iris.Prob.gp.by.Species$Species, function(x) {
@@ -92,10 +96,12 @@ calculatePdfs <- function(input.data) {
         iris.mean.gp.by.Species$Species==x,
         feature_names
         ]
-    pdf <- dnorm(
+    # Future summarise doesn't work if it is not numeric
+    #pdf <- calculateNorm((input.data),(this.mean),(this.var))
+    pdf <- calculateNorm(
       as.numeric(input.data),
-      mean = as.numeric(this.mean),
-      sd = as.numeric(sqrt(this.var))
+      input.mean=as.numeric(this.mean),
+      input.var=as.numeric(this.var)
       )
     return(pdf)
   })
@@ -126,14 +132,16 @@ for(i in 1:nrow(test.data)){
 
 pdfs.per.vector
 
+pdfs.per.vector[[1]][1,1]
+test.data[1,1]
 
 ```
 
-Using the dnorm function in r to calculate the value in the normal PDF. It uses standard deviation so getting the square root of the variance before calling it.
+The table will be read the value of the PDF of “row name” given “column name” for instance p(Sepal.Length=`r test.data[1,1]`|setosa)=`r pdfs.per.vector[[1]][1,1]`
 
-The table will be read the value of the PDF of “row name” given “column name” for instance p(Sepal.Length|setosa)=X 
+Multiplying the results of all the PDF values by the class probability too and picking up the class of the highest number. For each class (setosa, versicolor and virginica) we calculate:
 
-Multiplying the results of all the PDF values by the class probability too and picking up the class of the highest number.
+$$P(class)p(Sepal.Length|class)p(Sepal.Width|class)p(Petal.Length|class)p(Petal.Width|class)$$
 
 ```{r iris_class}
 #posteriors.per.vector <- list()
@@ -163,8 +171,7 @@ knitr::kable(posteriors.per.vector)
 
 ```
 
-
-
+The calculation of the “evidence” is omitted since will be a constant and won’t affect the result of the comparison.
 
 ```{r iris_extraction, include=FALSE}
 library(datasets)
