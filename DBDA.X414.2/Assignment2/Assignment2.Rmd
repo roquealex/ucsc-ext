@@ -60,7 +60,9 @@ test.data <- as.data.frame(
   matrix(c(4.5, 3.0, 5.6, 2.1, 5.4, 2.6, 4.5, 0.0),nrow=2,byrow=TRUE)
   )
 names(test.data) <- feature_names
-row.names(test.data)<-c("vector 1","vector 2")
+vector_names <- sapply(c(1:nrow(test.data)),function(x) {paste("Vector",x)})
+
+row.names(test.data)<-vector_names
 
 knitr::kable(test.data)
 
@@ -132,9 +134,6 @@ for(i in 1:nrow(test.data)){
 
 pdfs.per.vector
 
-pdfs.per.vector[[1]][1,1]
-test.data[1,1]
-
 ```
 
 The table will be read the value of the PDF of “row name” given “column name” for instance p(Sepal.Length=`r test.data[1,1]`|setosa)=`r pdfs.per.vector[[1]][1,1]`
@@ -166,7 +165,7 @@ posteriors.per.vector<- t(sapply(pdfs.per.vector, function(input.pdfs) {
  
 #}
 #i=1
-row.names(posteriors.per.vector)<-c("vector 1","vector 2")
+row.names(posteriors.per.vector)<-vector_names
 knitr::kable(posteriors.per.vector)
 
 ```
