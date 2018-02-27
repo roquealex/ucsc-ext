@@ -28,17 +28,13 @@ data(iris)
 Calculating the mean and the variance for each feature for each class.
 
 ```{r iris_summary}
-
 iris.gp.by.Species <- iris %>% group_by(Species)
 
 iris.mean.gp.by.Species <- iris.gp.by.Species %>% summarise_all(mean)
-
-knitr::kable(iris.mean.gp.by.Species)
+knitr::kable(iris.mean.gp.by.Species,caption = "Means by class")
 
 iris.var.gp.by.Species <- iris.gp.by.Species %>% summarise_all(var)
-
-knitr::kable(iris.var.gp.by.Species)
-
+knitr::kable(iris.var.gp.by.Species, caption = "Variances by class")
 ```
 
 Calculate the probability of each class.
@@ -47,8 +43,7 @@ Calculate the probability of each class.
 ntotal <- nrow(iris)
 iris.Prob.gp.by.Species <- iris.gp.by.Species %>%
   summarise(Prob=n()/ntotal)
-knitr::kable(iris.Prob.gp.by.Species)
-
+knitr::kable(iris.Prob.gp.by.Species, caption = "P(class)")
 ```
 
 Preparing the input test vectors for classification.
@@ -61,28 +56,13 @@ test.data <- as.data.frame(
   )
 names(test.data) <- feature_names
 vector_names <- sapply(c(1:nrow(test.data)),function(x) {paste("Vector",x)})
-
 row.names(test.data)<-vector_names
-
-knitr::kable(test.data)
-
-
-#as.numeric(test.data[1,])
+knitr::kable(test.data,caption = "Vectors")
 ```
 
 Calculating the PDFs using a normal distribution using the mean and variance previously calculated. Creating my own function taking the input vector and a vector of mean and variance.
 
 ```{r test_pdf}
-
-
-
-#for(i in 1:nrow(test.data)){
-
-#i=1
-
-#print(i)
-#input.data <- test.data[i,]  
-
 calculateNorm <- function(x,input.mean,input.var) {
   return(exp((-(x-input.mean)^2)/(2*input.var))/sqrt(2*pi*input.var))
 }
@@ -107,33 +87,20 @@ calculatePdfs <- function(input.data) {
       )
     return(pdf)
   })
-
-  #pdfs <- t(pdfs)
   rownames(pdfs) <- feature_names
   colnames(pdfs) <- species_names
-  #species_names
-  #str(pdfs)
-
   return(pdfs)
 }
 
 pdfs.per.vector <- list()
-#pdfs.per.vector
-#pdfs <- apply(test.data,2,function(x){return(x)})
-#pdfs <- apply(test.data,2,calculatePdfs)
 
 for(i in 1:nrow(test.data)){
   pdfs <- calculatePdfs(test.data[i,])
   pdfs
-  #pdfs.per.vector <- c(pdfs.per.vector,pdfs)
   pdfs.per.vector[[i]] <- pdfs
 }
 
-#knitr::kable(pdfs,caption=paste("PDF of rowname given colname for test vector",1))
-#knitr::kable(pdfs)
-
 pdfs.per.vector
-
 ```
 
 The table will be read the value of the PDF of “row name” given “column name” for instance p(Sepal.Length=`r test.data[1,1]`|setosa)=`r pdfs.per.vector[[1]][1,1]`
@@ -143,36 +110,22 @@ Multiplying the results of all the PDF values by the class probability too and p
 $$P(class)p(Sepal.Length|class)p(Sepal.Width|class)p(Petal.Length|class)p(Petal.Width|class)$$
 
 ```{r iris_class}
-#posteriors.per.vector <- list()
-
-#for (i in 1:length(pdfs.per.vector)) {
-
-#i = 1
-#probs <- rbind(pdfs.per.vector[[i]],iris.Prob.gp.by.Species$Prob)
-
-#i =1
-#input.pdfs <- pdfs.per.vector[[i]]
 posteriors.per.vector<- t(sapply(pdfs.per.vector, function(input.pdfs) {
   probs <- rbind(input.pdfs,iris.Prob.gp.by.Species$Prob)
   posteriors <- as.data.frame(probs) %>% summarise_all(prod)
-  #posteriors
   winner <- names(posteriors)[which.max(posteriors)]
   return(posteriors %>% mutate(winner=winner))
 }))
 
-#posteriors.per.vector[[i]] <- posteriors %>% mutate(winner=winner)
-
- 
-#}
-#i=1
 row.names(posteriors.per.vector)<-vector_names
-knitr::kable(posteriors.per.vector)
+knitr::kable(posteriors.per.vector,caption = "Classification")
 
 ```
 
 The calculation of the “evidence” is omitted since will be a constant and won’t affect the result of the comparison.
 
 ```{r iris_extraction, include=FALSE}
+# Deprecated code, new une uses dplyr and more compact
 library(datasets)
 data(iris)
 
