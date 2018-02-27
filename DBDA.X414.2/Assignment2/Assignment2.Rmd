@@ -17,7 +17,99 @@ knitr::opts_chunk$set(echo = TRUE)
 [4.5 3.0 5.6 2.1; 5.4 2.6 4.5 0.0] Don’t use the any R package. Show
 various steps involved and do as explained in the class.**
 
-```{r iris_extraction}
+posterior_setosa
+## 2.093198e-191
+## 7.233385e-08
+##  0.001185277
+
+Importing dataset and dplyr for better dataframe handling
+
+```{r iris_imports}
+library(datasets)
+library(dplyr)
+
+data(iris)
+```
+
+```{r iris_summary}
+
+iris.gp.by.Species <- iris %>% group_by(Species)
+
+iris.mean.gp.by.Species <- iris.gp.by.Species %>% summarise_all(mean)
+
+knitr::kable(iris.mean.gp.by.Species)
+
+iris.var.gp.by.Species <- iris.gp.by.Species %>% summarise_all(var)
+
+knitr::kable(iris.var.gp.by.Species)
+
+```
+
+```{r iris_prob}
+ntotal <- nrow(iris)
+iris.Prob.gp.by.Species <- iris.gp.by.Species %>% summarise(Prob=n()/ntotal)
+knitr::kable(iris.Prob.gp.by.Species)
+
+```
+
+```{r test_vectors}
+feature_names <- names(iris)
+feature_names <- feature_names[feature_names!="Species"]
+test.data <- as.data.frame(
+  matrix(c(4.5, 3.0, 5.6, 2.1, 5.4, 2.6, 4.5, 0.0),nrow=2,byrow=TRUE)
+  )
+names(test.data) <- feature_names
+knitr::kable(test.data)
+
+as.numeric(test.data[1,])
+```
+
+```{r test_pdf}
+
+#setosa_pdf <- dnorm(
+#as.numeric(test.data[1,]),
+#mean = as.numeric(iris.mean.gp.by.Species[iris.mean.gp.by.Species$Species=='setosa',feature_names]),
+#sd = as.numeric(sqrt(iris.var.gp.by.Species[iris.mean.gp.by.Species$Species=='setosa',feature_names]))
+#)
+
+species_names <- iris.Prob.gp.by.Species$Species
+pdfs <- sapply(iris.Prob.gp.by.Species$Species, function(x) {
+  #return(x)
+pdf <- dnorm(
+as.numeric(test.data[1,]),
+mean = as.numeric(iris.mean.gp.by.Species[iris.mean.gp.by.Species$Species==x,feature_names]),
+sd = as.numeric(sqrt(iris.var.gp.by.Species[iris.mean.gp.by.Species$Species==x,feature_names]))
+)
+})
+
+#pdfs <- t(pdfs)
+rownames(pdfs) <- feature_names
+colnames(pdfs) <- species_names
+species_names
+str(pdfs)
+
+knitr::kable(pdfs,caption=paste("PDF of rowname given colname for test vector",1))
+#test.pdfs <- data.frame(iris.Prob.gp.by.Species)
+
+probs <- rbind(pdfs,iris.Prob.gp.by.Species$Prob)
+
+posteriors <- as.data.frame(probs) %>% summarise_all(prod)
+posteriors
+
+winner <- names(posteriors)[which.max(posteriors)]
+
+posteriors %>% mutate(winner=winner)
+
+#test.pdfs %>% mutate(
+#tt = iris.mean.gp.by.Species[iris.mean.gp.by.Species$Species==Species,"Sepal.Width"]
+#)
+#iris.mean.gp.by.Species[iris.mean.gp.by.Species$Species=='setosa',"Sepal.Width"]
+```
+mean = iris.mean.gp.by.Species[iris.mean.gp.by.Species$Species=='setosa',feature_names],
+sd = sqrt(iris.var.gp.by.Species[iris.mean.gp.by.Species$Species=='setosa',feature_names])
+
+
+```{r iris_extraction, include=FALSE}
 library(datasets)
 data(iris)
 
