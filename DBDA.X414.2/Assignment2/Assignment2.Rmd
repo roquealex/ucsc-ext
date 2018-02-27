@@ -133,6 +133,17 @@ p_Petal.Width_virginica
 ## Sepal.Length  Sepal.Width Petal.Length  Petal.Width
 ##   0.40434286 0.10400408 0.30458776 0.07543265
 
+
+posterior_setosa <- P_setosa * p_Sepal.Length_setosa * p_Sepal.Width_setosa * p_Petal.Length_setosa * p_Petal.Width_setosa
+posterior_versicolor <- P_versicolor * p_Sepal.Length_versicolor * p_Sepal.Width_versicolor * p_Petal.Length_versicolor * p_Petal.Width_versicolor
+posterior_virginica <- P_virginica * p_Sepal.Length_virginica * p_Sepal.Width_virginica * p_Petal.Length_virginica * p_Petal.Width_virginica
+
+posterior_setosa
+posterior_versicolor
+posterior_virginica
+
+## 2.093198e-191
+
 ```
 
 
