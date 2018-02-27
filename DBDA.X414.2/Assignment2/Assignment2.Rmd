@@ -17,19 +17,28 @@ knitr::opts_chunk$set(echo = TRUE)
 [4.5 3.0 5.6 2.1; 5.4 2.6 4.5 0.0] Don’t use the any R package. Show
 various steps involved and do as explained in the class.**
 
-posterior_setosa
-## 2.093198e-191
-## 7.233385e-08
-##  0.001185277
+Importing iris dataset and dplyr for better dataframe handling
 
-Importing dataset and dplyr for better dataframe handling
-
-```{r iris_imports}
+```{r iris_imports,message=FALSE}
 library(datasets)
 library(dplyr)
-
 data(iris)
 ```
+
+Calculating the mean and the variance for each feature for each class.
+
+Calculate the probability of each class.
+
+Preparing the input test vectors for classification.
+
+Calculating the PDFs using a normal distribution using the mean and variance previously calculated.
+
+Using the dnorm function in r to calculate the value in the normal PDF. It uses standard deviation so getting the square root of the variance before calling it.
+
+The table will be read the value of the PDF of “row name” given “column name” for instance p(Sepal.Length|setosa)=X 
+
+Multiplying the results of all the PDF values by the class probability too and picking up the class of the highest number.
+
 
 ```{r iris_summary}
 
@@ -59,7 +68,10 @@ test.data <- as.data.frame(
   matrix(c(4.5, 3.0, 5.6, 2.1, 5.4, 2.6, 4.5, 0.0),nrow=2,byrow=TRUE)
   )
 names(test.data) <- feature_names
+row.names(test.data)<-c("vector 1","vector 2")
+
 knitr::kable(test.data)
+
 
 #as.numeric(test.data[1,])
 ```
