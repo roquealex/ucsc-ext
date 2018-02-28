@@ -11,6 +11,19 @@ knitr::opts_chunk$set(echo = TRUE)
 
 **1. What assumptions are made about the attributes in Naïve Bayes method of classification and why? What is Laplacian correction and why it is necessary?**
 
+The assumptions in the naïve bayes are that the features in the data set are equally important and independent. This simplifies the calculation of the conditional probability $p(X|C_k)$ to be a simple multiplication:
+
+$$p(X|C_k) = \prod_{i=1}^np(x_i|C_k)$$
+Where $X$ is the input feature vector and $x_i$ is the each individual feature value.
+
+This reduces the compute power needed to apply the model. It also reduces the size of the set required to train the model.
+
+A flaw in naïve bayes happens when one of the factors in the products of probabilities is zero because no example had that attribute in the training set for a particular class converting the whole probability in zero. The zero probability will dominate the final probability. For that we apply Laplace smoothing. According to Wikipedia this is the relationship:
+
+$$\hat{\theta_i}=\frac{x_i+\alpha}{N+\alpha d}$$
+$$(i=1,...,d)$$
+Where $\alpha>0$ is the smoothing parameter and as a result the estimate will create a value between the original probability $x_i/N$ and the uniform probability $1/d$
+
 **2.How can a decision tree be converted into a rule set? Illustrate with an example. What are the advantages of the rule set representation over the decision tree representation?**
 
 **3.Take the iris data. Use Naïve Bayes algorithm to find the species with the following two observations with attributes
