@@ -38,7 +38,7 @@ library(rpart.plot)
 data(iris)
 set.seed(1)
 dtree <- rpart(Species~., data=iris, method="class", parms=list(split="information"))
-prp(dtree, type=3,fallen.leaves=TRUE,main="Irirs decision tree")
+prp(dtree, type=3,fallen.leaves=TRUE,main="Iris Decision Tree")
 
 ```
 
@@ -112,7 +112,7 @@ calculatePdfs <- function(input.data) {
       feature_names
       ]
     this.var <- iris.var.gp.by.Species[
-        iris.mean.gp.by.Species$Species==x,
+        iris.var.gp.by.Species$Species==x,
         feature_names
         ]
     # Future summarise doesn't work if it is not numeric
@@ -133,7 +133,6 @@ pdfs.per.vector <- list()
 
 for(i in 1:nrow(test.data)){
   pdfs <- calculatePdfs(test.data[i,])
-  pdfs
   pdfs.per.vector[[i]] <- pdfs
 }
 
