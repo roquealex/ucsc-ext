@@ -18,7 +18,7 @@ Where $X$ is the input feature vector and $x_i$ is the each individual feature v
 
 This reduces the compute power needed to apply the model. It also reduces the size of the set required to train the model.
 
-A flaw in naïve bayes happens when one of the factors in the products of probabilities is zero because no example had that attribute in the training set for a particular class converting the whole probability in zero. The zero probability will dominate the final probability. For that we apply Laplace smoothing. According to Wikipedia this is the relationship:
+A flaw in naïve bayes happens when one of the factors in the products of probabilities is zero because no example had that attribute in the training set for a particular class converting the whole probability to zero. The zero probability will dominate the final probability. For that we apply Laplace smoothing. According to Wikipedia this is the relationship:
 
 $$\hat{\theta_i}=\frac{x_i+\alpha}{N+\alpha d}$$
 $$(i=1,...,d)$$
@@ -27,7 +27,7 @@ Where $\alpha>0$ is the smoothing parameter and as a result the estimate will cr
 **2.How can a decision tree be converted into a rule set? Illustrate with an example. What are the advantages of the rule set representation over the decision tree representation?**
 
 
-To convert a decision tree to a ruleset every leaf of the tree becomes a rule. To find the rule for the leaf we need to find the path from the root of the tree to the leaf and happy a logical "and" to all those conditions. An extra step would be to simplify the rule if there is redundancy.
+To convert a decision tree to a ruleset every leaf of the tree becomes a rule. To find the rule for the leaf we need to find the path from the root of the tree to the leaf and apply a logical "and" to all those conditions. An extra step would be to simplify the rule if there is redundancy.
 
 For instance this will be a decision tree extracted from the iris dataset:
 
@@ -74,7 +74,7 @@ iris.var.gp.by.Species <- iris.gp.by.Species %>% summarise_all(var)
 knitr::kable(iris.var.gp.by.Species, caption = "Variances by class")
 ```
 
-Calculate the probability of each class.
+Calculating the probability of each class.
 
 ```{r iris_prob}
 ntotal <- nrow(iris)
@@ -97,7 +97,8 @@ row.names(test.data)<-vector_names
 knitr::kable(test.data,caption = "Vectors")
 ```
 
-Calculating the PDFs using a normal distribution using the mean and variance previously calculated. Creating my own function taking the input vector and a vector of mean and variance.
+Calculating the PDFs as a normal distribution using the mean and variance previously calculated.
+Creating my own function taking the input vector and a vector of means and variances.
 
 ```{r test_pdf}
 calculateNorm <- function(x,input.mean,input.var) {
@@ -139,11 +140,11 @@ for(i in 1:nrow(test.data)){
 pdfs.per.vector
 ```
 
-The table will be read the value of the PDF of “row name” given “column name” for instance p(Sepal.Length=`r test.data[1,1]`|setosa)=`r pdfs.per.vector[[1]][1,1]`
+The table will be read *the value of the PDF of “row name” given “column name”* for instance p(Sepal.Length=`r test.data[1,1]`|setosa)=`r pdfs.per.vector[[1]][1,1]`
 
-Multiplying the results of all the PDF values by the class probability too and picking up the class of the highest number. For each class (setosa, versicolor and virginica) we calculate:
+Multiplying the results of all the PDF values by the class probability too and picking up the class with the highest number. For each class (setosa, versicolor and virginica) we calculate:
 
-$$P(class)p(Sepal.Length|class)p(Sepal.Width|class)p(Petal.Length|class)p(Petal.Width|class)$$
+$$P(Species)p(Sepal.Length|Species)p(Sepal.Width|Species)p(Petal.Length|Species)p(Petal.Width|Species)$$
 
 ```{r iris_class}
 posteriors.per.vector<- t(sapply(pdfs.per.vector, function(input.pdfs) {
@@ -158,7 +159,7 @@ knitr::kable(posteriors.per.vector,caption = "Classification")
 
 ```
 
-The calculation of the “evidence” is omitted since will be a constant and won’t affect the result of the comparison.
+The calculation of the "evidence" is omitted since it will be a constant and won’t affect the result of the comparison.
 
 ```{r iris_extraction, include=FALSE}
 # Deprecated code, new une uses dplyr and more compact
