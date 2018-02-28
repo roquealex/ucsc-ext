@@ -26,10 +26,29 @@ Where $\alpha>0$ is the smoothing parameter and as a result the estimate will cr
 
 **2.How can a decision tree be converted into a rule set? Illustrate with an example. What are the advantages of the rule set representation over the decision tree representation?**
 
-Every leaf that classifies becomes a rule,
 
-Find the path to leaf from root and all conditions that the tree satisfies.
+To convert a decision tree to a ruleset every leaf of the tree becomes a rule. To find the rule for the leaf we need to find the path from the root of the tree to the leaf and happy a logical "and" to all those conditions. An extra step would be to simplify the rule if there is redundancy.
 
+For instance this will be a decision tree extracted from the iris dataset:
+
+
+```{r dtree_example,echo=FALSE}
+library(rpart)
+library(rpart.plot)
+data(iris)
+set.seed(1)
+dtree <- rpart(Species~., data=iris, method="class", parms=list(split="information"))
+prp(dtree, type=3,fallen.leaves=TRUE,main="Irirs decision tree")
+
+```
+
+And the rules:
+
+* if(Petal.Length < 2.5) Species = setosa
+* if(Petal.length >= 2.5 AND Petal.width < 1.8) Species = versicolor
+* if(Petal.length >= 2.5 AND Petal.width >= 1.8) Species = virginica
+
+The advantage of the rule representation is that it is easier for coding or databases.
 
 **3.Take the iris data. Use Naïve Bayes algorithm to find the species with the following two observations with attributes
 [4.5 3.0 5.6 2.1; 5.4 2.6 4.5 0.0] Don’t use the any R package. Show
