@@ -48,7 +48,7 @@ And the rules:
 * if(Petal.length >= 2.5 AND Petal.width < 1.8) Species = versicolor
 * if(Petal.length >= 2.5 AND Petal.width >= 1.8) Species = virginica
 
-The advantage of the rule representation is that it is easier for coding or databases.
+The advantage of the rule representation is that it is easier to implement or use  as a report or in a database system.
 
 **3.Take the iris data. Use Naïve Bayes algorithm to find the species with the following two observations with attributes
 [4.5 3.0 5.6 2.1; 5.4 2.6 4.5 0.0] Don’t use the any R package. Show
@@ -293,64 +293,3 @@ posterior_virginica
 
 
 
-**1.What is machine learning? What is the difference between data mining and machine learning? (2 points)**
-
-Machine learning is the area of computer science that designs algorithms to learn patterns from historical data. It is based on training the algorithm with an input training set typically using statistical approaches. The algorithm should be able to generalize.
-
-Data mining is in charge of discovering patterns and finding structure in a large and unstructured data sets. Machine Learning could be used as a tool for data mining but it also involve the use of other tools and techniques as database systems, visualization tools, etc.
-
-**2. What is supervised and unsupervised learning? Give examples and applications where each can be used (2 points)**
-
-In supervised learning the input training set is labeled. The goal is to find or approximate a function that best describes the relationship between the inputs and the outputs (labels). Supervised learning can be further divided into classification if the output is a set of discrete values and regression if the output is a continuous value.
-
-Some examples would be credit card fraud detection, spam detection and image recognition in case of classification. An example of regression would be predicting stock value based on historical data.
-
-In unsupervised learning the training data is given without labels. The goal is to find the structure or distribution of the input data. The most common type of unsupervised algorithm is clustering where we try to group the training set according to similarities. For instance we can group customers by shopping habits.
-
-**3.What is normalization and why do you perform? Explain with examples. What are the different techniques used? (2 points)**
-
-Normalization is the process to convert columns in a dataset that were measured in different scales to a common scale usually between 0 and 1.
-
-It is used because different machine learning algorithms may be sensitive to the scale of the features. For instance if we use the Euclidean distance in kNN algorithm, the feature that uses the bigger scale will have more weight on the decision to find the nearest neighbors if we don’t normalize data.
-
-Lets take an example where we have two features to try to predict the damage of a building in an earthquake: one of them is magnitude of earthquake (Richter) and the other is the number of storeys in the building.
-
-Let’s assume our training set has one point with a magnitude 2 and the number of storeys is 20 and another point with a magnitude of 7 and number of storeys is 25. If we are given a 3rd test point where the magnitude is 3.5 and the storeys are 24 and we calculate the Euclidean distance then the nearest point of the two mentioned will be the one with the magnitude 7 earthquake since there is only 1 floor difference and 3.5 magnitude difference compared to the other point with 1.5 magnitude and 4 floors of difference.
-
-If we assume that the magnitude in the whole training set has a range from 1 to 8 and the number of storeys has a range from 1 to 50 and we normalize from 0 to 1 both features we will see that the magnitude difference is much more important than the floor difference in this case.
-
-Some techniques used (from lecture2b) are:
-
-* Min and max:
-
-$$v' = \frac{v-min_A}{max_A-min_A}(newmax_A-newmin_A) +newmin_A$$
-
-* Z-score:
-$$v' = \frac{v-mean_A}{stdev_A}$$
-
-* Decimal scaling
-$$v' = \frac{v}{10^j}$$
-Where $j$ is the smallest integer such that $Max(|v'|)<1$
-
-**4.What does K stand in K-nearest neighbor algorithm? How do you determine the optimal value of K. Take Wisconsin cancer data (provided), determine the optimal
-value of K. Plot misclassification error for test as well as training data. ( 4 points)**
-
-The parameter *k* is the number of nearest neighbors to be found by the algorithm given an input test point. The majority class label will be assigned to the test point.
-
-```{r data_setup, include=FALSE}
-#source('KNN.r')
-```
-
-The parameter is typically chosen to be an odd number to avoid a tie. As a rule of thumb we can pick *k* to be the square root of the number of elements in the training set:
-
-```{r k_size}
-#k_thumb <- sqrt(nrow(wbcd_train))
-#k_thumb
-```
-
-Trying different values of *k*:
-
-```{r k_test}
-#k_test <- seq(1,k_thumb*2,2)
-#k_test
-```
