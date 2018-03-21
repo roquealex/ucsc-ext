@@ -1,3 +1,7 @@
+# Data set:
+#https://archive.ics.uci.edu/ml/datasets/sms+spam+collection
+# sample is just the first 10 to test the algorithm
+
 smsfile <- "SMSSpamCollection"
 #smsfile <- "sample"
 smsds <- read.table(smsfile,sep="\t",stringsAsFactors = FALSE,quote="",col.names=c("Class","Text"))
@@ -109,3 +113,9 @@ library(caret)
 cm <- confusionMatrix(results,reference=test$isSpam)
 
 print(cm)
+
+#Reference
+#Prediction FALSE TRUE
+#FALSE   956    6
+#TRUE     14  139
+
