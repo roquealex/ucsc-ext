@@ -1,6 +1,9 @@
 # Data set:
 #https://archive.ics.uci.edu/ml/datasets/sms+spam+collection
 # sample is just the first 10 to test the algorithm
+library(text2vec)
+#library(data.table)
+library(magrittr)
 
 smsfile <- "SMSSpamCollection"
 #smsfile <- "sample"
@@ -100,13 +103,21 @@ dtm_test = create_dtm(it_test, vectorizer)
 dtm_test_matrix <- as.matrix(dtm_test)
 
 numTestDocs <- nrow(dtm_test_matrix)
-results <- test$isSpam;
+#results <- test$isSpam;
+results <- logical(numTestDocs)
+
 for ( i in 1:numTestDocs) {
   testvec <- dtm_test_matrix[i,]
   results[i] <- nbClassify(testvec,p0Vect,p1Vect,pSpam)
-  #results[i] <- FALSE
   print(results[i])
 }
+
+# Doesn't work
+#results<- sapply(dtm_test_matrix,function(testvec){
+#  result <- nbClassify(testvec,p0Vect,p1Vect,pSpam)
+#  print(result)
+#  return(result)
+#})
 
 library(caret)
 
