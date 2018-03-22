@@ -143,13 +143,13 @@ dtm_test_matrix <- as.matrix(dtm_test)
 #### Apply the model to the testing set ####
 
 numTestDocs <- nrow(dtm_test_matrix)
+resultsOld <- logical(numTestDocs)
 results <- logical(numTestDocs)
-resultsNew <- logical(numTestDocs)
 
 for ( i in 1:numTestDocs) {
   testvec <- dtm_test_matrix[i,]
-  results[i] <- nbClassify(testvec,p0Vect,p1Vect,pSpam)
-  resultsNew[i] <- predictNaiveBayes(nbModel,testvec)
+  resultsOld[i] <- nbClassify(testvec,p0Vect,p1Vect,pSpam)
+  results[i] <- predictNaiveBayes(nbModel,testvec)
   print(results[i])
 }
 
@@ -162,7 +162,7 @@ for ( i in 1:numTestDocs) {
 
 #### Models Performance ####
 
-cm <- confusionMatrix(resultsNew,reference=test$isSpam)
+cm <- confusionMatrix(results,reference=test$isSpam)
 
 print(cm)
 
@@ -171,6 +171,6 @@ print(cm)
 #FALSE   956    6
 #TRUE     14  139
 
-#all(results==resultsNew)
+#all(resultsOld==results)
 #all(nbModel$pPosVectLog==p1Vect)
 
