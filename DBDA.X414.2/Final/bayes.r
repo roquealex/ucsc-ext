@@ -101,22 +101,6 @@ trainNaiveBayes <- function(train.matrix, train.class) {
 
 nbModel <- trainNaiveBayes(dtm_train_matrix,train$isSpam)
 
-#train.matrix <- dtm_train_matrix
-#train.class <- train$isSpam
-#posSum <- colSums(train.matrix[train.class,])
-#negSum <- colSums(train.matrix[!train.class,])
-#posTotal <- sum(posSum)
-#negTotal <- sum(negSum)
-## Applying laplace smoothing to avoid 0 probability adding 1 count to each word
-#posSum <- posSum + 1
-#negSum <- negSum + 1
-## extra 2 in the denuminator
-#posTotal <- posTotal + 2 
-#negTotal <- negTotal + 2
-#pPos <- sum(train.class)/length(train.class)
-#pPosVectLog <- log(posSum/posTotal)
-#pNegVectLog <- log(negSum/negTotal)
-
 nbClassify <- function(vec2Classify,p0Vec,p1Vec,pClass1) {
   p1 <- sum(vec2Classify * p1Vec) + log(pClass1)
   p0 <- sum(vec2Classify * p0Vec) + log(1.0 - pClass1)
