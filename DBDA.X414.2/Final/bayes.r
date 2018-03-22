@@ -41,8 +41,9 @@ predictNaiveBayes <- function(nbModel,input.vector) {
   return (pPosGI > pNegGI)
 }
 
+set.seed(1L)
 
-
+#### Read the data source ####
 
 smsfile <- "SMSSpamCollection"
 #smsfile <- "sample"
@@ -51,6 +52,8 @@ smsds$ID <- seq.int(nrow(smsds))
 smsds$isSpam <- smsds$Class=="spam"
 smsds$Class <- factor(smsds$Class)
 str(smsds)
+
+#### Divide the data set in training and testing ####
 
 #train <- smsds
 #test <- smsds
@@ -63,6 +66,7 @@ low20 <- total - top80
 train <- head(smsds,top80)
 test <- tail(smsds,low20)
 
+#### Create Vocabulary ####
 
 ## Coppied from web
 prep_fun <- tolower
@@ -77,6 +81,7 @@ vocab <- create_vocabulary(it_train)
 
 vocab
 
+#### Create Training Document Term Matrix ####
 vectorizer = vocab_vectorizer(vocab)
 
 dtm_train = create_dtm(it_train, vectorizer)
@@ -84,9 +89,12 @@ dtm_train = create_dtm(it_train, vectorizer)
 str(dtm_train)
 dim(dtm_train)
 
+# Our naive bayes works with the matrix alone
 dtm_train_matrix <- as.matrix(dtm_train)
 
 #dtm_train_matrix_spam <- dtm_train_matrix[train$Class=="spam"]
+
+#### Train the Model ####
 
 #### Start of book function ####
 #nrow(dtm_train_matrix)
@@ -121,7 +129,7 @@ p0Vect <- log(p0Num/p0Denom)
 
 nbModel <- trainNaiveBayes(dtm_train_matrix,train$isSpam)
 
-#testing
+#### Create Testing Document Term Matrix ####
 
 it_test = test$Text %>% 
   prep_fun %>% tok_fun %>% 
@@ -130,13 +138,11 @@ it_test = test$Text %>%
 
 dtm_test = create_dtm(it_test, vectorizer)
 
-
-#test <- train
-#dtm_test_matrix <- dtm_train_matrix
 dtm_test_matrix <- as.matrix(dtm_test)
 
+#### Apply the model to the testing set ####
+
 numTestDocs <- nrow(dtm_test_matrix)
-#results <- test$isSpam;
 results <- logical(numTestDocs)
 resultsNew <- logical(numTestDocs)
 
@@ -154,7 +160,7 @@ for ( i in 1:numTestDocs) {
 #  return(result)
 #})
 
-
+#### Models Performance ####
 
 cm <- confusionMatrix(resultsNew,reference=test$isSpam)
 
