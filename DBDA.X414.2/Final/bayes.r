@@ -30,7 +30,7 @@ predictNaiveBayes <- function(nbModel,input.vector) {
   return (pPosGI > pNegGI)
 }
 
-# Based on the book, to be deleted in favor of the previos:
+# Based on the book, to be deleted in favor of the previous:
 nbClassify <- function(vec2Classify,p0Vec,p1Vec,pClass1) {
   p1 <- sum(vec2Classify * p1Vec) + log(pClass1)
   p0 <- sum(vec2Classify * p0Vec) + log(1.0 - pClass1)
@@ -61,7 +61,7 @@ str(smsds)
 
 # Train and testing
 total<- nrow(smsds)
-top80 <- total *0.8
+top80 <- as.integer(total *0.8)
 low20 <- total - top80
 
 train <- head(smsds,top80)
@@ -175,3 +175,7 @@ print(cm)
 #all(resultsOld==results)
 #all(nbModel$pPosVectLog==p1Vect)
 
+#> nrow(test)
+#[1] 1115
+#> nrow(train)
+#[1] 4459
