@@ -24,6 +24,13 @@ trainNaiveBayes <- function(train.matrix, train.class) {
   return(list("pPos"=pPos, "pPosVectLog"=pPosVectLog, "pNegVectLog"=pNegVectLog))
 }
 
+predictNaiveBayes <- function(nbModel,input.vector) {
+  pPosGI <- sum(input.vector * nbModel$pPosVectLog) + log(nbModel$pPos)
+  pNegGI <- sum(input.vector * nbModel$pNegVectLog) + log(1.0 - nbModel$pPos)
+  return (pPosGI > pNegGI)
+}
+
+# Based on the book, to be deleted in favor of the previos:
 nbClassify <- function(vec2Classify,p0Vec,p1Vec,pClass1) {
   p1 <- sum(vec2Classify * p1Vec) + log(pClass1)
   p0 <- sum(vec2Classify * p0Vec) + log(1.0 - pClass1)
@@ -33,12 +40,6 @@ nbClassify <- function(vec2Classify,p0Vec,p1Vec,pClass1) {
     return(FALSE)
   }
 
-}
-
-predictNaiveBayes <- function(nbModel,input.vector) {
-  pPosGI <- sum(input.vector * nbModel$pPosVectLog) + log(nbModel$pPos)
-  pNegGI <- sum(input.vector * nbModel$pNegVectLog) + log(1.0 - nbModel$pPos)
-  return (pPosGI > pNegGI)
 }
 
 set.seed(1L)
