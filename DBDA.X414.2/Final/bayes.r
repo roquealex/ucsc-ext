@@ -14,6 +14,7 @@ smsds$Class <- factor(smsds$Class)
 str(smsds)
 
 #train <- smsds
+#test <- smsds
 
 # Train and testing
 total<- nrow(smsds)
@@ -48,6 +49,7 @@ dtm_train_matrix <- as.matrix(dtm_train)
 
 #dtm_train_matrix_spam <- dtm_train_matrix[train$Class=="spam"]
 
+#### Start of book function ####
 #nrow(dtm_train_matrix)
 numTrainDocs <- nrow(dtm_train_matrix)
 numWords <- ncol(dtm_train_matrix)
@@ -76,6 +78,44 @@ for ( i in 1:numTrainDocs) {
 
 p1Vect <- log(p1Num/p1Denom) 
 p0Vect <- log(p0Num/p0Denom) 
+#### End of book function ####
+
+## R version ##
+trainNaiveBayes <- function(train.matrix, train.class) {
+  posSum <- colSums(train.matrix[train.class,])
+  negSum <- colSums(train.matrix[!train.class,])
+  posTotal <- sum(posSum)
+  negTotal <- sum(negSum)
+  # Applying laplace smoothing to avoid 0 probability adding 1 count to each word
+  posSum <- posSum + 1
+  negSum <- negSum + 1
+  # extra 2 in the denuminator
+  posTotal <- posTotal + 2 
+  negTotal <- negTotal + 2
+  pPos <- sum(train.class)/length(train.class)
+  pPosVectLog <- log(posSum/posTotal)
+  pNegVectLog <- log(negSum/negTotal)
+  # all(pNegVect==p0Vect)
+  return(list("pPos"=pPos, "pPosVectLog"=pPosVectLog, "pNegVectLog"=pNegVectLog))
+}
+
+nbModel <- trainNaiveBayes(dtm_train_matrix,train$isSpam)
+
+#train.matrix <- dtm_train_matrix
+#train.class <- train$isSpam
+#posSum <- colSums(train.matrix[train.class,])
+#negSum <- colSums(train.matrix[!train.class,])
+#posTotal <- sum(posSum)
+#negTotal <- sum(negSum)
+## Applying laplace smoothing to avoid 0 probability adding 1 count to each word
+#posSum <- posSum + 1
+#negSum <- negSum + 1
+## extra 2 in the denuminator
+#posTotal <- posTotal + 2 
+#negTotal <- negTotal + 2
+#pPos <- sum(train.class)/length(train.class)
+#pPosVectLog <- log(posSum/posTotal)
+#pNegVectLog <- log(negSum/negTotal)
 
 nbClassify <- function(vec2Classify,p0Vec,p1Vec,pClass1) {
   p1 <- sum(vec2Classify * p1Vec) + log(pClass1)
@@ -86,6 +126,12 @@ nbClassify <- function(vec2Classify,p0Vec,p1Vec,pClass1) {
     return(FALSE)
   }
 
+}
+
+predictNaiveBayes <- function(nbModel,input.vector) {
+  pPosGI <- sum(input.vector * nbModel$pPosVectLog) + log(nbModel$pPos)
+  pNegGI <- sum(input.vector * nbModel$pNegVectLog) + log(1.0 - nbModel$pPos)
+  return (pPosGI > pNegGI)
 }
 
 #testing
@@ -105,10 +151,12 @@ dtm_test_matrix <- as.matrix(dtm_test)
 numTestDocs <- nrow(dtm_test_matrix)
 #results <- test$isSpam;
 results <- logical(numTestDocs)
+resultsNew <- logical(numTestDocs)
 
 for ( i in 1:numTestDocs) {
   testvec <- dtm_test_matrix[i,]
   results[i] <- nbClassify(testvec,p0Vect,p1Vect,pSpam)
+  resultsNew[i] <- predictNaiveBayes(nbModel,testvec)
   print(results[i])
 }
 
@@ -121,7 +169,7 @@ for ( i in 1:numTestDocs) {
 
 library(caret)
 
-cm <- confusionMatrix(results,reference=test$isSpam)
+cm <- confusionMatrix(resultsNew,reference=test$isSpam)
 
 print(cm)
 
@@ -129,4 +177,7 @@ print(cm)
 #Prediction FALSE TRUE
 #FALSE   956    6
 #TRUE     14  139
+
+#all(results==resultsNew)
+#all(nbModel$pPosVectLog==p1Vect)
 
