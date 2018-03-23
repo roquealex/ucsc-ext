@@ -30,6 +30,17 @@ predictNaiveBayes <- function(nbModel,input.vector) {
   return (pPosGI > pNegGI)
 }
 
+readSmsSpamSource <- function(smsfile) {
+  smsds <- read.table(smsfile,sep="\t",stringsAsFactors = FALSE,quote="",col.names=c("Class","Text"))
+  # There are some duplicated:
+  #dups <- duplicated(smsds)
+  #smsds <- smsds[!dups,]
+  smsds$ID <- seq.int(nrow(smsds))
+  smsds$isSpam <- smsds$Class=="spam"
+  smsds$Class <- factor(smsds$Class)
+  return(smsds)
+}
+
 # Based on the book, to be deleted in favor of the previous:
 nbClassify <- function(vec2Classify,p0Vec,p1Vec,pClass1) {
   p1 <- sum(vec2Classify * p1Vec) + log(pClass1)
@@ -46,54 +57,69 @@ set.seed(1L)
 
 #### Read the data source ####
 
-smsfile <- "SMSSpamCollection"
-#smsfile <- "sample"
-smsds <- read.table(smsfile,sep="\t",stringsAsFactors = FALSE,quote="",col.names=c("Class","Text"))
-smsds$ID <- seq.int(nrow(smsds))
-smsds$isSpam <- smsds$Class=="spam"
-smsds$Class <- factor(smsds$Class)
-str(smsds)
+smsds <- readSmsSpamSource("SMSSpamCollection")
 
 #### Divide the data set in training and testing ####
 
-#train <- smsds
-#test <- smsds
+divideTrainAndTest <- function(dataset) {
+  #train <- smsds
+  #test <- smsds
+  
+  # Train and testing
+  total<- nrow(smsds)
+  top80 <- as.integer(total *0.8)
+  low20 <- total - top80
+  
+  train <- head(smsds,top80)
+  test <- tail(smsds,low20)
+  return(list("train"=train,"test"=test))
+}
 
-# Train and testing
-total<- nrow(smsds)
-top80 <- as.integer(total *0.8)
-low20 <- total - top80
+ds <- divideTrainAndTest(smsds)
+train <- ds$train
+test <- ds$test
 
-train <- head(smsds,top80)
-test <- tail(smsds,low20)
+#### Create Vocabulary and DTMs ####
 
-#### Create Vocabulary ####
+createVocabularyAndDTMs <- function(train,test) {
+  ## Coppied from web
+  prep_fun <- tolower
+  tok_fun <- word_tokenizer
+  
+  it_train <- itoken(train$Text, 
+                     preprocessor = prep_fun, 
+                     tokenizer = tok_fun, 
+                     ids = train$ID, 
+                     progressbar = FALSE)
+  vocab <- create_vocabulary(it_train)
+  
+  vocab
+  
+  #### Create Training Document Term Matrix ####
+  vectorizer = vocab_vectorizer(vocab)
+  
+  dtm_train = create_dtm(it_train, vectorizer)
+  
+  
+  #### Create Testing Document Term Matrix ####
+  
+  it_test = test$Text %>% 
+    prep_fun %>% tok_fun %>% 
+    itoken(ids = test$ID, progressbar = FALSE)
+  
+  dtm_test = create_dtm(it_test, vectorizer)
+  
+  return(list("vocab"=vocab,"trainDTM"=dtm_train,"testDTM"=dtm_test))
+}
 
-## Coppied from web
-prep_fun <- tolower
-tok_fun <- word_tokenizer
-
-it_train <- itoken(train$Text, 
-                   preprocessor = prep_fun, 
-                   tokenizer = tok_fun, 
-                   ids = train$ID, 
-                   progressbar = FALSE)
-vocab <- create_vocabulary(it_train)
-
-vocab
-
-#### Create Training Document Term Matrix ####
-vectorizer = vocab_vectorizer(vocab)
-
-dtm_train = create_dtm(it_train, vectorizer)
-
-str(dtm_train)
-dim(dtm_train)
-
+textVec <- createVocabularyAndDTMs(train,test)
 # Our naive bayes works with the matrix alone
-dtm_train_matrix <- as.matrix(dtm_train)
+dtm_train_matrix <- as.matrix(textVec$trainDTM)
+dtm_test_matrix <- as.matrix(textVec$testDTM)
 
-#dtm_train_matrix_spam <- dtm_train_matrix[train$Class=="spam"]
+#dtm_train_matrix <- as.matrix(dtm_train)
+#dtm_test_matrix <- as.matrix(dtm_test)
+
 
 #### Train the Model ####
 
@@ -130,16 +156,6 @@ p0Vect <- log(p0Num/p0Denom)
 
 nbModel <- trainNaiveBayes(dtm_train_matrix,train$isSpam)
 
-#### Create Testing Document Term Matrix ####
-
-it_test = test$Text %>% 
-  prep_fun %>% tok_fun %>% 
-  # turn off progressbar because it won't look nice in rmd
-  itoken(ids = test$ID, progressbar = FALSE)
-
-dtm_test = create_dtm(it_test, vectorizer)
-
-dtm_test_matrix <- as.matrix(dtm_test)
 
 #### Apply the model to the testing set ####
 
