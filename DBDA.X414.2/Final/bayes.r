@@ -6,30 +6,6 @@ library(text2vec)
 library(magrittr)
 library(caret)
 
-## R version ##
-trainNaiveBayes <- function(train.matrix, train.class) {
-  posSum <- colSums(train.matrix[train.class,])
-  negSum <- colSums(train.matrix[!train.class,])
-  posTotal <- sum(posSum)
-  negTotal <- sum(negSum)
-  # Applying laplace smoothing to avoid 0 probability adding 1 count to each word
-  posSum <- posSum + 1
-  negSum <- negSum + 1
-  # extra 2 in the denuminator
-  posTotal <- posTotal + 2 
-  negTotal <- negTotal + 2
-  pPos <- sum(train.class)/length(train.class)
-  pPosVectLog <- log(posSum/posTotal)
-  pNegVectLog <- log(negSum/negTotal)
-  return(list("pPos"=pPos, "pPosVectLog"=pPosVectLog, "pNegVectLog"=pNegVectLog))
-}
-
-predictNaiveBayes <- function(nbModel,input.vector) {
-  pPosGI <- sum(input.vector * nbModel$pPosVectLog) + log(nbModel$pPos)
-  pNegGI <- sum(input.vector * nbModel$pNegVectLog) + log(1.0 - nbModel$pPos)
-  return (pPosGI > pNegGI)
-}
-
 readSmsSpamSource <- function(smsfile) {
   smsds <- read.table(smsfile,sep="\t",stringsAsFactors = FALSE,quote="",col.names=c("Class","Text"))
   # There are some duplicated:
@@ -40,26 +16,6 @@ readSmsSpamSource <- function(smsfile) {
   smsds$Class <- factor(smsds$Class)
   return(smsds)
 }
-
-# Based on the book, to be deleted in favor of the previous:
-nbClassify <- function(vec2Classify,p0Vec,p1Vec,pClass1) {
-  p1 <- sum(vec2Classify * p1Vec) + log(pClass1)
-  p0 <- sum(vec2Classify * p0Vec) + log(1.0 - pClass1)
-  if (p1 > p0) {
-    return(TRUE)
-  } else {
-    return(FALSE)
-  }
-
-}
-
-set.seed(1L)
-
-#### Read the data source ####
-
-smsds <- readSmsSpamSource("SMSSpamCollection")
-
-#### Divide the data set in training and testing ####
 
 divideTrainAndTest <- function(dataset) {
   #train <- smsds
@@ -74,12 +30,6 @@ divideTrainAndTest <- function(dataset) {
   test <- tail(smsds,low20)
   return(list("train"=train,"test"=test))
 }
-
-ds <- divideTrainAndTest(smsds)
-train <- ds$train
-test <- ds$test
-
-#### Create Vocabulary and DTMs ####
 
 createVocabularyAndDTMs <- function(train,test) {
   ## Coppied from web
@@ -111,6 +61,61 @@ createVocabularyAndDTMs <- function(train,test) {
   
   return(list("vocab"=vocab,"trainDTM"=dtm_train,"testDTM"=dtm_test))
 }
+
+trainNaiveBayes <- function(train.matrix, train.class) {
+  posSum <- colSums(train.matrix[train.class,])
+  negSum <- colSums(train.matrix[!train.class,])
+  posTotal <- sum(posSum)
+  negTotal <- sum(negSum)
+  # Applying laplace smoothing to avoid 0 probability adding 1 count to each word
+  posSum <- posSum + 1
+  negSum <- negSum + 1
+  # extra 2 in the denuminator
+  posTotal <- posTotal + 2 
+  negTotal <- negTotal + 2
+  pPos <- sum(train.class)/length(train.class)
+  pPosVectLog <- log(posSum/posTotal)
+  pNegVectLog <- log(negSum/negTotal)
+  return(list("pPos"=pPos, "pPosVectLog"=pPosVectLog, "pNegVectLog"=pNegVectLog))
+}
+
+predictNaiveBayes <- function(nbModel,input.vector) {
+  pPosGI <- sum(input.vector * nbModel$pPosVectLog) + log(nbModel$pPos)
+  pNegGI <- sum(input.vector * nbModel$pNegVectLog) + log(1.0 - nbModel$pPos)
+  return (pPosGI > pNegGI)
+}
+
+# Based on the book, to be deleted in favor of the previous:
+nbClassify <- function(vec2Classify,p0Vec,p1Vec,pClass1) {
+  p1 <- sum(vec2Classify * p1Vec) + log(pClass1)
+  p0 <- sum(vec2Classify * p0Vec) + log(1.0 - pClass1)
+  if (p1 > p0) {
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+
+}
+
+# This is just debug code, the report and presentation is based on this code.
+# If you want to execute change the FALSE to TRUE
+if (TRUE) {
+
+#### Main ####
+
+set.seed(1L)
+
+#### Read the data source ####
+
+smsds <- readSmsSpamSource("SMSSpamCollection")
+
+#### Divide the data set in training and testing ####
+
+ds <- divideTrainAndTest(smsds)
+train <- ds$train
+test <- ds$test
+
+#### Create Vocabulary and DTMs ####
 
 textVec <- createVocabularyAndDTMs(train,test)
 # Our naive bayes works with the matrix alone
@@ -195,3 +200,5 @@ print(cm)
 #[1] 1115
 #> nrow(train)
 #[1] 4459
+
+}
