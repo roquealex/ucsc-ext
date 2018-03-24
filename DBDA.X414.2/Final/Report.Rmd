@@ -109,7 +109,7 @@ $$P(word|C)=\frac{\text{Times word is in class C}}{\text{Total number of words i
 
 ### Implementation
 
-We tried two naive bayes implementations from "naivebayes" and "e1071" but they didn’t work. It looks like whenever they see numerical matrices they try to use the mean and standard deviation approach. Because of these we implemented our own version of naive bayes based on counting words based on the book “Machine Learning in Action” chapter 4.
+We tried two naive bayes implementations from "naivebayes"" and "e1071"" but they didn't work. It looks like whenever they see numerical matrices they try to use the mean and standard deviation approach. Because of these we implemented our own version of naive bayes based on counting words. We got the algorithm from the book “Machine Learning in Action” chapter 4 and did a much simpler R implementation.
 
 The basic algorithm we implemented goes like this:
 
@@ -152,7 +152,7 @@ logSeq <- log(linearSeq)
 logTestP <- log(testP)
 ```
 
-If we take for example 2 probabilities P1=`r testP[1]` and P2=`r testP[2]` we know that P2>P1. In the logarithmic scale we have log(P1)=`r logTestP[1]` and log(P2)=`r logTestP[2]`, the relation log(P2)>log(P1) still remains true.
+If we take for example 2 probabilities $P_1$=`r testP[1]` and $P_2$=`r testP[2]` we know that $P_2>P_1$. In the logarithmic scale we have $\log(P_1)=$`r logTestP[1]` and $\log(P_2)$=`r logTestP[2]`, the relation $\log(P_2)>\log(P_1)$ still remains true.
 
 ```{r logexampleplot, echo=FALSE}
 par(mfcol=c(1,2))
@@ -165,4 +165,9 @@ points(x=testP[1],y=logTestP[1],col="red",pch=15)
 points(x=testP[2],y=logTestP[2],col="red",pch=16)
 ```
 
+At the end of the training phase we have three things:
+
+1. The probability of being "spam" $P(spam)$. The "ham" one is just the complement.
+2. A vector containing for each word in the vocabulary the conditional probability $\log(P(word|spam))$. The vector will be column consistent with our training DTM.
+3. A vector containing for each word in the vocabulary the conditional probability $\log(P(word|ham))$. The vector will be column consistent with our training DTM.
 
