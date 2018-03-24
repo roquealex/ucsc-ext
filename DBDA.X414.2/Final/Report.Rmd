@@ -105,8 +105,42 @@ $$P(W=[how:1,come:1]|C)=P(how|C)P(come|C)$$
 
 Our training process will consist of calculating the conditional probabilities for each word in the vocabulary given the class, where the classes are ham and spam. To calculate the probability of an individual word we count how many times that word appears across the given class and divide it by the total number of words in that given class.
 
-$$P(word|C)=\frac{\text{Times word is in C}}{\text{Total number of words in C}}$$
+$$P(word|C)=\frac{\text{Times word is in class C}}{\text{Total number of words in class C}}$$
+
+### Implementation
+
+We tried two naive bayes implementations from "naivebayes" and "e1071" but they didn’t work. It looks like whenever they see numerical matrices they try to use the mean and standard deviation approach. Because of these we implemented our own version of naive bayes based on counting words based on the book “Machine Learning in Action” chapter 4.
+
+The basic algorithm we implemented goes like this:
+
+1. Filter the input DTM using the class and separate into 2 new DTMs: DTMSpam and DTMHam.
+2. Reduce each DTM into a single vector by applying column sum (colSums function in r). This will give a vector of the total number of a given words present in the class (the numerator).
+3. To get the denominator value is as simple as applying a sum to each vector. This is a single number representing the total number of words per class.
+4. Create a conditional probability per class vectors by dividing the numerator vector calculated in step 2 by the denominator calculated in step 3.
+5. Calculate $P(Spam)$ by dividing the number of elements in the training set labeled as Spam by the total size of the training set. $P(Ham) = 1 - P(Spam)$
+
+This is an example of how we would apply the sum per column in the DTM:
+
+DTMSpam  | Word1 | Word2 | Word3 | ... | WordN
+---------|-------|-------|-------|-----|-------
+SMS1     |   1   |   0   |   0   | ... |   1
+SMS2     |   0   |   2   |   0   | ... |   0
+SMS3     |   0   |   1   |   0   | ... |   0
+...      |  ...  |  ...  |  ...  | ... |  ...
+SMSN     |   3   |   0   |   0   | ... |   2
+**Total**| **8** | **7** | **0** | ... | **5**
+
+We can easily spot that there will be some words that will have 0 count depending on the class. This will create a zero probability and everytime these words appear on a testing vector the total probability will become zero. To avoid this problem we apply some form of Laplace Smoothing by adding a count of 1 to every word. This will still keep those 0 count words as low probability but still allow other word calculation to be performed.
+
+DTMSpam    | Word1 | Word2 | Word3 | ... | WordN
+-----------|-------|-------|-------|-----|-------
+Total      |   8   |   7   |   0   | ... |   5  
+**Total+1**| **9** | **8** | **1** | ... | **6**
+
+
+Another optimization suggested by the book is to take the natural logarithm of the probabilities. This would avoid the problem of small number multiplication and convert the multiplication to a simple sum.
+
+$$\log(P(C)\prod_{i=1}^nP(w_i|C))=\log(P(C))+\sum_{i=1}^n\log(P(w_i|C))$$
 
 
 
-$$p(X|C_k) = \prod_{i=1}^np(x_i|C_k)$$
