@@ -1,0 +1,234 @@
+---
+title: "Spam Classification"
+author: "Roque Arcudia, Arshia Razavi"
+date: "March 24, 2018"
+output:
+  beamer_presentation:
+    theme : "CambridgeUS"
+    colortheme: "dolphin"
+  slidy_presentation: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(text2vec)
+library(magrittr)
+source("bayes.r")
+
+set.seed(1L)
+```
+
+## R Motivation
+
+Write...
+
+## Data Set
+
+```{r readdata,echo=FALSE}
+
+smsds <- readSmsSpamSource("SMSSpamCollection")
+
+```
+
+The data set consists of….
+
+Example of a few lines of the file
+
+```{r sampledata}
+knitr::kable(head(smsds[nchar(smsds$Text)<50,c("Class","Text")]),row.names = FALSE)
+#knitr::kable(head(smsds)[c("Class","Text")], caption = "Example Dataset")
+```
+
+## Dividing training and testing set
+
+```{r divide_train_test,echo=FALSE}
+
+ds <- divideTrainAndTest(smsds)
+train <- ds$train
+test <- ds$test
+
+```
+The strategy we follow is 80/20
+
+## Text Vectorization
+
+- We can’t work directly with the spam data set as is.
+- We need to map every entry to a vector format that is suitable for a machine learning algorithm.
+- The approach we are going to follow is to convert each entry into a "bag of words".
+- The goal here is to build a Document-term matrix.
+
+## Creating the vocabulary
+
+- As a first step we have to extract the vocabulary from the training set.
+- A vocabulary is the set of unique words present in the given dataset.
+
+```{r subset,echo=FALSE}
+#cat testfile | awk '{ print length, $0 }' | sort -n -s | cut -d" " -f2-
+example <- read.table("subsetPres.txt",sep="\t",stringsAsFactors = FALSE,quote="",col.names=c("Class","Text"))
+knitr::kable(example, caption = "Extract of SMSs")
+```
+
+## Creating the vocabulary (Cont)
+
+```{r example_voc,echo=FALSE}
+example$ID <- seq.int(nrow(example))
+
+it_example <- itoken(example$Text, 
+             preprocessor = tolower, 
+             tokenizer = word_tokenizer, 
+             ids = example$ID, 
+             progressbar = FALSE)
+ex_voc  <- create_vocabulary(it_example)
+
+
+knitr::kable(ex_voc, caption = "Example Vocabulary")
+```
+
+## Document-term matrix 
+
+```{r example_dtm,echo=FALSE}
+
+ex_dtm = create_dtm(it_example, vocab_vectorizer(ex_voc))
+
+knitr::kable(as.matrix(ex_dtm), caption = "Example DTM", row.names = TRUE)
+
+```
+
+## Real Numbers From Training Set
+
+```{r vocab_and_dtms,echo=FALSE}
+textVec <- createVocabularyAndDTMs(train,test)
+dtm_train_matrix <- as.matrix(textVec$trainDTM)
+dtm_test_matrix <- as.matrix(textVec$testDTM)
+
+textVec$vocab
+```
+
+## Naive Bayes
+
+- We estimate the conditional probability of a particular message in its vectorized form $W$ being spam or ham and pick the class of the maximum value.
+
+$$P(W|Ham)P(Ham) > P(W|Spam)P(Spam) \Rightarrow Ham$$
+$$P(W|Ham)P(Ham) < P(W|Spam)P(Spam) \Rightarrow Spam$$
+
+- We estimate the conditional probability of a message by multiplying the individual conditional probabilities of each word that belongs to that message given the class (Spam or Ham).
+
+$$P(W=[how:1,come:1]|C)=P(how|C)P(come|C)$$
+
+## Training Naive Bayes
+
+- Our training process will consist of calculating the conditional probabilities for each word in the vocabulary given the class, where the classes are ham and spam.
+
+$$P(word|C)=\frac{\text{Times word is in class C}}{\text{Total number of words in class C}}$$
+
+- We tried two naive bayes implementations from "naivebayes"" and "e1071"" but they didn't work.
+- They try to use the mean and standard deviation approach.
+
+
+```{r train_model,echo=FALSE}
+
+nbModel <- trainNaiveBayes(dtm_train_matrix,train$isSpam)
+
+```
+
+## Training Algorithm
+
+1. Filter the input DTM using the class and create: DTMSpam and DTMHam.
+2. Reduce each DTM into a single vector by applying **colSums** function in r.
+3. To get the denominator value is as simple as applying a **sum** to each vector.
+4. Create a conditional probability per class vectors by dividing the vector calculated in step 2 by number calculated in step 3.
+5. Calculate $P(Spam)$
+
+## Training Example
+
+DTMSpam  | Word1 | Word2 | Word3 | ... | WordN
+---------|-------|-------|-------|-----|-------
+SMS1     |   1   |   0   |   0   | ... |   1
+SMS2     |   0   |   2   |   0   | ... |   0
+SMS3     |   0   |   1   |   0   | ... |   0
+...      |  ...  |  ...  |  ...  | ... |  ...
+SMSN     |   3   |   0   |   0   | ... |   2
+**Total**| **8** | **7** | **0** | ... | **5**
+
+## Zero Probability Problem
+
+- We artificially add a count of 1 to every word
+
+DTMSpam    | Word1 | Word2 | Word3 | ... | WordN
+-----------|-------|-------|-------|-----|-------
+Total      |   8   |   7   |   0   | ... |   5  
+**Total+1**| **9** | **8** | **1** | ... | **6**
+
+## Multiplication Problem
+
+- We apply Natural Logarithm to the probabilities so the calculation becomes a sum
+
+$$\log(P(C)\prod_{i=1}^nP(w_i|C))=\log(P(C))+\sum_{i=1}^n\log(P(w_i|C))$$
+
+## Logarithmic Scale
+
+
+```{r logexample, echo=FALSE}
+linearSeq <- seq(from=0.01,to=1,by=0.01)
+testP <- c(0.4,0.6)
+
+logSeq <- log(linearSeq)
+logTestP <- log(testP)
+
+par(mfcol=c(1,2))
+plot(x=linearSeq,y=linearSeq,type="l",col="blue",main="Linear",ylab="P",xlab="")
+points(x=testP[1],y=testP[1],col="red",pch=15)
+points(x=testP[2],y=testP[2],col="red",pch=16)
+
+plot(x=linearSeq,y=logSeq,type="l",col="blue",main="Logarithmic",ylab="log(P)",xlab="")
+points(x=testP[1],y=logTestP[1],col="red",pch=15)
+points(x=testP[2],y=logTestP[2],col="red",pch=16)
+```
+
+
+## Apply the Model
+
+```{r apply_model}
+
+numTestDocs <- nrow(dtm_test_matrix)
+results <- logical(numTestDocs)
+
+for ( i in 1:numTestDocs) {
+  testvec <- dtm_test_matrix[i,]
+  results[i] <- predictNaiveBayes(nbModel,testvec)
+}
+
+
+#### Models Performance ####
+
+cm <- confusionMatrix(results,reference=test$isSpam,positive="TRUE")
+
+cm$table
+
+```
+
+- The Accuracy of our classifier was: `r cm$overall["Accuracy"]`
+
+## More
+
+```{r overall}
+knitr::kable(cm$overall)
+```
+
+## By class
+```{r byclass}
+knitr::kable(cm$byClass)
+```
+
+## Conclussion
+
+Naive Bayes provides a good accuracy.
+
+## References
+
+-  “Machine Learning in Action” chapter 4
+- CRAN page for text2vec: https://cran.r-project.org/web/packages/text2vec/vignettes/text-vectorization.html
+
+
+
+
