@@ -25,6 +25,8 @@ smsds <- readSmsSpamSource("SMSSpamCollection")
 
 ```
 
+https://archive.ics.uci.edu/ml/datasets/sms+spam+collection
+
 The data set consists of….
 
 Example of a few lines of the file
