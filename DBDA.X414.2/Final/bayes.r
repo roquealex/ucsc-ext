@@ -8,8 +8,13 @@ library(caret)
 
 readSmsSpamSource <- function(smsfile) {
   smsds <- read.table(smsfile,sep="\t",stringsAsFactors = FALSE,quote="",col.names=c("Class","Text"))
-  # There are some duplicated:
+  #> dim(smsds)
+  #[1] 5574    2
+  # There are some duplied:
   #dups <- duplicated(smsds)
+  #411 dups
+  #smalltext <- nchar(smsds$Text) < 25
+  #smsds <- smsds[!dups | smalltext,]
   #smsds <- smsds[!dups,]
   smsds$ID <- seq.int(nrow(smsds))
   smsds$isSpam <- smsds$Class=="spam"
@@ -17,17 +22,34 @@ readSmsSpamSource <- function(smsfile) {
   return(smsds)
 }
 
+cleanupSmsSpamSource <- function(dataset) {
+  # There are some duplied:
+  dups <- duplicated(dataset$Text)
+  #411 dups
+  smalltext <- nchar(dataset$Text) < 25
+  nodupsds <- dataset[!dups | smalltext,]
+  return(nodupsds)
+}
+
+
 divideTrainAndTest <- function(dataset) {
   #train <- smsds
   #test <- smsds
   
   # Train and testing
+
+  # Basic approach:
   total<- nrow(smsds)
   top80 <- as.integer(total *0.8)
   low20 <- total - top80
-  
   train <- head(smsds,top80)
   test <- tail(smsds,low20)
+  
+  # Caret:
+  #trainIndex <- createDataPartition(smsds$isSpam, p=0.8, list=FALSE,times=1)
+  #train<- smsds[trainIndex,]
+  #test<- smsds[-trainIndex,]
+  
   return(list("train"=train,"test"=test))
 }
 
@@ -99,7 +121,7 @@ nbClassify <- function(vec2Classify,p0Vec,p1Vec,pClass1) {
 
 # This is just debug code, the report and presentation is based on this code.
 # If you want to execute change the FALSE to TRUE
-if (TRUE) {
+if (FALSE) {
 
 #### Main ####
 
@@ -108,6 +130,7 @@ set.seed(1L)
 #### Read the data source ####
 
 smsds <- readSmsSpamSource("SMSSpamCollection")
+#smsds <- cleanupSmsSpamSource(smsds)
 
 #### Divide the data set in training and testing ####
 
@@ -212,6 +235,13 @@ print(cm)
 #
 #'Positive' Class : TRUE   
 
+# Caret partition:
+#Reference
+#Prediction FALSE TRUE
+#FALSE   956    8
+#TRUE      9  141
+#
+#Accuracy : 0.9847   
 
 #all(resultsOld==results)
 #all(nbModel$pPosVectLog==p1Vect)
@@ -220,5 +250,8 @@ print(cm)
 #[1] 1115
 #> nrow(train)
 #[1] 4459
+
+#> sum(smsds$isSpam)/length(smsds$isSpam)
+#[1] 0.1340151
 
 }
