@@ -218,7 +218,7 @@ for ( i in 1:numTestDocs) {
 
 #### Models Performance ####
 
-cm <- confusionMatrix(results,reference=test$isSpam)
+cm <- confusionMatrix(results,reference=test$isSpam,positive="TRUE")
 
 cm
 ```

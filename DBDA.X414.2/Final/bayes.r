@@ -184,7 +184,7 @@ for ( i in 1:numTestDocs) {
 
 #### Models Performance ####
 
-cm <- confusionMatrix(results,reference=test$isSpam)
+cm <- confusionMatrix(results,reference=test$isSpam,positive="TRUE")
 
 print(cm)
 
@@ -192,6 +192,26 @@ print(cm)
 #Prediction FALSE TRUE
 #FALSE   956    6
 #TRUE     14  139
+#
+#Accuracy : 0.9821         
+#95% CI : (0.9724, 0.989)
+#No Information Rate : 0.87           
+#P-Value [Acc > NIR] : <2e-16         
+#
+#Kappa : 0.9225         
+#Mcnemar's Test P-Value : 0.1175         
+#
+#Sensitivity : 0.9586         
+#Specificity : 0.9856         
+#Pos Pred Value : 0.9085         
+#Neg Pred Value : 0.9938         
+#Prevalence : 0.1300         
+#Detection Rate : 0.1247         
+#Detection Prevalence : 0.1372         
+#Balanced Accuracy : 0.9721         
+#
+#'Positive' Class : TRUE   
+
 
 #all(resultsOld==results)
 #all(nbModel$pPosVectLog==p1Vect)
