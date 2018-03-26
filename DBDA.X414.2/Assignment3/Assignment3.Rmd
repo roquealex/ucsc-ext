@@ -26,9 +26,8 @@ knitr::kable(head(Boston))
 Fitting a linear model for variable analysis
 
 ```{r correlation}
-
 fullSetModel <- lm(medv~.,data=Boston)
-summary(fullSetModel)
+summary(fullSetModel)$coefficients
 ```
 
 **Arrange the features in the order of their imporance.**
@@ -46,7 +45,7 @@ We can see the predictors "indus" and "age" have no importance to the model. The
 
 **Divide the data into training and testing.  Fit a linear model.**
 
-Two models will be trained, one using the whole Boston dataset and another excluding the features "indus" and "age" that were discovered to not to be important for the linear model. 
+Two models will be trained, one using the whole Boston dataset and another excluding the features "indus" and "age" that were discovered not to be important for the linear model. 
 
 First divide in training and testing sets both sets:
 
@@ -103,12 +102,8 @@ Calculate RMSE for both models based on predicted values:
 RMSE <- sqrt(mean((testingSet$medv-vals)^2))
 RMSE
 
-## [1] 4.626874
-
 subRMSE <- sqrt(mean((subTestingSet$medv-subVals)^2))
 subRMSE
-
-## [1] 4.6231
 ```
 
 The RMSE of the model not using the features "indus" and "age" is smaller. From now on using that model.
