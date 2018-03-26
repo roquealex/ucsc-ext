@@ -1,0 +1,126 @@
+---
+title: "Assignment 3"
+author: "Roque Arcudia"
+date: "March 25, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Take the Boston Housing Data.
+We want to predict median house price. Select the features from the given data set.
+Arrange the features in the order of their importance. Divide the data into training and testing. Fit a linear model. Plot the predicted values of the test data.
+
+**Take the Boston Housing Data.**
+
+```{r import_data}
+library(MASS)
+data(Boston)
+knitr::kable(head(Boston))
+```
+
+**We want to predict median house price. Select the features from the given data set.**
+
+Fitting a linear model for variable analysis
+
+```{r correlation}
+
+fullSetModel <- lm(medv~.,data=Boston)
+summary(fullSetModel)
+```
+
+**Arrange the features in the order of their imporance.**
+
+Arranging by p-value of variable, the higher on the table the lower the p-value and the higher the importance for the linear model.
+
+```{r order_importance}
+p_values <- summary(fullSetModel)$coefficients[,"Pr(>|t|)"]
+p_values_ord <- p_values[order(p_values)]
+
+knitr::kable(p_values_ord[names(p_values_ord)!="(Intercept)"])
+```
+
+We can see the predictors "indus" and "age" have no importance to the model. Their p-value is very high.
+
+**Divide the data into training and testing.  Fit a linear model.**
+
+Two models will be trained, one using the whole Boston dataset and another excluding the features "indus" and "age" that were discovered to not to be important for the linear model. 
+
+First divide in training and testing sets both sets:
+
+```{r sample_training}
+namesBoston <- names(Boston)
+subsetBoston <- namesBoston[!(namesBoston %in% c("indus","age"))]
+
+# Dropping inignificant features: 
+subBoston <- subset(Boston, select=subsetBoston)
+
+numEntries <- nrow(Boston)
+
+set.seed(1)
+# Selecting 80% of the dataset for training
+trainingSamp <- sample(c(1:numEntries),0.8*numEntries,replace=FALSE)
+# which not required but easier to visialize
+testingSamp <- which(!(c(1:numEntries) %in% trainingSamp))
+
+trainingSet <- Boston[trainingSamp,]
+testingSet <- Boston[testingSamp,]
+
+subTrainingSet <- subBoston[trainingSamp,]
+subTestingSet <- subBoston[testingSamp,]
+```
+
+Fit linear models for the whole Boston data set and the subset excluding "indus" and "age"
+```{r fit_models}
+# medv is a function of everything else
+bostonModel <- lm(medv~.,data=trainingSet)
+subBostonModel <- lm(medv~.,data=subTrainingSet)
+```
+
+Summary of Boston, still showing "indus" and "age" but with high p-values
+```{r summaryFull}
+summary(bostonModel)
+```
+
+Sumary of subset, all the variables show at least 1 "*" of significance
+```{r summarySub}
+summary(subBostonModel)
+```
+
+Calculate the predicted values from the testing sets for both models
+```{r predict}
+# Apply the model to the testing set
+vals <- predict(bostonModel,testingSet[,attr(bostonModel$terms,"term.labels")])
+subVals <- predict(subBostonModel,subTestingSet[,attr(subBostonModel$terms,"term.labels")])
+```
+
+Calculate RMSE for both models based on predicted values:
+```{r rmseCalc}
+
+#Quickly get rmse
+RMSE <- sqrt(mean((testingSet$medv-vals)^2))
+RMSE
+
+## [1] 4.626874
+
+subRMSE <- sqrt(mean((subTestingSet$medv-subVals)^2))
+subRMSE
+
+## [1] 4.6231
+```
+
+The RMSE of the model not using the features "indus" and "age" is smaller. From now on using that model.
+
+**Plot the predicted values of the test data.**
+
+This is multivariable so just plotting the predicted value vs the actual medv
+
+```{r fit_plot}
+#with(testingSetPred, plot(medv,predicted))
+plot(x=subTestingSet$medv,y=subVals,xlab="Actual medv",ylab="Predicted medv")
+abline(a=0,b=1,col="red")
+
+```
+
