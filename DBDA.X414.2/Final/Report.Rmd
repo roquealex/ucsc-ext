@@ -205,9 +205,11 @@ nbModel <- trainNaiveBayes(dtm_train_matrix,train$isSpam)
 2. A vector containing for each word in the vocabulary the conditional probability $\log(P(word|spam))$. The vector will be column consistent with our training DTM.
 3. A vector containing for each word in the vocabulary the conditional probability $\log(P(word|ham))$. The vector will be column consistent with our training DTM.
 
-## Apply the Model
+## Applying Naive Bayes Model
 
-```{r apply_model}
+Now that we have our model trained the next step is to apply the model to our testing set in order to get some metrics. This is the output of caret confusionMatrix function:
+
+```{r apply_model,echo=FALSE}
 
 numTestDocs <- nrow(dtm_test_matrix)
 results <- logical(numTestDocs)
@@ -224,3 +226,43 @@ cm <- confusionMatrix(results,reference=test$isSpam,positive="TRUE")
 
 cm
 ```
+
+## Log Reg
+
+```{r logregmod}
+# Ultra slow:
+#lrm <- glm.fit(x = dtm_train_matrix, y = train$isSpam, family = binomial())
+
+library(glmnet)
+NFOLDS = 4
+
+glmnet_classifier = cv.glmnet(x = textVec$trainDTM, y = train$isSpam, 
+                              family = 'binomial', 
+                              # L1 penalty
+                              alpha = 1,
+                              # interested in the area under ROC curve
+                              type.measure = "auc",
+                              # 5-fold cross-validation
+                              nfolds = NFOLDS,
+                              # high value is less accurate, but has faster training
+                              thresh = 1e-3,
+                              # again lower number of iterations for faster training
+                              maxit = 1e3)
+```
+
+Predict
+```{r predict}
+#preds = predict(lrm, dtm_test_matrix)
+#preds
+
+preds = predict(glmnet_classifier, textVec$testDTM, type = 'response')[,1]
+#preds = predict(glmnet_classifier, textVec$testDTM) > 0
+#preds
+```
+Confusion matrix
+
+```{r }
+cmLr <- confusionMatrix(preds>0.5,reference=test$isSpam,positive="TRUE")
+cmLr
+```
+
