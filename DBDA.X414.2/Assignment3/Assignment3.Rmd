@@ -113,7 +113,6 @@ The RMSE of the model not using the features "indus" and "age" is smaller. From 
 This is multivariable so just plotting the predicted value vs the actual medv
 
 ```{r fit_plot}
-#with(testingSetPred, plot(medv,predicted))
 plot(x=subTestingSet$medv,y=subVals,xlab="Actual medv",ylab="Predicted medv")
 abline(a=0,b=1,col="red")
 
