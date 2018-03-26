@@ -39,16 +39,16 @@ divideTrainAndTest <- function(dataset) {
   # Train and testing
 
   # Basic approach:
-  total<- nrow(smsds)
-  top80 <- as.integer(total *0.8)
-  low20 <- total - top80
-  train <- head(smsds,top80)
-  test <- tail(smsds,low20)
+  #total<- nrow(smsds)
+  #top80 <- as.integer(total *0.8)
+  #low20 <- total - top80
+  #train <- head(smsds,top80)
+  #test <- tail(smsds,low20)
   
   # Caret:
-  #trainIndex <- createDataPartition(smsds$isSpam, p=0.8, list=FALSE,times=1)
-  #train<- smsds[trainIndex,]
-  #test<- smsds[-trainIndex,]
+  trainIndex <- createDataPartition(smsds$isSpam, p=0.8, list=FALSE,times=1)
+  train<- smsds[trainIndex,]
+  test<- smsds[-trainIndex,]
   
   return(list("train"=train,"test"=test))
 }
