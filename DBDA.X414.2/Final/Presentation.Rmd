@@ -30,9 +30,10 @@ smsds <- readSmsSpamSource("SMSSpamCollection")
 
 ```
 
-The data set consists of….
+https://archive.ics.uci.edu/ml/datasets/sms+spam+collection
 
-Example of a few lines of the file
+- Size: `r length(smsds$isSpam)`
+- SPAM: `r sum(smsds$isSpam)`
 
 ```{r sampledata}
 knitr::kable(head(smsds[nchar(smsds$Text)<50,c("Class","Text")]),row.names = FALSE)
@@ -41,14 +42,17 @@ knitr::kable(head(smsds[nchar(smsds$Text)<50,c("Class","Text")]),row.names = FAL
 
 ## Dividing training and testing set
 
+* The data sat is divided in:
+    + 80% Training Set
+    + 20% Testing Set
+* This is done using caret createDataPartition 
+
 ```{r divide_train_test,echo=FALSE}
 
 ds <- divideTrainAndTest(smsds)
 train <- ds$train
 test <- ds$test
-
 ```
-The strategy we follow is 80/20
 
 ## Text Vectorization
 
@@ -209,13 +213,13 @@ cm$table
 
 - The Accuracy of our classifier was: `r cm$overall["Accuracy"]`
 
-## More
+## CM Overall
 
 ```{r overall}
 knitr::kable(cm$overall)
 ```
 
-## By class
+## CM By Class
 ```{r byclass}
 knitr::kable(cm$byClass)
 ```
@@ -226,7 +230,7 @@ Naive Bayes provides a good accuracy.
 
 ## References
 
--  “Machine Learning in Action” chapter 4
+- Harrington, Peter. *Machine Learning in Action*. Manning, 2012. Chapter 4
 - CRAN page for text2vec: https://cran.r-project.org/web/packages/text2vec/vignettes/text-vectorization.html
 
 
