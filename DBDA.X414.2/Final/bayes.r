@@ -65,12 +65,12 @@ createVocabularyAndDTMs <- function(train,test) {
                      progressbar = FALSE)
   vocab <- create_vocabulary(it_train)
   
-  vocab
+  #vocab
   
   #### Create Training Document Term Matrix ####
-  vectorizer = vocab_vectorizer(vocab)
+  vectorizer <- vocab_vectorizer(vocab)
   
-  dtm_train = create_dtm(it_train, vectorizer)
+  dtm_train <- create_dtm(it_train, vectorizer)
   
   
   #### Create Testing Document Term Matrix ####
