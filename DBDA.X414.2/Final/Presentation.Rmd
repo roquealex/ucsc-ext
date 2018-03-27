@@ -20,9 +20,9 @@ set.seed(1L)
 
 ## Motivation
 
-* Curious as in how to identify spam text messages?
-    + Very common problem.
-    + Simple NLP problem.
+- Curiosity on how to identify spam.
+- Very common problem.
+- Simple NLP problem.
 
 ![Ham VS Spam](spam_ham.jpg)
 
