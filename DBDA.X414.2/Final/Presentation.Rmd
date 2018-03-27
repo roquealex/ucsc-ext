@@ -18,9 +18,12 @@ source("bayes.r")
 set.seed(1L)
 ```
 
-## R Motivation
+## Motivation
 
-Write...
+- Very common problem.
+- Simple NLP problem.
+
+![Ham VS Spam](spam_ham.jpg)
 
 ## Data Set
 
@@ -40,7 +43,14 @@ knitr::kable(head(smsds[nchar(smsds$Text)<50,c("Class","Text")]),row.names = FAL
 #knitr::kable(head(smsds)[c("Class","Text")], caption = "Example Dataset")
 ```
 
-## Dividing training and testing set
+## Spam Examples (too big for a table)
+
+- Free entry in 2 a wkly comp to win FA Cup final tkts 21st May 2005. Text FA to 87121 to receive entry question(std txt rate)T&C's apply 08452810075over18's
+- Had your mobile 11 months or more? U R entitled to Update to the latest colour mobiles with camera for Free! Call The Mobile Update Co FREE on 08002986030
+- SIX chances to win CASH! From 100 to 20,000 pounds txt> CSH11 and send to 87575. Cost 150p/day, 6days, 16+ TsandCs apply Reply HL 4 info
+- URGENT! You have won a 1 week FREE membership in our £100,000 Prize Jackpot! Txt the word: CLAIM to No: 81010 T&C www.dbuk.net LCCLTD POBOX 4403LDNW1A7RW18
+
+## Dividing Training And Testing Set
 
 ```{r divide_train_test,echo=FALSE}
 
@@ -61,7 +71,7 @@ test <- ds$test
 - The approach we are going to follow is to convert each entry into a "bag of words".
 - The goal here is to build a Document-term matrix.
 
-## Creating the vocabulary
+## Creating The Vocabulary
 
 - As a first step we have to extract the vocabulary from the training set.
 - A vocabulary is the set of unique words present in the given dataset.
@@ -72,7 +82,7 @@ example <- read.table("subsetPres.txt",sep="\t",stringsAsFactors = FALSE,quote="
 knitr::kable(example, caption = "Extract of SMSs")
 ```
 
-## Creating the vocabulary (Cont)
+## Creating The Vocabulary (Cont)
 
 ```{r example_voc,echo=FALSE}
 example$ID <- seq.int(nrow(example))
@@ -88,7 +98,7 @@ ex_voc  <- create_vocabulary(it_example)
 knitr::kable(ex_voc, caption = "Example Vocabulary")
 ```
 
-## Document-term matrix 
+## Document-Term Matrix 
 
 ```{r example_dtm,echo=FALSE}
 
@@ -189,8 +199,21 @@ points(x=testP[1],y=logTestP[1],col="red",pch=15)
 points(x=testP[2],y=logTestP[2],col="red",pch=16)
 ```
 
+## Top 10 $\log(P(w_i|Spam))$
 
-## Apply the Model
+```{r pspam}
+pPosOrd <- order(-nbModel$pPosVectLog)
+knitr::kable(head(nbModel$pPosVectLog[pPosOrd],10), caption = "Spam: Words with higher probability", row.names = TRUE)
+```
+
+## Top 10 $\log(P(w_i|Ham))$
+
+```{r psham}
+pNegOrd <- order(-nbModel$pNegVectLog)
+knitr::kable(head(nbModel$pNegVectLog[pNegOrd],10), caption = "Ham: Words with higher probability", row.names = TRUE)
+```
+
+## Applying Naive Bayes Model
 
 * What we know:
     + Size of testing set `r nrow(test)`
@@ -230,7 +253,10 @@ knitr::kable(cm$byClass)
 
 ## Conclussion
 
-Naive Bayes provides a good accuracy.
+- Naive Bayes provides good accuracy and it is very simple.
+- Sensitivity and Positive Predictive value suffer from the fact that our dataset contains less spam messages than ham. Errors in classification will affect proportionally more the positive class, in this case spam.
+- We believe this works really well because the spam set has a few keywords that repeat in a lot of messages that makes easy to identify spam: call, free, now.
+- Same approach can be applied to different kind of problems: Sentiment Analysis, document classification.
 
 ## References
 
