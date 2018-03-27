@@ -42,17 +42,17 @@ knitr::kable(head(smsds[nchar(smsds$Text)<50,c("Class","Text")]),row.names = FAL
 
 ## Dividing training and testing set
 
-* The data sat is divided in:
-    + 80% Training Set
-    + 20% Testing Set
-* This is done using caret createDataPartition 
-
 ```{r divide_train_test,echo=FALSE}
 
 ds <- divideTrainAndTest(smsds)
 train <- ds$train
 test <- ds$test
 ```
+
+* The dataset is divided in:
+    + 80% Training Set, size: `r nrow(train)`, spam: `r sum(train$isSpam)`.
+    + 20% Testing Set, size: `r nrow(test)`, spam: `r sum(test$isSpam)`.
+* This is done using caret createDataPartition 
 
 ## Text Vectorization
 
@@ -192,6 +192,10 @@ points(x=testP[2],y=logTestP[2],col="red",pch=16)
 
 ## Apply the Model
 
+* What we know:
+    + Size of testing set `r nrow(test)`
+    + Size of the spam set `r sum(test$isSpam)`.
+* Confusion Matrix:
 ```{r apply_model}
 
 numTestDocs <- nrow(dtm_test_matrix)
@@ -211,7 +215,7 @@ cm$table
 
 ```
 
-- The Accuracy of our classifier was: `r cm$overall["Accuracy"]`
+* The Accuracy of our classifier was: `r cm$overall["Accuracy"]`
 
 ## CM Overall
 
