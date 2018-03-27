@@ -20,8 +20,9 @@ set.seed(1L)
 
 ## Motivation
 
-- Very common problem.
-- Simple NLP problem.
+* Curious as in how to identify spam text messages?
+    + Very common problem.
+    + Simple NLP problem.
 
 ![Ham VS Spam](spam_ham.jpg)
 
@@ -256,7 +257,7 @@ knitr::kable(cm$byClass)
 - Naive Bayes provides good accuracy and it is very simple.
 - Sensitivity and Positive Predictive value suffer from the fact that our dataset contains less spam messages than ham. Errors in classification will affect proportionally more the positive class, in this case spam.
 - We believe this works really well because the spam set has a few keywords that repeat in a lot of messages that makes easy to identify spam: call, free, now.
-- Same approach can be applied to different kind of problems: Sentiment Analysis, document classification.
+- Same approach can be applied to different kind of problems: Sentiment Analysis, Document Classification.
 
 ## References
 
