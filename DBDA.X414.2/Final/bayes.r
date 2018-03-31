@@ -5,6 +5,7 @@ library(text2vec)
 #library(data.table)
 library(magrittr)
 library(caret)
+library(glmnet)
 
 readSmsSpamSource <- function(smsfile) {
   smsds <- read.table(smsfile,sep="\t",stringsAsFactors = FALSE,quote="",col.names=c("Class","Text"))
@@ -94,6 +95,29 @@ predictNaiveBayes <- function(nbModel,input.vector) {
   pPosGI <- sum(input.vector * nbModel$pPosVectLog) + log(nbModel$pPos)
   pNegGI <- sum(input.vector * nbModel$pNegVectLog) + log(1.0 - nbModel$pPos)
   return (pPosGI > pNegGI)
+}
+
+trainLogisticRegression <- function(train.dtm, train.class) {
+  NFOLDS <- 4
+  
+  logReg <- cv.glmnet(x = train.dtm, y = train.class, 
+                                 family = 'binomial', 
+                                 # L1 penalty
+                                 alpha = 1,
+                                 # interested in the area under ROC curve
+                                 type.measure = "auc",
+                                 # 5-fold cross-validation
+                                 nfolds = NFOLDS,
+                                 # high value is less accurate, but has faster training
+                                 thresh = 1e-3,
+                                 # again lower number of iterations for faster training
+                                 maxit = 1e3)
+  return(logReg)
+}
+
+predictLogisticRegression <- function(lr.model,test.dtm) {
+  pred <- predict(lr.model, test.dtm, type = 'response')[,1]
+  return(pred)
 }
 
 # Based on the book, to be deleted in favor of the previous:
@@ -242,5 +266,13 @@ print(cm)
 
 #> sum(smsds$isSpam)/length(smsds$isSpam)
 #[1] 0.1340151
+
+# Logistic Regression
+modelLR <- trainLogisticRegression(textVec$trainDTM, train$isSpam)
+
+resultsLR <- predictLogisticRegression(modelLR,textVec$testDTM)
+
+cmLR <- confusionMatrix(resultsLR>0.5,reference=test$isSpam,positive="TRUE")
+print(cmLR)
 
 }
