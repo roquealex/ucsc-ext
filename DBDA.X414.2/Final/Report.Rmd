@@ -182,7 +182,7 @@ SMS3     |   0   |   1   |   0   | ... |   0
 SMSN     |   3   |   0   |   0   | ... |   2
 **Total**| **8** | **7** | **0** | ... | **5**
 
-We can easily spot that there will be some words that will have 0 count depending on the class. This will create a zero probability and everytime these words appear on a testing vector the total probability will become zero. To avoid this problem we apply some form of Laplace Smoothing by adding a count of 1 to every word. This will still keep those 0 count words as low probability but still allow other word calculation to be performed.
+We can easily spot that there will be some words that will have 0 count depending on the class. This will create a zero probability and every time these words appear on a testing vector the total probability will become zero. To avoid this problem we apply some form of Laplace Smoothing by adding a count of 1 to every word. This will still keep those 0 count words as low probability but still allow other word calculation to be performed.
 
 Table: Adding 1 to avoid the 0 probability
 
@@ -293,7 +293,7 @@ The model still has good accuracy: `r cmLR$overall["Accuracy"]`. This particular
 
 Naive Bayes provides good accuracy and it is very simple and relatively fast. As we saw the model suffers from low Sensitivity and PPV given the proportionally high error numbers compared to the spam examples in the testing set.
 
-We believe this works really well because, as we saw in the probability vector of spam, the spam set has a few keywords that repeat in a lot of messages that makes easy to identify spam: call, free, now, reply, etc. The presence of any of this keywords will increase the probability of being spam but will have minimal effect in the probability of being ham.
+We believe this works really well because, as we saw in the probability vector of spam, the spam set has a few keywords that repeat in a lot of messages that makes easy to identify spam: call, free, now, reply, etc. The presence of any of these keywords will increase the probability of being spam but will have minimal effect in the probability of being ham.
 
 The logistic regression model run for comparison also gives good results. It is probable that the final equation is getting benefited from the spam keywords too.
 
