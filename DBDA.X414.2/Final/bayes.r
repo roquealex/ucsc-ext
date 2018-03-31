@@ -8,14 +8,6 @@ library(caret)
 
 readSmsSpamSource <- function(smsfile) {
   smsds <- read.table(smsfile,sep="\t",stringsAsFactors = FALSE,quote="",col.names=c("Class","Text"))
-  #> dim(smsds)
-  #[1] 5574    2
-  # There are some duplied:
-  #dups <- duplicated(smsds)
-  #411 dups
-  #smalltext <- nchar(smsds$Text) < 25
-  #smsds <- smsds[!dups | smalltext,]
-  #smsds <- smsds[!dups,]
   smsds$ID <- seq.int(nrow(smsds))
   smsds$isSpam <- smsds$Class=="spam"
   smsds$Class <- factor(smsds$Class)
@@ -33,9 +25,6 @@ cleanupSmsSpamSource <- function(dataset) {
 
 
 divideTrainAndTest <- function(dataset) {
-  #train <- smsds
-  #test <- smsds
-  
   # Train and testing
 
   # Basic approach:
