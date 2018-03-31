@@ -20,7 +20,7 @@ set.seed(1L)
 
 We chose Spam Detection as the topic for this project mainly because of interest in knowing how text classification works. Spam is a very common problem in all forms of electronic communication nowadays. We searched online for spam datasets and the most common we found was the SMS spam data set that will be described in the next section.
 
-This is a good introductory topic for Natural Language Processing and text based machine learning and can be used for different problems as document classification and sentiment analysis.
+This is a good introductory topic for Natural Language Processing and text based machine learning and the same approach can be used for different problems as document classification and sentiment analysis.
 
 ## Dataset
 
