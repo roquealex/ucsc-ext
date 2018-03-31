@@ -17,7 +17,7 @@ set.seed(1L)
 
 ## Motivation
 
-## Data Set
+## Dataset
 
 ```{r readdata,echo=FALSE}
 
@@ -25,19 +25,28 @@ smsds <- readSmsSpamSource("SMSSpamCollection")
 
 ```
 
+The dataset is a collection of “Ham” and “Spam” SMS messages from different sources. It was downloaded from UC Irvine Machine Learning repository. The following URL is the link where the dataset can be downloaded:
+
 https://archive.ics.uci.edu/ml/datasets/sms+spam+collection
 
-The data set consists of….
+The dataset is a text file where there is one SMS per line. The line starts with the word “ham” or “spam” that classifies the message. The next thing found in the line is the SMS itself. The separator between the category and the message is a “tab” character. This is a sample of a few lines from the file, the spam messages are typically long so we picked a few that could fit the document:
 
-Example of a few lines of the file
-
-```{r sampledata}
-knitr::kable(head(smsds), caption = "Example Dataset")
+```
+ham	Ok lar... Joking wif u oni...
+ham	U dun say so early hor... U c already then say...
+ham	Nah I don't think he goes to usf, he lives around here though
+ham	Even my brother is not like to speak with me. They treat me like aids patent.
+spam	You have 1 new message. Call 0207-083-6089
+spam	3. You have received your mobile content. Enjoy
+spam	Mobile Club: Choose any of the top quality items for your mobile. 7cfca1a
+spam	Money i have won wining number 946 wot do i do next
 ```
 
-Cleanup: duplicates
+There is a total of `r length(smsds$isSpam)` lines and out of them `r sum(smsds$isSpam)` are spam.
 
-## Dividing training and testing set
+## Cleanup: duplicates
+
+## Dividing Training And Testing Sets
 
 ```{r divide_train_test,echo=FALSE}
 
@@ -46,7 +55,17 @@ train <- ds$train
 test <- ds$test
 
 ```
-The strategy we follow is 80/20
+
+We used caret createDataPartition to create the training and testing set. We used 80% of the samples as training set and the remaining 20% as testing set. The function provides a random partition that has the same proportions of spam and ham as the original set.
+
+Table: Summary of datasets
+
+Set      | Size            | Spam                  | %Spam
+---------|-----------------|-----------------------|---------------------------------
+Whole    | `r nrow(smsds)` | `r sum(smsds$isSpam)` | `r 100*sum(smsds$isSpam)/nrow(smsds)`
+Training | `r nrow(train)` | `r sum(train$isSpam)` | `r 100*sum(train$isSpam)/nrow(train)`
+Testing  | `r nrow(test)`  | `r sum(test$isSpam)`  | `r 100*sum(test$isSpam)/nrow(test)`
+
 
 ## Text Vectorization
 
@@ -54,7 +73,7 @@ We can’t work directly with the spam data set as is. We need to map every entr
 
 The goal here is to build a Document-term matrix which is a mathematical representation of the training set showing the frequency of each word in each message
 
-### Creating the vocabulary
+### Creating The Vocabulary
 
 As a first step we have to extract the vocabulary from the training set. A vocabulary is the set of unique words present in the given dataset and will be the basis for the construction of the DTM.
 
@@ -64,7 +83,7 @@ So if for instance we take this very small subset of our dataset:
 ```{r subset,echo=FALSE}
 #cat testfile | awk '{ print length, $0 }' | sort -n -s | cut -d" " -f2-
 example <- read.table("subset.txt",sep="\t",stringsAsFactors = FALSE,quote="",col.names=c("Class","Text"))
-knitr::kable(example, caption = "Example")
+knitr::kable(example, caption = "Example dataset",row.names = TRUE)
 ```
 
 The final vocabulary will look like this:
@@ -80,14 +99,14 @@ it_example <- itoken(example$Text,
 ex_voc  <- create_vocabulary(it_example)
 
 
-knitr::kable(ex_voc, caption = "Example Vocabulary")
+knitr::kable(ex_voc, caption = "Example vocabulary")
 ```
 
 Notice how there is a conversion to lowercase, this is to avoid creating new entries for the same word and is part of our preprocessing. 
 
 We relied on the r package “text2vec” to extract the vocabulary from the training set with the function “create_vocabulary”
 
-### Document-term matrix 
+### Document-Term Matrix 
 
 From this point we can consider every word identified in the vocabulary as a single feature that will be part of the vectorized form of our dataset.
 
@@ -108,7 +127,7 @@ This example DTM has only 0s and 1s due to the small size of the inputs but in r
 
 We used the function “create_dtm” from “text2vec” to process the dataset and obtain the DTM. One of the parameters that has to be passed is a vectorizer function, in our case we used the “vocab_vectorizer” which is the one suitable to be used with a vocabulary.
 
-### Real numbers
+### Real Numbers
 
 ```{r vocab_and_dtms,echo=FALSE}
 textVec <- createVocabularyAndDTMs(train,test)
@@ -128,7 +147,7 @@ The objective of this project is to create a spam classifier. The Naive Bayes cl
 
 $$P(W|Ham)P(Ham) > P(W|Spam)P(Spam) \Rightarrow Ham$$
 $$P(W|Ham)P(Ham) < P(W|Spam)P(Spam) \Rightarrow Spam$$
-We estimate the conditional probability of a message by multiplying the individual conditional probabilities of each word that belongs to that message given the class (Spam or Ham). So for the example of the message “How come?” it will looks something like:
+We estimate the conditional probability of a message by multiplying the individual conditional probabilities of each word that belongs to that message given the class (Spam or Ham). So for the example of the message “How come?” it will look something like:
 
 $$P(W=[how:1,come:1]|C)=P(how|C)P(come|C)$$
 
@@ -138,13 +157,13 @@ $$P(word|C)=\frac{\text{Times word is in class C}}{\text{Total number of words i
 
 ### Implementation
 
-We tried two naive bayes implementations from "naivebayes"" and "e1071"" but they didn't work. It looks like whenever they see numerical matrices they try to use the mean and standard deviation approach. Because of these we implemented our own version of naive bayes based on counting words. We got the algorithm from the book “Machine Learning in Action” chapter 4 and did a much simpler R implementation.
+We tried two naive bayes implementations from "naivebayes"" and "e1071"" but they didn't work. It looks like whenever they see numerical matrices they try to use the mean and standard deviation approach. Because of these we implemented our own version of naive bayes based on counting words. We got the algorithm from the book “Machine Learning in Action” chapter 4 and we did a much simpler R implementation.
 
 The basic algorithm we implemented goes like this:
 
 1. Filter the input DTM using the class and separate into 2 new DTMs: DTMSpam and DTMHam.
 2. Reduce each DTM into a single vector by applying column sum (colSums function in r). This will give a vector of the total number of a given words present in the class (the numerator).
-3. To get the denominator value is as simple as applying a sum to each vector. This is a single number representing the total number of words per class.
+3. To get the denominator value is as simple as applying a sum to each result vector from step 2. This is a single number representing the total number of words per class.
 4. Create a conditional probability per class vectors by dividing the numerator vector calculated in step 2 by the denominator calculated in step 3.
 5. Calculate $P(Spam)$ by dividing the number of elements in the training set labeled as Spam by the total size of the training set. $P(Ham) = 1 - P(Spam)$
 
