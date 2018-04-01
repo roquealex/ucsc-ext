@@ -15,26 +15,10 @@ readSmsSpamSource <- function(smsfile) {
   return(smsds)
 }
 
-cleanupSmsSpamSource <- function(dataset) {
-  # There are some duplied:
-  dups <- duplicated(dataset$Text)
-  #411 dups
-  smalltext <- nchar(dataset$Text) < 25
-  nodupsds <- dataset[!dups | smalltext,]
-  return(nodupsds)
-}
-
 
 divideTrainAndTest <- function(dataset) {
   # Train and testing
 
-  # Basic approach:
-  #total<- nrow(smsds)
-  #top80 <- as.integer(total *0.8)
-  #low20 <- total - top80
-  #train <- head(smsds,top80)
-  #test <- tail(smsds,low20)
-  
   # Caret:
   trainIndex <- createDataPartition(smsds$isSpam, p=0.8, list=FALSE,times=1)
   train<- smsds[trainIndex,]
@@ -120,18 +104,6 @@ predictLogisticRegression <- function(lr.model,test.dtm) {
   return(pred)
 }
 
-# Based on the book, to be deleted in favor of the previous:
-nbClassify <- function(vec2Classify,p0Vec,p1Vec,pClass1) {
-  p1 <- sum(vec2Classify * p1Vec) + log(pClass1)
-  p0 <- sum(vec2Classify * p0Vec) + log(1.0 - pClass1)
-  if (p1 > p0) {
-    return(TRUE)
-  } else {
-    return(FALSE)
-  }
-
-}
-
 # This is just debug code, the report and presentation is based on this code.
 # If you want to execute change the FALSE to TRUE
 if (FALSE) {
@@ -143,7 +115,6 @@ set.seed(1L)
 #### Read the data source ####
 
 smsds <- readSmsSpamSource("SMSSpamCollection")
-#smsds <- cleanupSmsSpamSource(smsds)
 
 #### Divide the data set in training and testing ####
 
@@ -164,59 +135,19 @@ dtm_test_matrix <- as.matrix(textVec$testDTM)
 
 #### Train the Model ####
 
-#### Start of book function ####
-#nrow(dtm_train_matrix)
-numTrainDocs <- nrow(dtm_train_matrix)
-numWords <- ncol(dtm_train_matrix)
-
-pSpam <- sum(train$Class=="spam")/(numTrainDocs)
-pHam <- sum(train$Class=="ham")/(numTrainDocs)
-p0Num = matrix(1.0,nrow=1,ncol=numWords)
-p1Num = matrix(1.0,nrow=1,ncol=numWords)
-colnames(p0Num) <- colnames(dtm_train_matrix)
-colnames(p1Num) <- colnames(dtm_train_matrix)
-p0Denom <- 2.0
-p1Denom <- 2.0
-
-for ( i in 1:numTrainDocs) {
-  if (train$Class[i]=="spam") {
-    print(sprintf("Spam: %d",i))
-    p1Num <- p1Num + dtm_train_matrix[i,]
-    p1Denom <- p1Denom + sum(dtm_train_matrix[i,])
-    print("finish")
-  } else {
-    print(sprintf("Ham: %d",i))
-    p0Num <- p0Num + dtm_train_matrix[i,]
-    p0Denom <- p0Denom + sum(dtm_train_matrix[i,])
-  }
-}
-
-p1Vect <- log(p1Num/p1Denom) 
-p0Vect <- log(p0Num/p0Denom) 
-#### End of book function ####
-
 nbModel <- trainNaiveBayes(dtm_train_matrix,train$isSpam)
 
 
 #### Apply the model to the testing set ####
 
 numTestDocs <- nrow(dtm_test_matrix)
-resultsOld <- logical(numTestDocs)
 results <- logical(numTestDocs)
 
 for ( i in 1:numTestDocs) {
   testvec <- dtm_test_matrix[i,]
-  resultsOld[i] <- nbClassify(testvec,p0Vect,p1Vect,pSpam)
   results[i] <- predictNaiveBayes(nbModel,testvec)
   print(results[i])
 }
-
-# Doesn't work
-#results<- sapply(dtm_test_matrix,function(testvec){
-#  result <- nbClassify(testvec,p0Vect,p1Vect,pSpam)
-#  print(result)
-#  return(result)
-#})
 
 #### Models Performance ####
 
