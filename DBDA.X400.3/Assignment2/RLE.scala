@@ -7,8 +7,6 @@ object RLE {
 			val c = input.charAt(i)
 			val idx = input.indexWhere(_!=c,i+1)
 			val lim = if (idx>0) idx else input.length
-			//println(s"Current $c, next index $lim")
-			//println(s"${lim-i}$c")
 			buf ++= (lim-i).toString
 			buf += c
 			i = lim
@@ -21,7 +19,6 @@ object RLE {
 		var i:Int = 0
 		val buff = new StringBuilder
 		while(i < input.length) {
-			//val c = input.charAt(i)
 			val idx = input.indexWhere(isNotNum,i)
 			val lim = if (idx>=0) idx else input.length
 			try {
@@ -37,11 +34,6 @@ object RLE {
 		}
 		return(buff.toString)
 	}
-/*
-*/
-
-
-
 
 	def encoding(input:String) : String = {
 		def charEncoding(cl:List[Char]) : String = cl match {
@@ -55,7 +47,6 @@ object RLE {
 	}
 
 	def decoding(input:String) : String = {
-		//println(input)
 		val isNum = (c:Char) => (c>= '0' && c <='9')
 		input match {
 			case x if (x.isEmpty) => return "";
@@ -81,12 +72,6 @@ object RLE {
 			("","")
 		)
 		println("RLE test")
-//encoding(result)
-		//println(encoding(tests(1)._1))
-		//println(tests(1)._2)
-		//decoding(tests(1)._2)
-		//decoding("")
-		//println(decoding("2A3BCCDD1F10X"))
 		for((raw,rle) <- tests) {
 			println(s"Testing Encoding $raw")
 			val enc = encoding(raw)
