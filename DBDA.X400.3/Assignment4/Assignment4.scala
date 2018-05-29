@@ -3,6 +3,7 @@ import java.text.SimpleDateFormat
 
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.functions.{to_date,col,date_format}
 //import org.apache.spark.sql.functions.{window,col,expr}
 import org.apache.spark.sql.functions.desc
 //import org.apache.spark.sql.types._
@@ -97,7 +98,7 @@ object Assignment4 extends App{
 
   case class Violation(
                         business_id: Int,
-                        date: Int,
+                        date: String,
                         violationTypeID: Int,
                         risk_category: Option[String],
                         description: Option[String] )
@@ -105,7 +106,7 @@ object Assignment4 extends App{
   val violationsRDD = violationsSplitRDD
     .map(p =>Violation(
       p(0).trim.toInt,
-      p(1).trim.toInt,
+      p(1),
       p(2).trim.toInt,
       if(p(3)=="N/A") None else Some(p(3)),
       if (p.length<5) None else Some(p(4))
@@ -163,10 +164,27 @@ object Assignment4 extends App{
     .join(business_id_100,Seq("business_id"),"left_semi")
     .where($"risk_category"==="High Risk")
     .withColumnRenamed("date","dateString")
-    .select("business_id", "risk_category", "dateString", "description")
+    .withColumn("newDate",to_date(col("dateString"),"yyyyMMdd"))
+    .select(
+      col("business_id"),
+      col("risk_category"),
+      date_format(col("newDate"),"M/d/y").as("date"),
+      col("description"))
 
-  query5A.orderBy("business_id").show(20, false)
+  query5A.orderBy("business_id","date").show(20, false)
 
+  val query5B = violationsDF
+    .join(business_id_100,Seq("business_id","date"),"left_semi")
+    .where($"risk_category"==="High Risk")
+    .withColumnRenamed("date","dateString")
+    .withColumn("newDate",to_date(col("dateString"),"yyyyMMdd"))
+    .select(
+      col("business_id"),
+      col("risk_category"),
+      date_format(col("newDate"),"M/d/y").as("date"),
+      col("description"))
+
+  query5B.orderBy("business_id","date").show(20, false)
 
 
 
