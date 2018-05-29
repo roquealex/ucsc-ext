@@ -19,9 +19,38 @@ inspections <- read.csv("sf-food-csv/inspections_plus.csv",header=TRUE,stringsAs
 #products <- read.table("data_products.txt",header=FALSE,sep="#", comment.char = "")
 
 violations <- read.csv("sf-food-csv/violations_plus.csv",header=TRUE,stringsAsFactors = FALSE)
+
+business <- read.csv("sf-food-csv/businesses_plus.csv",header=TRUE,stringsAsFactors = FALSE)
   
+business$postal_code[grepl("CA",business$postal_code)] = NA
+business$postal_code[business$postal_code == "941102019"] = "94110"
+business$postal_code[business$postal_code == "941033148"] = "94103"
+
+business$postal_code[nchar(business$postal_code) != 5] = NA
+
+business$name[business$business_id==64333]= "The Creme Brulee Cart"
+business$name[business$business_id==66922]= "The Creme Brulee Cart"
+business$name[business$business_id==67807]= "The Creme Brulee Cart"
+business$name[business$business_id==70155]= "The Creme Brulee Cart"
+business$name[business$business_id==70705]= "Creme Brulee To Go"
+business$name[business$business_id==71259]= "Creme Brulee To Go"
+
+business$name[business$business_id==68091]= "Kien Thanh"
+
+business$name[business$business_id==75448]= "Laguna Cafe"
+
+business$name[business$business_id==81484]= "La Noisette Cafe and Deli"
+
+
+
 #knitr::kable(head(inspections,5),caption = "Inspections")
-knitr::kable(head(violations,5),caption = "Violations")
+#knitr::kable(head(violations,5),caption = "Violations")
+#knitr::kable(head(business,5),caption = "Violations")
+
+#knitr::kable(business[4332,],caption = "Violations")
+#knitr::kable(business[,1:7],caption = "Violations")
+
+
 
 ```
 
@@ -83,6 +112,25 @@ query5b <- violations %>%
   filter(risk_category=="High Risk") %>%
   select(business_id, risk_category, date, description)
 knitr::kable(query5b,caption = "Query 5b")
+```
+
+6) Average inspection score by zip code
+(inspections_plus.csv, businesses_plus.csv)
+
+Expected columns - (zip, average score with only two digits after decimal) - order by average inspection score in descending order
+
+```{r q6}
+
+zips <- business %>% select(business_id,postal_code)
+zips <- na.omit(zips)
+
+joinScoreZip <- na.omit(inspections) %>% select(business_id, score) %>% left_join(zips,by = "business_id")
+
+joinScoreZip <- na.omit(joinScoreZip)
+
+query6 <- joinScoreZip %>% group_by(postal_code) %>% summarise(avg = round(mean(score),2)) %>% arrange(desc(avg))
+
+knitr::kable(query6,caption = "Query 6")
 ```
 
 
