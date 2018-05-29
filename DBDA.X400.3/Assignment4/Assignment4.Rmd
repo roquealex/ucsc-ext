@@ -25,6 +25,65 @@ knitr::kable(head(violations,5),caption = "Violations")
 
 ```
 
-## Including Plots
+## Query 1
+
+1) What is the inspection score distribution like? (inspections_plus.csv)
+Expected output - (score, count) - order by score in descending order
+
+```{r q1}
+query1 <- na.omit(inspections) %>% group_by(score) %>% summarise(n()) %>% arrange((score))
+knitr::kable(head(query1,20),caption = "Violations")
+```
+
+## Query 2
+
+2) What is the risk category distribution like? (violations_plus.csv)
+Expected output - (risk category, count)
+
+```{r q2}
+query2 <- violations %>% group_by(risk_category) %>% summarise(n())
+knitr::kable(query2,caption = "Violations")
+```
+
+## Query 3
+
+Need clarification
+
+## Query 4
+
+Need clarification
+
+## Query 5
+
+5) Among all the restaurants that got 100 score, what kind of violations did they get (if any)
+(inspections_plus.csv, violations_plus.csv)
+
+(Examine "High Risk" violation only)
+
+Expected columns - (business_id, risk_category, date, description)
+
+Note - format the date in (month/day/year)
+
+
+```{r q5 a}
+# Version A any violation that a restaurant that has gotten the 100 score
+restaurants100 <- inspections %>% filter(score==100) %>% select(business_id) %>% distinct()
+query5a <- violations %>%
+  filter(business_id %in% restaurants100$business_id) %>%
+  filter(risk_category=="High Risk") %>%
+  select(business_id, risk_category, date, description)
+knitr::kable(query5a,caption = "Vio/lations")
+```
+
+```{r q5 b}
+# Version B the violation has to be the same day it got the 100 score
+restaurants100b <- inspections %>% filter(score==100) %>% select(business_id,date) %>% distinct()
+query5b <- violations %>%
+  semi_join(restaurants100b) %>%
+  filter(risk_category=="High Risk") %>%
+  select(business_id, risk_category, date, description)
+knitr::kable(query5b,caption = "Query 5b")
+```
+
 
 
