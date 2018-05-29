@@ -38,7 +38,7 @@ object Assignment4 extends App{
   val inspectionsSplitRDD = raw_inspections.map(_.split("\t"))
   inspectionsSplitRDD.persist()
 
-  val dateFormat = new SimpleDateFormat("yyyyMMdd")
+  //val dateFormat = new SimpleDateFormat("yyyyMMdd")
   // Allowing NA/ null type is reserved word
   case class Inspection(business_id:Int, score:Option[Int], date:String, Type:String)
 
@@ -133,6 +133,68 @@ object Assignment4 extends App{
   +-------------+-----+
   */
 
+  // Reading business
+  // Suggested schema:
+  /*
+  root
+   |-- business_id: integer (nullable = true) *
+   |-- name: string (nullable = true)  *
+   |-- address: string (nullable = true) *
+   |-- city: string (nullable = true) *
+   |-- postal_code: string (nullable = true) *
+   |-- latitude: double (nullable = true) *
+   |-- longitude: double (nullable = true) *
+   |-- phone_number: long (nullable = true)
+   |-- tax_code: string (nullable = true)
+   |-- business_certificate: integer (nullable = true)
+   |-- application_date: string (nullable = true)
+   |-- owner_name: string (nullable = true)
+   |-- owner_address: string (nullable = true)
+   |-- owner_city: string (nullable = true)
+   |-- owner_state: string (nullable = true)
+   |-- owner_zip: string (nullable = true)
+   */
+
+  case class Business(
+    business_id: Int,
+    name: String,
+    address: String,
+    city: String,
+    postal_code: Int,
+    latitude: Double,
+    longitude: Double
+  )
+
+  val businessSplitRDD = business.map(_.split("\t"))
+  businessSplitRDD.persist()
+
+  val cleanDouble = (x:String) => if(x.trim()=="") 0.0 else x.trim().toDouble
+  val cleanZip = (str: String) => str.trim() match  {
+    case x if (!x.matches("\\d+")) => -2
+    case x if (x.length()==9) => x.substring(0,5).toInt
+    case x if (x.length()==5) => x.toInt
+    case _ => -1
+  }
+  val businessRDD = businessSplitRDD
+    .map(p =>Business(
+      p(0).trim.toInt,
+      p(1),
+      p(2),
+      p(3),
+      cleanZip(p(4)),
+      cleanDouble(p(5)),
+      cleanDouble(p(6))
+      //if(p(3)=="N/A") None else Some(p(3)),
+      //if (p.length<5) None else Some(p(4))
+    ))//.filter(m => m.description=="EMPTY")
+  businessRDD.collect().foreach(println)
+
+  // A Few wrong zip codes:
+  //"941102019" "941"       "941033148" "941"
+  //"CA" "CA  94523" "0"
+  // Many off the gird address  Off The Grid  contain odd postal codes
+
+
   // 3) Which 20 businesses got lowest scores?
   //(inspections_plus.csv, businesses_plus.csv)
   //
@@ -157,6 +219,7 @@ object Assignment4 extends App{
   // Version A
 
   // Get the business that got 100
+  /*
   val business_id_100 = inspectionsDF.where($"score"===100)
   business_id_100.persist()
 
@@ -185,6 +248,7 @@ object Assignment4 extends App{
       col("description"))
 
   query5B.orderBy("business_id","date").show(20, false)
+  */
 
 
 
