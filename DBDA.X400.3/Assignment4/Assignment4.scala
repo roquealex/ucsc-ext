@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat
 
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.functions.{to_date,col,date_format}
+import org.apache.spark.sql.functions.{to_date,col,date_format,avg,round}
 //import org.apache.spark.sql.functions.{window,col,expr}
 import org.apache.spark.sql.functions.desc
 //import org.apache.spark.sql.types._
@@ -160,20 +160,20 @@ object Assignment4 extends App{
     name: String,
     address: String,
     city: String,
-    postal_code: Int,
-    latitude: Double,
-    longitude: Double
+    postal_code: Option[Int],
+    latitude: Option[Double],
+    longitude: Option[Double]
   )
 
   val businessSplitRDD = business.map(_.split("\t"))
   businessSplitRDD.persist()
 
-  val cleanDouble = (x:String) => if(x.trim()=="") 0.0 else x.trim().toDouble
+  val cleanDouble = (x:String) => if(x.trim()=="") None else Some(x.trim().toDouble)
   val cleanZip = (str: String) => str.trim() match  {
-    case x if (!x.matches("\\d+")) => -2
-    case x if (x.length()==9) => x.substring(0,5).toInt
-    case x if (x.length()==5) => x.toInt
-    case _ => -1
+    case x if (!x.matches("\\d+")) => None
+    case x if (x.length()==9) => Some(x.substring(0,5).toInt)
+    case x if (x.length()==5) => Some(x.toInt)
+    case _ => None
   }
   val businessRDD = businessSplitRDD
     .map(p =>Business(
@@ -187,12 +187,18 @@ object Assignment4 extends App{
       //if(p(3)=="N/A") None else Some(p(3)),
       //if (p.length<5) None else Some(p(4))
     ))//.filter(m => m.description=="EMPTY")
-  businessRDD.collect().foreach(println)
+  //businessRDD.collect().foreach(println)
+
+  val businessDF = businessRDD.toDF()
+  businessDF.show()
+  businessDF.printSchema()
 
   // A Few wrong zip codes:
   //"941102019" "941"       "941033148" "941"
   //"CA" "CA  94523" "0"
   // Many off the gird address  Off The Grid  contain odd postal codes
+
+  // There is an NA in the names 82649	N/A	2250 Irving St	SF
 
 
   // 3) Which 20 businesses got lowest scores?
@@ -250,8 +256,39 @@ object Assignment4 extends App{
   query5B.orderBy("business_id","date").show(20, false)
   */
 
+  // 6) Average inspection score by zip code
+  //(inspections_plus.csv, businesses_plus.csv)
+  //
+  //Expected columns - (zip, average score with only two digits after decimal) - order by average inspection score in descending order
 
+  /*
+   |-- business_id: integer (nullable = false)
+ |-- name: string (nullable = true)
+ |-- address: string (nullable = true)
+ |-- city: string (nullable = true)
+ |-- postal_code: integer (nullable = true)
+ |-- latitude: double (nullable = true)
+ |-- longitude: double (nullable = true)
+   */
 
+  //businessDF = businessRDD.toDF()
+
+  val zips = businessDF.select("business_id","postal_code").na.drop()
+  //zips.show()
+  val joinScoreZip = inspectionsDF.na.drop()
+    .select("business_id","score")
+    .join(
+      zips,
+      Seq("business_id"),
+      "inner")
+  //joinScoreZip.show()
+
+  val query6 = joinScoreZip
+    .groupBy("postal_code")
+    .agg(round(avg("score"),2).as("average"))
+    .orderBy(desc("average"))
+
+  query6.show(50)
 
 
 }
