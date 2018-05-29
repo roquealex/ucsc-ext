@@ -1,0 +1,30 @@
+---
+title: "Assignment 4"
+author: "Roque Arcudia"
+date: "May 28, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+```{r init}
+library(dplyr)
+inspections <- read.csv("sf-food-csv/inspections_plus.csv",header=TRUE,stringsAsFactors = FALSE)
+
+#products <- read.table("data_products.txt",header=FALSE,sep="#", comment.char = "")
+
+violations <- read.csv("sf-food-csv/violations_plus.csv",header=TRUE,stringsAsFactors = FALSE)
+  
+#knitr::kable(head(inspections,5),caption = "Inspections")
+knitr::kable(head(violations,5),caption = "Violations")
+
+```
+
+## Including Plots
+
+
