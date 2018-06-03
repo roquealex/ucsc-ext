@@ -15,14 +15,22 @@ import org.apache.spark.sql.functions.desc
 object Assignment4 extends App{
   println("Assignment 4")
 
-  val spark = SparkSession.builder
+  val sparkConf = SparkSession.builder
     .master("local[*]")
     .appName("Spark Word Count")
-    .getOrCreate()
+    .config("spark.driver.bindAddress", "127.0.0.1")
+    .config("spark.driver.host", "127.0.0.1")
+    //.config("spark.local.ip", "127.0.0.1")
+    //.config("spark.ui.enabled", "false")
+
+
+  val spark = sparkConf.getOrCreate()
+  //.setExecutorEnv("")
+  //spark.conf.set("spark.driver.bindAddress", "127.0.0.1")
 
   import spark.implicits._
 
-  val hw4root = "/Users/roquealex/Documents/ucsc-ext/DBDA.X400.3/Assignment4"
+  val hw4root = "/Users/roque/Documents/sandbox/ucsc-ext/DBDA.X400.3/Assignment4"
   val baseDir = s"$hw4root/sf-food-tsv"
 
   // Homework should start from here
