@@ -193,13 +193,63 @@ object Assignment4 extends App{
 
   // There are many variations (and typos) for San Francisco name
   val cleanCity = (str: String) => str match {
+      // First the exceptions:
     case "Sand Francisco" => "San Francisco"
     case "S F" => "San Francisco"
-    case s if (s.matches("\"?[Ss]\\.?[Ff]\\.?.*")) => "San Francisco"
-    case s if (s.toLowerCase().matches("\"?san fran.*")) => "San Francisco"
     case "SO. SAN FRANCISCO" => "So. San Francisco"
     case "SO.S.F." => "So. San Francisco"
-    case _ => str
+    case "CA" => ""
+    case "" => ""
+      // Variations of SF initials:
+    case s if (s.matches("\"?[Ss]\\.?[Ff]\\.?.*")) => "San Francisco"
+      // Variations and typos of San Francisco:
+    case s if (s.toLowerCase().matches("\"?san fran.*")) => "San Francisco"
+    // Remaining capitalize each word of the city:
+    case _ => str.toLowerCase().split(" ").map(s => s.capitalize).mkString(" ")
+  }
+
+  /* Before Merging:
+
++-----------------+-----+
+|             city|count|
++-----------------+-----+
+|          Oakland|    2|
+|        Brentwood|    1|
+|    San Francisco| 5982|
+|So. San Francisco|    7|
+|        Daly City|    1|
+|        San Bruno|    2|
+|         San Fran|    7|
+|          Hayward|    1|
+|               SF| 1329|
+|           Novato|    1|
+|    Pleasant Hill|    1|
+|         Millbrae|    1|
+|      Foster City|    1|
+|                 |  246|
++-----------------+-----+
+
+  * */
+
+
+
+  def cleanBusiness(b : Business): Business = {
+    // Deduct the city from Zip code if possible
+    val sfZips = Set(
+      94102, 94103, 94104, 94105, 94107, 94108, 94109, 94110, 94111, 94112,
+      94114, 94115, 94116, 94117, 94118, 94121, 94122, 94123, 94124, 94127,
+      94129, 94130, 94131, 94132, 94133, 94134, 94158,
+      // Missing from the list:
+      94188, 94101
+    )
+    b match {
+      case Business(id, name, addr, "", Some(94066), lat, lon) => Business(id, name, addr, "San Bruno", Some(94066), lat, lon)
+      case Business(id, name, addr, "", Some(94030), lat, lon) => Business(id, name, addr, "Millbrae", Some(94030), lat, lon)
+      case Business(id, name, addr, "", Some(94080), lat, lon) => Business(id, name, addr, "So. San Francisco", Some(94080), lat, lon)
+      case Business(id, name, addr, "", zip, lat, lon) => if (sfZips(zip.getOrElse(0))) Business(id, name, addr, "SF", zip, lat, lon) else b
+      case _ => b
+    }
+
   }
 
   val businessRDD = businessSplitRDD
@@ -214,7 +264,10 @@ object Assignment4 extends App{
       cleanDouble(p(6))
       //if(p(3)=="N/A") None else Some(p(3)),
       //if (p.length<5) None else Some(p(4))
-    ))//.filter(m => m.description=="EMPTY")
+    ))
+    .map(b => cleanBusiness(b))
+
+
   //businessRDD.collect().foreach(println)
 
   val businessDF = businessRDD.toDF()
@@ -260,8 +313,9 @@ object Assignment4 extends App{
     //.where($"city" !== "San Francisco")
     //.where($"city" !== "So. San Francisco")
     //.where($"city" !== "")
-    .where($"city" === "CA")
-    .show(
+    .where($"city" === "")
+    .na.drop(Seq("postal_code"))
+    .show(300)
 
   // 4) Which 20 businesses got highest scores?
   //(inspections_plus.csv, businesses_plus.csv)
