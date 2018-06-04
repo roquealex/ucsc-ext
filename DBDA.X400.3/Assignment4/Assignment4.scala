@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat
 
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.functions.{to_date,col,date_format,avg,round,udf,count,sum,expr,min}
+import org.apache.spark.sql.functions.{to_date,col,date_format,avg,round,udf,count,sum,expr,min,max}
 //import org.apache.spark.sql.functions.{window,col,expr}
 import org.apache.spark.sql.functions.desc
 //import org.apache.spark.sql.types._
@@ -237,12 +237,9 @@ object Assignment4 extends App{
       p(1),
       p(2),
       cleanCity(p(3)), // City
-      //p(3), // City
       cleanZip(p(4)),
       cleanDouble(p(5)),
       cleanDouble(p(6))
-      //if(p(3)=="N/A") None else Some(p(3)),
-      //if (p.length<5) None else Some(p(4))
     ))
     .map(b => cleanBusiness(b))
 
@@ -252,6 +249,13 @@ object Assignment4 extends App{
   val businessDF = businessRDD.toDF()
   businessDF.show()
   businessDF.printSchema()
+
+
+  //businessDF
+  //  .na.fill(Map("city" -> "N/A"))
+  //  .groupBy("city")
+  //  .count()
+  //  .show()
 
   // A Few wrong zip codes:
   //"941102019" "941"       "941033148" "941"
@@ -272,35 +276,33 @@ object Assignment4 extends App{
   val lowestScoresDF = inspectionsDF.na.drop()
     .groupBy("business_id")
     .agg(min("score").as("lowest_score"))
-    //.orderBy("lowest_score","business_id")
-    //.limit(20)
-  //lowestScoresDF.show(25)
 
   // My businessDF has already this fields only: business_id,name,address,city,postal_code,latitude,longitude
   val businessLowestScoresDF = businessDF
     .join(lowestScoresDF,Seq("business_id"),"inner")
     .orderBy("lowest_score","business_id")
-    //.limit(20)
+    .limit(20)
 
-  businessLowestScoresDF.show()
+  businessLowestScoresDF.show(30)
 
-  businessDF
-    .na.fill(Map("city" -> "N/A"))
-    .groupBy("city")
-    .count()
-    .show()
-  businessDF
-    //.where($"city" !== "San Francisco")
-    //.where($"city" !== "So. San Francisco")
-    //.where($"city" !== "")
-    .where($"city" === "")
-    .na.drop(Seq("postal_code"))
-    .show(300)
 
   // 4) Which 20 businesses got highest scores?
   //(inspections_plus.csv, businesses_plus.csv)
   //
   //Expected columns - (business_id,name,address,city,postal_code,score)
+
+  val highestScoresDF = inspectionsDF.na.drop()
+    .groupBy("business_id")
+    .agg(max("score").as("highest_score"))
+
+  val businessHighestScoresDF = businessDF
+    .join(highestScoresDF,Seq("business_id"),"inner")
+    .orderBy(desc("highest_score"),col("business_id"))
+    .limit(20)
+
+  businessHighestScoresDF.show(450)
+
+
 
   // 5) Among all the restaurants that got 100 score, what kind of violations did they get (if any)
   //(inspections_plus.csv, violations_plus.csv)
