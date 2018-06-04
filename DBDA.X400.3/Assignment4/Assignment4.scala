@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat
 
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.functions.{to_date,col,date_format,avg,round}
+import org.apache.spark.sql.functions.{to_date,col,date_format,avg,round,udf,count,sum,expr,min}
 //import org.apache.spark.sql.functions.{window,col,expr}
 import org.apache.spark.sql.functions.desc
 //import org.apache.spark.sql.types._
@@ -176,19 +176,39 @@ object Assignment4 extends App{
   val businessSplitRDD = business.map(_.split("\t"))
   businessSplitRDD.persist()
 
+  // If lat and long are empty then assign null
   val cleanDouble = (x:String) => if(x.trim()=="") None else Some(x.trim().toDouble)
+
+  // Assign null to no numeric or anything that is not 9 or 5 digit zip, 9 digit zip gets trimmed to 5
   val cleanZip = (str: String) => str.trim() match  {
     case x if (!x.matches("\\d+")) => None
     case x if (x.length()==9) => Some(x.substring(0,5).toInt)
     case x if (x.length()==5) => Some(x.toInt)
     case _ => None
   }
+
+  // Wrong zip city:
+  // FOSTER CITY|      94536| maybe union city
+  // OAKLAND|      94501| Really alameda
+
+  // There are many variations (and typos) for San Francisco name
+  val cleanCity = (str: String) => str match {
+    case "Sand Francisco" => "San Francisco"
+    case "S F" => "San Francisco"
+    case s if (s.matches("\"?[Ss]\\.?[Ff]\\.?.*")) => "San Francisco"
+    case s if (s.toLowerCase().matches("\"?san fran.*")) => "San Francisco"
+    case "SO. SAN FRANCISCO" => "So. San Francisco"
+    case "SO.S.F." => "So. San Francisco"
+    case _ => str
+  }
+
   val businessRDD = businessSplitRDD
     .map(p =>Business(
       p(0).trim.toInt,
       p(1),
       p(2),
-      p(3),
+      cleanCity(p(3)), // City
+      //p(3), // City
       cleanZip(p(4)),
       cleanDouble(p(5)),
       cleanDouble(p(6))
@@ -215,6 +235,33 @@ object Assignment4 extends App{
   //(This should be low score rather than lowest score)
   //
   //Expected columns - (business_id,name,address,city,postal_code,score)
+
+
+  val lowestScoresDF = inspectionsDF.na.drop()
+    .groupBy("business_id")
+    .agg(min("score").as("lowest_score"))
+    //.orderBy("lowest_score","business_id")
+    //.limit(20)
+  //lowestScoresDF.show(25)
+
+  // My businessDF has already this fields only: business_id,name,address,city,postal_code,latitude,longitude
+  val businessLowestScoresDF = businessDF
+    .join(lowestScoresDF,Seq("business_id"),"inner")
+    .orderBy("lowest_score","business_id")
+    //.limit(20)
+
+  businessLowestScoresDF.show()
+
+  businessDF
+    .groupBy("city")
+    .count()
+    .show()
+  businessDF
+    //.where($"city" !== "San Francisco")
+    //.where($"city" !== "So. San Francisco")
+    //.where($"city" !== "")
+    .where($"city" === "CA")
+    .show(
 
   // 4) Which 20 businesses got highest scores?
   //(inspections_plus.csv, businesses_plus.csv)
@@ -281,6 +328,7 @@ object Assignment4 extends App{
 
   //businessDF = businessRDD.toDF()
 
+  /*
   val zips = businessDF.select("business_id","postal_code").na.drop()
   //zips.show()
   val joinScoreZip = inspectionsDF.na.drop()
@@ -298,6 +346,91 @@ object Assignment4 extends App{
 
   query6.show(50)
 
+
+
+  // 7) Compute the proportion of all businesses in each neighborhood that have incurred at least one of the violations
+  //"High risk vermin infestation"
+  //"Moderate risk vermin infestation"
+  //"Sewage or wastewater contamination”
+  //"Improper food labeling or menu misrepresentation"
+  //"Contaminated or adulterated food”
+  //"Reservice of previously served foods"
+  //"Expected output: zip code, percentage"
+  //This question is asking for each neighborhood, what is the proportion of businesses that have incurred at least one of the above nasty violations
+  //
+  //Note: use UDF to determine which violations match with one of the above extremely bad violations
+  //
+  //Expected columns - (zip code, total violation count, extreme violation count, proportion with only two digits after decimal)
+  //
+  //Order the result by the proportion in descending order
+
+  // null case works fine:
+  def isNastyViolation(str : String): Boolean  =  str match {
+    case "High risk vermin infestation" => true
+    case "Moderate risk vermin infestation" => true
+    case "Sewage or wastewater contamination" => true
+    case "Improper food labeling or menu misrepresentation" => true
+    case "Contaminated or adulterated food" => true
+    case "Reservice of previously served foods" => true
+    //case null => true
+    case _ => false
+  }
+
+  //val myBool: Boolean = true
+  violationsDF.printSchema()
+  val isNastyViolationUDF = udf(isNastyViolation(_:String))
+  //violationsDF.na.drop(Seq("risk_category")) .groupBy("risk_category").count()//.orderBy(desc("risk_category"))
+  // 54 has misxture of tru and false
+  // 10 is only false
+  // 3855 is only false has null, 11 elements
+  //println(violationsDF.na.drop(Seq("risk_category")).count())
+
+  // Create a new column classifying if the violation belongs to the bad group.
+  // the risk category N/A gets discarded, empty (null) description is still used
+  val violationClassifiedDF = violationsDF.na.drop(Seq("risk_category"))
+    .withColumn("is_nasty_violation",isNastyViolationUDF(col("description")))
+
+  // Summarize showing number of violations and the number of bad violations per business
+  // Create a boolean representing that business had any of the bad ones
+  val violationSummaryDF = violationClassifiedDF
+    .groupBy("business_id")
+    .agg(
+      count("is_nasty_violation").as("violation_count"),
+      sum(col("is_nasty_violation").cast("Int")).as("extreme_violation_count"))
+    .withColumn("has_extreme_violation",col("extreme_violation_count")>0)
+
+   //   .orderBy("business_id")
+
+    //.where("is_nasty_violation")
+  //println(violationSummary.count())
+  //violationSummaryDF.show()
+
+  // merge with the zip data frame that has all the business ids and zip codes
+  val businessViolationSummaryDF = zips
+    .join(violationSummaryDF,Seq("business_id"),"left_outer")
+  //businessViolationSummaryDF.orderBy("business_id").show()
+
+  // Clean NA
+  val businessViolationSummaryNoNaDF = businessViolationSummaryDF.na.fill(Map(
+    "violation_count" -> 0,
+    "extreme_violation_count" -> 0,
+    "has_extreme_violation" -> false
+  ))
+  //businessViolationSummaryNoNaDF.orderBy("business_id").show()
+  //println(businessViolationSummaryNoNaDF.count())
+
+  val violationsPerZipDF = businessViolationSummaryNoNaDF
+    .groupBy("postal_code")
+    .agg(
+      sum("violation_count").as("total_violation_count"),
+      sum("extreme_violation_count").as("total_extreme_violation_count"),
+      round(
+        sum(col("has_extreme_violation").cast("Int"))/count("has_extreme_violation"),
+        2).as("proportion_of_business"))
+    .orderBy(desc("proportion_of_business"))
+  violationsPerZipDF.show()
+  println(violationsPerZipDF.count)
+  */
 
 }
 
