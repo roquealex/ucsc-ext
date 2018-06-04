@@ -167,7 +167,7 @@ object Assignment4 extends App{
     business_id: Int,
     name: String,
     address: String,
-    city: String,
+    city: Option[String],
     postal_code: Option[Int],
     latitude: Option[Double],
     longitude: Option[Double]
@@ -194,47 +194,22 @@ object Assignment4 extends App{
   // There are many variations (and typos) for San Francisco name
   val cleanCity = (str: String) => str match {
       // First the exceptions:
-    case "Sand Francisco" => "San Francisco"
-    case "S F" => "San Francisco"
-    case "SO. SAN FRANCISCO" => "So. San Francisco"
-    case "SO.S.F." => "So. San Francisco"
-    case "CA" => ""
-    case "" => ""
+    case "Sand Francisco" => Some("San Francisco")
+    case "S F" => Some("San Francisco")
+    case "SO. SAN FRANCISCO" => Some("So. San Francisco")
+    case "SO.S.F." => Some("So. San Francisco")
+    case "CA" => None
+    case "" => None
       // Variations of SF initials:
-    case s if (s.matches("\"?[Ss]\\.?[Ff]\\.?.*")) => "San Francisco"
+    case s if (s.matches("\"?[Ss]\\.?[Ff]\\.?.*")) => Some("San Francisco")
       // Variations and typos of San Francisco:
-    case s if (s.toLowerCase().matches("\"?san fran.*")) => "San Francisco"
+    case s if (s.toLowerCase().matches("\"?san fran.*")) => Some("San Francisco")
     // Remaining capitalize each word of the city:
-    case _ => str.toLowerCase().split(" ").map(s => s.capitalize).mkString(" ")
+    case _ => Some(str.toLowerCase().split(" ").map(s => s.capitalize).mkString(" "))
   }
 
-  /* Before Merging:
-
-+-----------------+-----+
-|             city|count|
-+-----------------+-----+
-|          Oakland|    2|
-|        Brentwood|    1|
-|    San Francisco| 5982|
-|So. San Francisco|    7|
-|        Daly City|    1|
-|        San Bruno|    2|
-|         San Fran|    7|
-|          Hayward|    1|
-|               SF| 1329|
-|           Novato|    1|
-|    Pleasant Hill|    1|
-|         Millbrae|    1|
-|      Foster City|    1|
-|                 |  246|
-+-----------------+-----+
-
-  * */
-
-
-
   def cleanBusiness(b : Business): Business = {
-    // Deduct the city from Zip code if possible
+    // Only functionality is to deduct the city from Zip code if possible
     val sfZips = Set(
       94102, 94103, 94104, 94105, 94107, 94108, 94109, 94110, 94111, 94112,
       94114, 94115, 94116, 94117, 94118, 94121, 94122, 94123, 94124, 94127,
@@ -243,10 +218,14 @@ object Assignment4 extends App{
       94188, 94101
     )
     b match {
-      case Business(id, name, addr, "", Some(94066), lat, lon) => Business(id, name, addr, "San Bruno", Some(94066), lat, lon)
-      case Business(id, name, addr, "", Some(94030), lat, lon) => Business(id, name, addr, "Millbrae", Some(94030), lat, lon)
-      case Business(id, name, addr, "", Some(94080), lat, lon) => Business(id, name, addr, "So. San Francisco", Some(94080), lat, lon)
-      case Business(id, name, addr, "", zip, lat, lon) => if (sfZips(zip.getOrElse(0))) Business(id, name, addr, "SF", zip, lat, lon) else b
+      case Business(id, name, addr, None, Some(94066), lat, lon) =>
+        Business(id, name, addr, Some("San Bruno"), Some(94066), lat, lon)
+      case Business(id, name, addr, None, Some(94030), lat, lon) =>
+        Business(id, name, addr, Some("Millbrae"), Some(94030), lat, lon)
+      case Business(id, name, addr, None, Some(94080), lat, lon) =>
+        Business(id, name, addr, Some("So. San Francisco"), Some(94080), lat, lon)
+      case Business(id, name, addr, None, zip, lat, lon) if (sfZips(zip.getOrElse(0))) =>
+        Business(id, name, addr, Some("San Francisco"), zip, lat, lon)
       case _ => b
     }
 
@@ -306,6 +285,7 @@ object Assignment4 extends App{
   businessLowestScoresDF.show()
 
   businessDF
+    .na.fill(Map("city" -> "N/A"))
     .groupBy("city")
     .count()
     .show()
