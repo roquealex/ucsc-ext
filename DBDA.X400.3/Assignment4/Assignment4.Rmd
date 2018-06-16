@@ -76,7 +76,28 @@ knitr::kable(query2,caption = "Violations")
 
 ## Query 3
 
-Need clarification
+3) Which 20 businesses got lowest scores?
+(inspections_plus.csv, businesses_plus.csv)
+
+(This should be low score rather than lowest score)
+
+Expected columns - (business_id,name,address,city,postal_code,score)
+
+ 1       74522           42
+ 2       68633           46
+ 3       18480           47
+ 4         286           49
+ 5       64154           50
+ 
+```{r q3}
+
+lowest_scores <- head(na.omit(inspections) %>% group_by(business_id) %>% summarise(lowest_score=min(score)) %>% arrange(lowest_score,business_id),20)
+
+business_extract <- business %>% select(business_id,name,address,city,postal_code,latitude,longitude)
+
+query3 <- lowest_scores %>% inner_join(business_extract, by = "business_id")
+
+```
 
 ## Query 4
 
@@ -131,6 +152,80 @@ joinScoreZip <- na.omit(joinScoreZip)
 query6 <- joinScoreZip %>% group_by(postal_code) %>% summarise(avg = round(mean(score),2)) %>% arrange(desc(avg))
 
 knitr::kable(query6,caption = "Query 6")
+```
+
+7) Compute the proportion of all businesses in each neighborhood that have incurred at least one of the violations
+"High risk vermin infestation"
+"Moderate risk vermin infestation"
+"Sewage or wastewater contamination”
+"Improper food labeling or menu misrepresentation"
+"Contaminated or adulterated food”
+"Reservice of previously served foods"
+"Expected output: zip code, percentage"
+This question is asking for each neighborhood, what is the proportion of businesses that have incurred at least one of the above nasty violations
+
+Note: use UDF to determine which violations match with one of the above extremely bad violations
+
+Expected columns - (zip code, total violation count, extreme violation count, proportion with only two digits after decimal)
+
+Order the result by the proportion in descending order
+
+Notes:
+
+This violations ids are NA:
+
+103163
+103164
+103168
+
+This one is empty description
+103140
+
+
+```{r q7}
+badViolations <- c(
+  "High risk vermin infestation",
+  "Moderate risk vermin infestation",
+  "Sewage or wastewater contamination",
+  "Improper food labeling or menu misrepresentation",
+  "Contaminated or adulterated food",
+  "Reservice of previously served foods"
+)
+
+#violations %>% filter(business_id==54) %>% mutate(bad_violations = description %in% badViolations) %>% summarise(total=n(),bad=sum(bad_violations),hasBad=any(bad_violations))
+
+#Create a list by business showing how many violations, how many bad violations and if they had any violation
+
+violationSummary <- violations %>% filter(risk_category!="N/A") %>%
+  mutate(bad_violations = description %in% badViolations) %>%
+  group_by(business_id) %>%
+  summarise(violation_count=n(),extreme_violation_count=sum(bad_violations),has_extreme_violation=any(bad_violations))
+  
+
+#sum(violationSummary$bad_violations)
+#query2 <- violations %>% group_by(description) %>% summarise(n())
+#knitr::kable(query2,caption = "Violations")
+
+#knitr::kable(violationSummary,caption = "Violations")
+
+joinBusiness <- zips %>% left_join(violationSummary,by = "business_id")
+
+
+#clean NA:
+joinBusiness$violation_count[is.na(joinBusiness$violation_count)] = 0
+joinBusiness$extreme_violation_count[is.na(joinBusiness$extreme_violation_count)] = 0
+joinBusiness$has_extreme_violation[is.na(joinBusiness$has_extreme_violation)] = FALSE
+
+query7 <- joinBusiness %>% group_by(postal_code) %>% summarise(
+  total_violation_count = sum(violation_count),
+  total_extreme_violation_count = sum(extreme_violation_count),
+  num = n(),
+  proportion_of_business = round(sum(has_extreme_violation)/n(),2)
+) %>% arrange(desc(proportion_of_business))
+
+
+knitr::kable(query7,caption = "Violations")
+
 ```
 
 
