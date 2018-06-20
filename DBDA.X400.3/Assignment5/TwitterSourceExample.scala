@@ -7,6 +7,10 @@ import org.apache.spark.sql.expressions.UserDefinedFunction
 
 import scala.collection.mutable
 
+/**
+  * Assignment #5 - Twitter Tweets Sentiment Analysis
+  * Roque Arcudia Hernandez
+  */
 
 /**
   * Created by hluu on 3/11/18.
