@@ -69,23 +69,6 @@ object TwitterSourceExample {
     tweetDF.printSchema()
 
     /*
-    val folder = "src/main/resources"
-
-    val positive = s"$folder/pos-words.txt"
-    val negative = s"$folder/neg-words.txt"
-    val stop = s"$folder/stop-words.txt"
-
-    val stopDF = spark.read.format("csv")
-      .option("header","false")
-      .option("inferSchema","true")
-      .load(stop)
-      .select(lower(col("_c0")).as("word"))
-    stopDF.persist()
-    stopDF.show()
-    stopDF.printSchema()
-*/
-
-    /*
     root
      |-- text: string (nullable = true)
      |-- user: string (nullable = true)
@@ -147,6 +130,7 @@ object TwitterSourceExample {
     // Creates exception:
     //classPosNegDF.persist()
 
+    // I need to separate the window in start and end to be abl to sink to csv
     val win30sSummaryDF = classPosNegDF
       .withWatermark("createdDate","1 minute")
       .groupBy(window(col("createdDate"),"30 seconds"))
@@ -169,32 +153,6 @@ object TwitterSourceExample {
       )
       .select("window.start","window.end","positive_total","negative_total","neutral_total","total_10")
 
-
-    /*
-    def udfCheckWord(wordList: Broadcast[Set[String]]): UserDefinedFunction = {
-      udf {(s: String) => if (wordList.value(s)) 1 else 0 }
-    }
-
-    //val positiveWords = posWordsRDD.collect().toSet
-    //val negativeWords = negWordsRDD.collect().toSet
-
-    val wordsPosNegDF = wordsDF
-      .withColumn("positive", udfCheckWord(spark.sparkContext.broadcast(positiveWords))(col("word")))
-      .withColumn("negative", udfCheckWord(spark.sparkContext.broadcast(negativeWords))(col("word")))
-
-    val wordsSummaryDF = wordsPosNegDF
-      .withWatermark("createdDate","1 minute")
-      .groupBy(col("text"), col("user"), col("createdDate"))
-      .agg(
-        sum("positive").as("positiveCount"),
-        sum("negative").as("negativeCount"))
-      .withColumn("score", col("positiveCount") - col("negativeCount"))
-
-    val windowSummaryDF = wordsSummaryDF
-      .groupBy(window(col("createdDate"),"30 seconds"))
-      .agg(sum("score"))
-      */
-
     // original:
     //val tweetQS = tweetDF.writeStream.format("console").option("truncate", false).start()
 
@@ -209,7 +167,7 @@ object TwitterSourceExample {
       val tweet30QS = win30sSummaryDF.writeStream.format("console").option("truncate", false).start()
       val tweet10QS = win10sSummaryDF.writeStream.format("console").option("truncate", false).start()
       //Thread.sleep(1000 * 35)
-      //Thread.sleep(1000 )
+      Thread.sleep(1000 )
       tweet30QS.awaitTermination()
     } else {
       val outputFolder = "src/main/output"
@@ -227,20 +185,9 @@ object TwitterSourceExample {
         .option("checkpointLocation", s"$outputFolder/checkpoint10")
         .start()
 
+      Thread.sleep(1000 )
       tweet30QS.awaitTermination()
     }
-
-    /*
-    Doesn't work:
-    18/06/19 09:04:24 ERROR MicroBatchExecution: Query [id = fd15d905-8af5-4d65-8d4a-cb32d9d852eb, runId = b72b3b5d-1b70-4f09-bc00-4887a455b419] terminated with error
-    java.lang.ClassCastException: org.apache.spark.sql.execution.streaming.SerializedOffset cannot be cast to org.apache.spark.sql.sources.v2.reader.streaming.Offset
-    // File:
-    //val tweet10QS = win10sSummaryDF.writeStream.format("console").option("truncate", false).start()
-      */
-
-
-    //Exception in thread "main" org.apache.spark.sql.AnalysisException: Multiple streaming aggregations are not supported with streaming DataFrames/Datasets;;
-
 
   }
 }
