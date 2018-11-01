@@ -26,7 +26,7 @@ Happy Kiting!
 # Data
 ```{r data_setup, include=FALSE}
 executionStart <- Sys.time()
-source('WeatherTest.R')
+source('WeatherMain.R')
 # General variables:
 stationID <- "IYUCATNT2"
 loc <- getPWSLocation(stationID)

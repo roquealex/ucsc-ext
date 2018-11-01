@@ -13,7 +13,7 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 
 executionStart <- Sys.time()
-source('WeatherTest.R')
+source('WeatherMain.R')
 # General variables:
 stationID <- "IYUCATNT2"
 loc <- getPWSLocation(stationID)
@@ -155,9 +155,9 @@ calendarDailySummary(daySum,targetDate)
 ## Monthly Report
 
 ```{r monthly_summary ,echo = FALSE}
-monthSum  <- computeMontlySummary(daySum)
+monthSum  <- computeMonthlySummary(daySum)
 
-plt <- ggplotMontlySummary(monthSum,startDateStr,endDateStr)
+plt <- ggplotMonthlySummary(monthSum,startDateStr,endDateStr)
 print(plt)
 ```
 
