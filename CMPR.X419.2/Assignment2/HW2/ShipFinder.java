@@ -29,27 +29,43 @@ public class ShipFinder {
             // Horizontal
             System.out.println("H");
             // find the first hit
-            int sx;
-            for (sx = x-(SHIP_SIZE-1) ; sx < x ; sx++) {
-              System.out.println(sx);
-              if(sx >= 0 && board.hit(sx,y)) {
-                System.out.println("Hit at "+sx+","+y);
+            int v;
+            for (v = x-(SHIP_SIZE-1) ; v < x ; v++) {
+              System.out.println(v);
+              if(v >= 0 && board.hit(v,y)) {
+                System.out.println("Hit at "+v+","+y);
                 break;
               }
             }
-            //int limit = sx+SHIP_SIZE;
-            System.out.println("Start at "+sx);
+            //int limit = v+SHIP_SIZE;
+            System.out.println("Start at "+v);
             result = new int[SHIP_SIZE][];
             for (int row = 0 ; row < result.length ; row++) {
-              result[row] = new int[]{sx+row,y};
+              result[row] = new int[]{v+row,y};
             }
             return result;
-            //return new int[SHIP_SIZE][2];
-            //return IntStream.range(sx,sx+SHIP_SIZE).mapToObj(nx -> new int[]{nx,y}).toArray();
-          } else {
+          } else if (!east && !west) {
             // Vertical
             System.out.println("V");
-            return new int[SHIP_SIZE][2];
+            // find the first hit
+            int v;
+            for (v = y-(SHIP_SIZE-1) ; v < y ; v++) {
+              System.out.println(v);
+              if(v >= 0 && board.hit(x,v)) {
+                System.out.println("Hit at "+x+","+v);
+                break;
+              }
+            }
+            //int limit = v+SHIP_SIZE;
+            System.out.println("Start at "+v);
+            result = new int[SHIP_SIZE][];
+            for (int row = 0 ; row < result.length ; row++) {
+              result[row] = new int[]{x,v+row};
+            }
+            return result;
+          } else {
+            // Error condition
+            return null;
           }
         }
       }

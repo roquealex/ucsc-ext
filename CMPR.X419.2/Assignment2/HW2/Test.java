@@ -11,15 +11,16 @@ public class Test {
       }
     }
     */
+
     /*
-    b.setCoord(3,4);
-    b.setCoord(3,5);
-    b.setCoord(3,6);
-    */
-    //b.setCoord(0,0);
     b.setCoord(1,0);
     b.setCoord(2,0);
     b.setCoord(3,0);
+    */
+
+    b.setCoord(3,4);
+    b.setCoord(3,5);
+    b.setCoord(3,6);
 
     b.print();
     ShipFinder sf = new ShipFinder(b);
