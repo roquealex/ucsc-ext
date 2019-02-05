@@ -322,7 +322,8 @@ ggplotMonthlySummary <- function(monthlySummary,startDateString,endDateString) {
 
 getPWSMap <- function(stationName) {
   loc <- getPWSLocation(stationName)
-  map <- get_map(location="Yucatan",zoom=5)
+  #map <- get_map(location="Yucatan",zoom=5) # API Errors
+  map <- get_map(location=loc,zoom=5)
   plt <- ggmap(map) +
     geom_point(aes(x = lon, y = lat), data = data.frame(loc), alpha = .75, col='red', size=2) +
     labs(title=paste("Location of Station",stationName), x="", y="")
