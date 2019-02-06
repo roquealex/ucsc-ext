@@ -1,6 +1,6 @@
 public class Test {
   public static void main(String[] args) {
-    Board b = new Board(10);
+    ArrayBoard b = new ArrayBoard(10);
     int dim = b.getGridSize();
     /*
     b.setCoord(3,4);
