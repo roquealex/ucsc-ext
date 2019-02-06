@@ -1,3 +1,4 @@
+// file Test.java
 public class Test {
   public static void main(String[] args) {
     ArrayBoard b = new ArrayBoard(10);

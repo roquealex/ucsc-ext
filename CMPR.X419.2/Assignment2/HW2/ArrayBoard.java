@@ -1,3 +1,4 @@
+// file ArrayBoard.java
 public class ArrayBoard implements Board {
 
   private int dim;
