@@ -20,74 +20,40 @@ public class ShipFinder {
           south = y!=(dim-1) && board.hit(x,y+1);
           west = x!=0 && board.hit(x-1,y);
           east = x!=(dim-1) && board.hit(x+1,y);
-          System.out.println("Hit "+x+","+y);
-          System.out.println("N "+north);
-          System.out.println("S "+south);
-          System.out.println("E "+east);
-          System.out.println("W "+west);
+
+          int vLimit;
+          boolean fixedX;
           if (!north && !south) {
             // Horizontal
-            System.out.println("H");
-            // find the first hit
-            int v;
-            for (v = x-(SHIP_SIZE-1) ; v < x ; v++) {
-              System.out.println(v);
-              if(v >= 0 && board.hit(v,y)) {
-                System.out.println("Hit at "+v+","+y);
-                break;
-              }
-            }
-            //int limit = v+SHIP_SIZE;
-            System.out.println("Start at "+v);
-            result = new int[SHIP_SIZE][];
-            for (int row = 0 ; row < result.length ; row++) {
-              result[row] = new int[]{v+row,y};
-            }
-            return result;
+            vLimit = x;
+            fixedX = false;
           } else if (!east && !west) {
             // Vertical
-            System.out.println("V");
-            // find the first hit
-            int v;
-            for (v = y-(SHIP_SIZE-1) ; v < y ; v++) {
-              System.out.println(v);
-              if(v >= 0 && board.hit(x,v)) {
-                System.out.println("Hit at "+x+","+v);
-                break;
-              }
-            }
-            //int limit = v+SHIP_SIZE;
-            System.out.println("Start at "+v);
-            result = new int[SHIP_SIZE][];
-            for (int row = 0 ; row < result.length ; row++) {
-              result[row] = new int[]{x,v+row};
-            }
-            return result;
+            vLimit = y;
+            fixedX = true;
           } else {
             // Error condition
             return null;
           }
+
+          // Find the first coordinate of the ship
+          int v;
+          for (v = vLimit -(SHIP_SIZE-1) ; v < vLimit  ; v++) {
+            if(v >= 0 && ((fixedX)?board.hit(x,v):board.hit(v,y))) {
+              break;
+            }
+          }
+          // Create a bi dimensional array to return
+          // {{x1,y1},{x2,y2},{x3,y3}}
+          result = new int[SHIP_SIZE][];
+          for (int row = 0 ; row < result.length ; row++) {
+            result[row] = (fixedX)?new int[]{x,v+row}:new int[]{v+row,y};
+          }
+          return result;
         }
       }
     }
     return null;
   }
 
-  /*
-  public static void main(String[] args) {
-    Board b = new Board(10);
-    //b.setCoord(3,3);
-    b.print();
-    int dim = b.getGridSize();
-    for (int y = 0 ; y < dim ; y++) {
-      for (int x = y%3 ; x < dim ; x+= 3) {
-        b.setCoord(x,y);
-      }
-    }
-    b.setCoord(3,4);
-    b.setCoord(3,5);
-    b.setCoord(3,6);
-    b.print();
-  }
-   */
 }

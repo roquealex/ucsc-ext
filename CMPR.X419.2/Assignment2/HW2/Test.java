@@ -18,9 +18,15 @@ public class Test {
     b.setCoord(3,0);
     */
 
+    /*
     b.setCoord(3,4);
     b.setCoord(3,5);
     b.setCoord(3,6);
+    */
+
+    b.setCoord(4,3);
+    b.setCoord(5,3);
+    b.setCoord(6,3);
 
     b.print();
     ShipFinder sf = new ShipFinder(b);
