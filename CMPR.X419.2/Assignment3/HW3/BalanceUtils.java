@@ -50,22 +50,4 @@ public class BalanceUtils {
     return (stack.empty());
   }
 
-  public static void main(String s[]) throws IOException {
-    System.out.println("Balance test");
-    //String test = "{ ff { } dd}";
-    String test = "{ ff [<{ }>] dd}";
-    //String test = "{ ff [<{ }>] dd";
-    //String test = "ff [<{ }>] dd}";
-    //String test = "ff [{tt }x<ss>] dd";
-    //String test = "{ ff [<{ }>}] dd";
-    System.out.println(isBalancedString(test));
-    System.out.println(isBalancedFile("QueueUtil.java"));
-    Stack<Character> stack = new Stack<Character>();
-    stack.push('a');
-    stack.push('b');
-    stack.push('c');
-    System.out.println(stack.pop());
-    System.out.println(stack.pop());
-    System.out.println(stack.pop());
-  }
 }
