@@ -1,16 +1,10 @@
 // TestPalindrome.java
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class TestPalindrome {
 
-  @Test
-  public void testAdd() {
-    String str = "Junit is working fine";
-    assertEquals("Junit is working fine",str);
-  }
-
-  //public static void main(String arg[]) {
   @Test
   public void testPalindrome() {
     String[] palinSentences = new String[]{
@@ -39,7 +33,9 @@ public class TestPalindrome {
     };
     System.out.println("Test Palindrome");
     for (String test : palinSentences) {
-      System.out.println(Palindrome.isPalindromeSentence(test));
+      assertTrue(
+          "Expecting Palindrome '"+test+"'",
+          Palindrome.isPalindromeSentence(test));
     }
 
   }
@@ -56,10 +52,10 @@ public class TestPalindrome {
       "A Man, A Plan, A Camel-Panama!"
     };
     for (String test : noPalinSentences) {
-      System.out.println(Palindrome.isPalindromeSentence(test));
+      assertFalse(
+          "Expecting Non Palindrome '"+test+"'",
+          Palindrome.isPalindromeSentence(test));
     }
   }
-  /*
-  */
 }
 

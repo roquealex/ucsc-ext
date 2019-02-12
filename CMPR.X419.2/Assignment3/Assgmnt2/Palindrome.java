@@ -1,14 +1,13 @@
+// Palindrome.java
 public class Palindrome {
 
   public static boolean isPalindromeSentence(String sentence) {
     int leftIdx = 0;
     int rightIdx = sentence.length();
-    boolean result = true;
-    /*
-    for (int i = 0 ; i < rightIdx ; i++ ) {
-      System.out.println(sentence.charAt(i));
-    }
-    */
+
+    // Empty string is not a palindrome
+    if (rightIdx==0) return false;
+
     while (leftIdx != rightIdx) {
       // Advance left
       boolean notEmpty;
@@ -32,40 +31,8 @@ public class Palindrome {
             }
       leftIdx++;
     }
-    return result;
+    return true;
   }
 
-  public static void main(String arg[]) {
-    //String test = "This is sisi HT";
-    String[] palinSentences = new String[]{
-      "Eva, Can I Stab Bats In A Cave?",
-      "A Man, A Plan, A Canal-Panama!",
-      "Madam In Eden, I'm Adam",
-      "Mr. Owl Ate My Metal Worm",
-      "A Santa Lived As a Devil At NASA...",
-      "Dammit! I'm Mad!",
-      "Was It A Rat I Saw?",
-      "Do Geese See God?",
-      "Ma......a.m!",
-      "No!....devil...,.'....lived......on",
-      "32.23",
-      "12.5e-521"
-    };
-    System.out.println("Hello Pal");
-    for (String test : palinSentences) {
-      System.out.println(isPalindromeSentence(test));
-    }
-
-    String[] noPalinSentences = new String[]{
-      "This is a random sentence",
-      "It is harder to match",
-      ".$%@#$!()",
-      "Mr. Owl Ate May Metal Worm",
-      "A Man, A Plan, A Camel-Panama!"
-    };
-    for (String test : noPalinSentences) {
-      System.out.println(isPalindromeSentence(test));
-    }
-  }
 }
 
