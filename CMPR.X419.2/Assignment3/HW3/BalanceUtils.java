@@ -1,12 +1,27 @@
 import java.text.*;
 import java.util.Stack;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class BalanceUtils {
-  public static boolean isBalanced(String str){
+
+  public static boolean isBalancedString(String str) throws IOException {
+    StringReader reader = new StringReader(str);
+    return isBalanced(reader);
+  }
+
+  public static boolean isBalancedFile(String filename) throws IOException {
+    FileReader reader = new FileReader(filename);
+    return isBalanced(reader);
+  }
+
+  public static boolean isBalanced(Reader reader) throws IOException {
     Stack<Character> stack = new Stack<Character>();
-    CharacterIterator it = new StringCharacterIterator(str);
-    for (char c = it.first() ; c != CharacterIterator.DONE ; c = it.next()) {
-      //System.out.println(c);
+    int intChar;
+    while ((intChar=reader.read()) != -1) {
+      char c = (char)intChar;
       switch(c) {
         case '{' :
         case '(' :
@@ -35,15 +50,16 @@ public class BalanceUtils {
     return (stack.empty());
   }
 
-  public static void main(String s[]) {
+  public static void main(String s[]) throws IOException {
     System.out.println("Balance test");
     //String test = "{ ff { } dd}";
-    //String test = "{ ff [<{ }>] dd}";
+    String test = "{ ff [<{ }>] dd}";
     //String test = "{ ff [<{ }>] dd";
     //String test = "ff [<{ }>] dd}";
     //String test = "ff [{tt }x<ss>] dd";
-    String test = "{ ff [<{ }>}] dd";
-    System.out.println(isBalanced(test));
+    //String test = "{ ff [<{ }>}] dd";
+    System.out.println(isBalancedString(test));
+    System.out.println(isBalancedFile("QueueUtil.java"));
     Stack<Character> stack = new Stack<Character>();
     stack.push('a');
     stack.push('b');
