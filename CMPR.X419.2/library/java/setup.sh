@@ -5,4 +5,6 @@ export JUNIT_HOME=$PWD
 # 4.12
 #export CLASSPATH = $CLASSPATH:$JUNIT_HOME/junit4.12.jar:.
 # Dowloaded beta:
-export CLASSPATH=$JUNIT_HOME/junit-4.13-beta-2.jar:$JUNIT_HOME/hamcrest-2.1.jar:.
+#export CLASSPATH=$JUNIT_HOME/junit-4.13-beta-2.jar:$JUNIT_HOME/hamcrest-2.1.jar:.
+#export CLASSPATH=$JUNIT_HOME/:.
+export CLASSPATH=$JUNIT_HOME/junit-4.13-beta-2.jar:$JUNIT_HOME/hamcrest-2.1.jar:$JUNIT_HOME/:.
