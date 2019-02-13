@@ -1,3 +1,4 @@
+// TestBalanceUtils.java
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -42,11 +43,17 @@ public class TestBalanceUtils {
   }
 
   @Test
-  public void fileTest() throws IOException {
+  public void fileBalanceTest() throws IOException {
     System.out.println("File Balance test");
-    //System.out.println(BalanceUtils.isBalancedFile("QueueUtil.java"));
-    assertTrue(BalanceUtils.isBalancedFile("QueueUtil.java"));
+    assertTrue(BalanceUtils.isBalancedFile("QueueUtils.java"));
   }
+
+  @Test
+  public void fileImbalanceTest() throws IOException {
+    System.out.println("File Imbalance test");
+    assertFalse(BalanceUtils.isBalancedFile("BalanceUtils.java"));
+  }
+
 
 
 }

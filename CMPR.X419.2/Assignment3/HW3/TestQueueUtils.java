@@ -1,22 +1,44 @@
-// TestQueueUtils.java
-import java.util.Queue;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.stream.IntStream;
 
 public class TestQueueUtils {
 
-  public static void main(String[] s) {
+  @Test
+  public void basicTestReverse() {
     LinkedList<Integer> ll= new LinkedList<Integer>();
-    ll.add(1);
-    ll.add(2);
-    ll.add(3);
-    ll.add(4);
+    int i;
+    for (i = 0 ; i < 5 ; i++) {
+      ll.add(i);
+    }
     QueueUtils.reverseQueue(ll);
-    System.out.println("reversing");
-    for (int i : ll) {
-      System.out.println(i);
+    for (int x : ll) {
+      //System.out.println(x);
+      assertEquals(x,--i);
     }
   }
+
+  @Test
+  public void otherTestReverse() {
+    LinkedList<Integer> ll = new LinkedList<Integer>(Arrays.asList(-231,23,322,-54,2,9,1,345,-7));
+    Integer[] arr = ll.toArray(new Integer[0]);
+    int i = arr.length;
+    QueueUtils.reverseQueue(ll);
+    for (Integer x : ll) {
+      //System.out.println(x);
+      assertEquals(x,arr[--i]);
+    }
+  }
+
+  @Test
+  public void emptyTestReverse() {
+    LinkedList<Integer> ll = new LinkedList<Integer>();
+    assertEquals(ll.size(),0);
+    QueueUtils.reverseQueue(ll);
+    assertEquals(ll.size(),0);
+  }
+
 
 }
 
