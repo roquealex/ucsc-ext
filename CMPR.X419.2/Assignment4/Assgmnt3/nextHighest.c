@@ -43,6 +43,13 @@ void printList(struct node_t *list) {
   }
 }
 
+void deleteList(struct node_t *list) {
+  if (list) {
+    deleteList(list->next);
+    free(list);
+  }
+}
+
 void initNextHighest(struct node_t *list) {
   if(list) {
     list->nextHighest = list->next;
@@ -69,6 +76,8 @@ int main() {
   struct node_t *list = createListFromArray(a, sizeof(a)/sizeof(a[0]), 0);
   initNextHighest(list);
   printList(list);
+  deleteList(list);
+  list = NULL;
   return 0;
 }
 
