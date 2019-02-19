@@ -31,6 +31,7 @@ void deleteList(node_t *list) {
   }
 }
 
+/*
 node_t *initNextHigher(node_t *list) {
   // Build a heap with node pointers:
   std::vector<node_t*> node_heap;
@@ -52,4 +53,5 @@ node_t *initNextHigher(node_t *list) {
   }
   return ptr;
 }
+*/
 
