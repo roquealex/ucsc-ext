@@ -1,6 +1,6 @@
 CXXFLAGS =	-std=c++11 -g -Wall -fmessage-length=0
 
-OBJS =	main.o
+OBJS =	main.o utils.o
 
 LIBS =
 
