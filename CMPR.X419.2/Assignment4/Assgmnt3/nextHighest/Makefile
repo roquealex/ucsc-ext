@@ -1,6 +1,6 @@
-CFLAGS =	-Wall -fmessage-length=0
+CFLAGS =	-Wall -fmessage-length=0 -g
 
-OBJS =		nextHighest.o
+OBJS =		nextHighest.o utils.o
 
 LIBS =
 

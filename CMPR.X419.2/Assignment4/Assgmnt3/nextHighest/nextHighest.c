@@ -1,55 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <assert.h>
+#include "node.h"
+#include "utils.h"
 
-struct node_t {
-  struct node_t *next;
-  struct node_t *nextHighest;
-  int val;
-};
-
-struct node_t * createListFromArray(int *vals, size_t size, int initNextHighest) {
-  struct node_t *nextNode = NULL;
-  struct node_t *hi = NULL;
-  for (int i = size-1 ; i >=0 ; i--) {
-    struct node_t *node = (struct node_t*)malloc(sizeof(struct node_t));
-    node->next = nextNode;
-    if (initNextHighest) {
-      node->nextHighest = hi;
-    } else {
-      node->nextHighest = NULL;
-    }
-    node->val = vals[i];
-    nextNode = node;
-    if (hi) {
-      if (node->val > hi->val) {
-        hi = node;
-      }
-    } else {
-      hi = node;
-    }
-  }
-  return nextNode;
-}
-
-void printList(struct node_t *list) {
-  struct node_t *nextNode = list;
-  while(nextNode) {
-    printf("node: val %d",nextNode->val);
-    if (nextNode->nextHighest) {
-      printf(", nextHighest %d",nextNode->nextHighest->val);
-    }
-    printf("\n");
-    nextNode = nextNode->next;
-  }
-}
-
-void deleteList(struct node_t *list) {
-  if (list) {
-    deleteList(list->next);
-    free(list);
-  }
-}
-
+// Solution:
 void initNextHighest(struct node_t *list) {
   if(list) {
     list->nextHighest = list->next;
@@ -62,22 +16,64 @@ void initNextHighest(struct node_t *list) {
   }
 }
 
+#define NUM_TESTS 10
 int main() {
-  printf("Hello\n");
-  //int a[] = {1,2,3,4};
-  //int a[] = {3,10,1,7,5,4,2,9,8,6};
-  //int a[] = {4,6,7,9,10,2,8,1,3,5};
-//  int a[] = {5,1,9,8,10,4,6,3,2,7};
-  //int a[] = {10,7,2,3,4,1,6,8,9,5};
-  //int a[] = {6,3,7,8,4,5,1,2,9,10};
-  //int a[] = {10,7,2,3,9,4,1,6,8,9,5};
-  //int a[] = {-3,10,-10,3,-5,4,7,9,-9,-7,2,5,-8,6,-6,-4,0,-2,1,-1,8};
-  int a[] = {2,7,-6,-2,1,-9,3,10,4,5,9,-7,-1,8,-3,-5,-10,6,-4,0,-8};
-  struct node_t *list = createListFromArray(a, sizeof(a)/sizeof(a[0]), 0);
-  initNextHighest(list);
-  printList(list);
-  deleteList(list);
-  list = NULL;
+
+  int test0[] = {2,7,-6,-2,1,-9,3,10,4,5,9,-7,-1,8,-3,-5,-10,6,-4,0,-8};
+  int test1[] = {1,2,3,4};
+  int test2[] = {3,10,1,7,5,4,2,9,8,6};
+  int test3[] = {4,6,7,9,10,2,8,1,3,5};
+  int test4[] = {5,1,9,8,10,4,6,3,2,7};
+  int test5[] = {10,7,2,3,4,1,6,8,9,5};
+  int test6[] = {6,3,7,8,4,5,1,2,9,10};
+  int test7[] = {10,7,2,3,9,4,1,6,8,9,5};
+  int test8[] = {-1000,1000,2000,500,400};
+  int test9[] = {0};
+
+  int *test[NUM_TESTS] = {
+    test0,test1,test2,test3,test4,
+    test5,test6,test7,test8,test9
+  };
+
+  int testSize[NUM_TESTS] = {
+    sizeof(test0)/sizeof(int), sizeof(test1)/sizeof(int),
+    sizeof(test2)/sizeof(int), sizeof(test3)/sizeof(int),
+    sizeof(test4)/sizeof(int), sizeof(test5)/sizeof(int),
+    sizeof(test6)/sizeof(int), sizeof(test7)/sizeof(int),
+    sizeof(test8)/sizeof(int), sizeof(test9)/sizeof(int)
+  };
+
+  for (int i = 0 ; i < NUM_TESTS; i++) {
+    int *a = test[i];
+    int aSize = testSize[i];
+    struct node_t *ptr, *ptrGold;
+    struct node_t *list = createListFromArray(a, aSize, 0);
+    struct node_t *golden = createListFromArray(a, aSize, 1);
+    initNextHighest(list);
+    printList(list);
+
+    ptr = list;
+    ptrGold = golden;
+    while (ptr && ptrGold) {
+      assert(ptr->val == ptrGold->val);
+      if (ptr->nextHighest) {
+        assert(ptrGold->nextHighest);
+        assert(ptr->nextHighest->val == ptrGold->nextHighest->val);
+      } else {
+        assert(!ptrGold->nextHighest);
+      }
+      ptr = ptr->next;
+      ptrGold = ptrGold->next;
+    }
+    assert(ptr==NULL);
+    assert(ptrGold==NULL);
+
+    deleteList(list);
+    deleteList(golden);
+    list = NULL;
+    golden = NULL;
+  }
+  printf("Test PASSED\n");
   return 0;
 }
 
