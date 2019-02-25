@@ -34,11 +34,11 @@ public class TreeUtils {
       List<Node<T>> list = Arrays.asList(current.left,current.right);
       for (Node<T> dest : list) {
         if (dest!=null) {
-          out.println(String.format("n%d_%d -> n%d_%d",n,current.key,cnt,dest.key ));
+          out.println(String.format("n%d_%s -> n%d_%s",n,current.key.toString(),cnt,dest.key.toString() ));
           q.add(dest);
           qn.add(cnt++);
         } else {
-          out.println(String.format("n%d_%d -> null%d",n,current.key,nullCnt));
+          out.println(String.format("n%d_%s -> null%d",n,current.key.toString(),nullCnt));
           nullCnt++;
         }
       }
