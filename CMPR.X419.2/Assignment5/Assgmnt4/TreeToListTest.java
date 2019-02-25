@@ -3,8 +3,10 @@ import org.junit.Test;
 //import org.junit.Ignore;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-//import java.util.Random;
-//import java.util.Arrays;
+import java.util.Random;
+import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.Arrays;
 
 public class TreeToListTest {
   //public static final TreeTo test = new KthLargest();
@@ -65,85 +67,57 @@ public class TreeToListTest {
     assertNull(head.right);
   }
 
-  @Test
-  public void random() {
-    Random rand = new Random(1);
-    int testVectors = 1000;
-    for (int i = 0 ; i < testVectors ; i++ ) {
-      System.out.println("Iteration "+i);
-      int size = rand.nextInt(1000)+1;
-      //int size = 15;
-      System.out.println("Chosen size "+size);
-      int a[] = rand.ints(0,(size*2)).limit(size).toArray();
-      int k = rand.nextInt(size)+1;
-      System.out.println(String.format("Random k=%d",k));
-      int result = test.findKthLargest(a,k);
-      //System.out.println(Arrays.toString(a));
-      Arrays.sort(a);
-      //System.out.println(Arrays.toString(a));
-      assertEquals(a[a.length-k],result);
-    }
-  }
-
-
-
-  /*
-  @Test(expected = IllegalArgumentException.class)
-  public void badHighTest() {
-    int a[] = {1,2,3,4,5,6};
-    System.out.println("Accesing a bad index");
-    int result = test.findKthLargest(a,7);
-  }
-
-  @Test
-  public void identityTest() {
-    int a[] = {10,9,8,7,6,5,4,3,2,1};
-    System.out.println("Identity");
-    for (int k = 1 ; k <= 10 ; k++) {
-      int result = test.findKthLargest(a,k);
-      assertEquals(10 + 1 - k, result);
-    }
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void nullArr() {
-    System.out.println("Null Array");
-    int notinit[]= null;
-    int result = test.findKthLargest(notinit,1);
-  }
-
-  @Test
-  public void focused() {
-    System.out.println("Focused");
-    int a[]= {1};
-    assertEquals(1,test.findKthLargest(a,1));
-    int b[]= {4,-1,5,-2,1,0,3,-3,-4,2,-5};
-    assertEquals(-5,test.findKthLargest(b,11));
-    assertEquals(-4,test.findKthLargest(b,10));
-    assertEquals(3,test.findKthLargest(b,3));
-    assertEquals(4,test.findKthLargest(b,2));
-    assertEquals(5,test.findKthLargest(b,1));
+  public <T> void inOrderJList(Node<T> root, LinkedList<T> list) {
+    if (root == null) return;
+    inOrderJList(root.left,list);
+    list.add(root.key);
+    inOrderJList(root.right,list);
   }
 
   @Test
   public void random() {
-    Random rand = new Random(1);
-    int testVectors = 1000;
-    for (int i = 0 ; i < testVectors ; i++ ) {
-      System.out.println("Iteration "+i);
-      int size = rand.nextInt(1000)+1;
-      //int size = 15;
-      System.out.println("Chosen size "+size);
-      int a[] = rand.ints(0,(size*2)).limit(size).toArray();
-      int k = rand.nextInt(size)+1;
-      System.out.println(String.format("Random k=%d",k));
-      int result = test.findKthLargest(a,k);
-      //System.out.println(Arrays.toString(a));
-      Arrays.sort(a);
-      //System.out.println(Arrays.toString(a));
-      assertEquals(a[a.length-k],result);
-    }
+    Random rnd = new Random(1);
+    Node<Integer> random;
+    System.out.println("Random Test");
+    for (int i = 0 ; i < 10000 ; i++) {
+      int height = rnd.nextInt(25)+1;
+      int maxVal = rnd.nextInt(5000)+3;
+      int nullCoef = rnd.nextInt(10)+2;
+      System.out.printf("rep %d, h:%d , max:%d, null:%d\n",i,height,maxVal,nullCoef);
+      random = TreeUtils.buildRandomIntTree(nullCoef, height, maxVal, rnd );
+      //random = TreeUtils.buildRandomIntTree(5, 10, 500, rnd );
+      Node<Integer> copy = TreeUtils.copyTree(random);
+      //inOrderPrint(random);
+      Node<Integer> head = TreeToList.createDList(copy);
+      Node<Integer> ptr = head;
+      Node<Integer> tail = null;
+
+      LinkedList<Integer> list = new LinkedList<>();
+
+      inOrderJList(random, list);
+      Iterator<Integer> it = list.iterator();
+
+      System.out.println("Forward");
+      while(it.hasNext()) {
+        int exp = it.next();
+        //System.out.printf("exp:%d , act:%d\n",exp,ptr.key);
+        assertEquals(exp,ptr.key.longValue());
+        tail = ptr;
+        ptr = ptr.right;
+      }
+      assertNull(ptr);
+
+      System.out.println("Backward");
+      it = list.descendingIterator();
+      ptr = tail;
+      while(it.hasNext()) {
+        int exp = it.next();
+        //System.out.printf("exp:%d , act:%d\n",exp,ptr.key);
+        assertEquals(exp,ptr.key.longValue());
+        ptr = ptr.left;
+      }
+      assertNull(ptr);
+    } // for
   }
-  */
 
 }
