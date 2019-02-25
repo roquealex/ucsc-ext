@@ -1,6 +1,5 @@
 // TreeToListTest.java
 import org.junit.Test;
-//import org.junit.Ignore;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import java.util.Random;
@@ -9,10 +8,8 @@ import java.util.Iterator;
 import java.util.Arrays;
 
 public class TreeToListTest {
-  //public static final TreeTo test = new KthLargest();
   @Test
   public void basic() {
-  //public static void main(String[] args) throws Exception {
     System.out.println("Basic test");
     String exp[] = {"cat","dog","bird","mouse","monkey","fish"};
     Node<String> n0 = new Node<>(exp[0]);
@@ -85,9 +82,7 @@ public class TreeToListTest {
       int nullCoef = rnd.nextInt(10)+2;
       System.out.printf("rep %d, h:%d , max:%d, null:%d\n",i,height,maxVal,nullCoef);
       random = TreeUtils.buildRandomIntTree(nullCoef, height, maxVal, rnd );
-      //random = TreeUtils.buildRandomIntTree(5, 10, 500, rnd );
       Node<Integer> copy = TreeUtils.copyTree(random);
-      //inOrderPrint(random);
       Node<Integer> head = TreeToList.createDList(copy);
       Node<Integer> ptr = head;
       Node<Integer> tail = null;
