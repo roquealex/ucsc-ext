@@ -10,7 +10,7 @@ public class TreeToList {
     return head;
   }
 
-  public static <T> Node<T> createCircularDList(Node<T> root) {
+  private static <T> Node<T> createCircularDList(Node<T> root) {
     if (root==null) return null;
     Node<T> left = createCircularDList(root.left);
     Node<T> right = createCircularDList(root.right);
