@@ -129,6 +129,27 @@ public class TreeUtils {
     descOrderPrint(node.left);
   }
 
+  public static Node<Integer> buildRandomSymmIntTree(int nullOneInN, int maxLevel, int max, Random rnd) {
+    Node<Integer> root = new Node<Integer>(rnd.nextInt(max));
+    root.left = TreeUtils.buildRandomIntTree(nullOneInN, maxLevel, max, rnd);
+    root.right = copyMirrorTree(root.left);
+    return root;
+  }
+
+  public static <T> Node<T> copyMirrorTree(Node<T> node) {
+    //Stack<Node<T>> s = new Stack<Node<T>>();
+    //Node<T> curr = node;
+    if (node == null) return null;
+    Node<T> lst = copyMirrorTree(node.left);
+    Node<T> rst = copyMirrorTree(node.right);
+    Node<T> nNode = new Node<T>(node.key);
+    nNode.right = lst;
+    nNode.left = rst;
+    return nNode;
+  }
+
+
+
   /*
   public static <T> void inOrderJList(Node<T> root, LinkedList<T> list) {
     if (root == null) return;
