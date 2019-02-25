@@ -19,6 +19,7 @@ public class TreeUtils {
     }
   }
 
+  /*
   public static <T> void dotTree(Node<T> node, String filename) throws IOException {
     Queue<Node<T>> q = new LinkedList<Node<T>>();
     Queue<Integer> qn = new LinkedList<Integer>();
@@ -46,6 +47,7 @@ public class TreeUtils {
     out.println("}");
     out.close();
   }
+  */
 
   public static Node<Integer> buildRandomIntTree(int nullOneInN, int maxLevel, int max, Random rnd) {
     Node<Integer> root = new Node<Integer>(rnd.nextInt(max));
@@ -75,6 +77,7 @@ public class TreeUtils {
     return root;
   }
 
+  /*
   public static Node<Integer> buildRandomIntBST(int numNodes, int max, Random rnd) {
     if (numNodes <= 0 ) return null;
     numNodes--;
@@ -104,6 +107,7 @@ public class TreeUtils {
     }
     return root;
   }
+  */
 
   public static <T> Node<T> copyTree(Node<T> node) {
     if (node == null) return null;
@@ -115,6 +119,7 @@ public class TreeUtils {
     return nNode;
   }
 
+  /*
   public static <T> void inOrderPrint(Node<T> node) {
     if (node == null) return;
     inOrderPrint(node.left);
@@ -128,6 +133,7 @@ public class TreeUtils {
     System.out.println(node.key);
     descOrderPrint(node.left);
   }
+  */
 
   public static Node<Integer> buildRandomSymmIntTree(int nullOneInN, int maxLevel, int max, Random rnd) {
     Node<Integer> root = new Node<Integer>(rnd.nextInt(max));
@@ -137,8 +143,6 @@ public class TreeUtils {
   }
 
   public static <T> Node<T> copyMirrorTree(Node<T> node) {
-    //Stack<Node<T>> s = new Stack<Node<T>>();
-    //Node<T> curr = node;
     if (node == null) return null;
     Node<T> lst = copyMirrorTree(node.left);
     Node<T> rst = copyMirrorTree(node.right);
@@ -147,112 +151,5 @@ public class TreeUtils {
     nNode.left = rst;
     return nNode;
   }
-
-
-
-  /*
-  public static <T> void inOrderJList(Node<T> root, LinkedList<T> list) {
-    if (root == null) return;
-    inOrderJList(root.left,list);
-    list.add(root.key);
-    inOrderJList(root.right,list);
-  }
-
-  public static <T> Node<T> createCircularDList(Node<T> root) {
-    if (root==null) return null;
-    Node<T> left = createCircularDList(root.left);
-    Node<T> right = createCircularDList(root.right);
-    Node<T> tail = null;
-    if (left != null) {
-      tail = left.left;
-      tail.right = root;
-      root.left = tail;
-    } else {
-      left = root;
-    }
-    if (right != null) {
-      tail = right.left;
-      root.right = right;
-      right.left = root;
-    } else {
-      tail = root;
-    }
-    left.left = tail;
-    tail.right = left;
-    return left;
-  }
-
-  public static <T> Node<T> createDList(Node<T> root) {
-    Node<T> head = createCircularDList(root);
-    Node<T> tail = head.left;
-    head.left = null;
-    tail.right = null;
-    return head;
-  }
-
-  public static void main(String s[]) throws Exception {
-    Random rnd = new Random(4);
-    Node<Integer> random;
-    for (int i = 0 ; i < 1000 ; i++) {
-    System.out.println("Random Tree");
-    //random = buildRandomIntTree(5, 6, 5, rnd );
-    random = buildRandomIntTree(5, 10, 500, rnd );
-    //random = buildRandomIntBST(1000, 50000, rnd );
-    dotTree(random,"random.dot");
-    Node<Integer> copy = copyTree(random);
-    //inOrderPrint(random);
-    Node<Integer> head = createDList(copy);
-    Node<Integer> ptr = head;
-    Node<Integer> tail = null;
-
-    LinkedList<Integer> list = new LinkedList<>();
-
-    inOrderJList(random, list);
-    Iterator<Integer> it = list.iterator();
-
-    System.out.println("JList");
-    //ptr = null;
-    while(it.hasNext()) {
-      int exp = it.next();
-      assert (ptr!=null) : "Null list";
-      System.out.printf("exp:%d , act:%d\n",exp,ptr.key);
-      assert (exp==ptr.key) : "Different";
-      tail = ptr;
-      ptr = ptr.right;
-    }
-    assert (ptr==null) : "Different Size";
-
-    System.out.println("List");
-    while(ptr!=null) {
-      System.out.println(ptr.key);
-      tail = ptr;
-      ptr = ptr.right;
-    }
-    System.out.println("Desc JList");
-    //descOrderPrint(random);
-    it = list.descendingIterator();
-
-    ptr = tail;
-
-    while(it.hasNext()) {
-      int exp = it.next();
-      assert (ptr!=null) : "Null list";
-      System.out.printf("exp:%d , act:%d\n",exp,ptr.key);
-      assert (exp==ptr.key) : "Different";
-      tail = ptr;
-      ptr = ptr.left;
-    }
-    assert (ptr==null) : "Different Size";
-
-
-    System.out.println("Desc list");
-    while(ptr!=null) {
-      System.out.println(ptr.key);
-      ptr = ptr.left;
-    }
-    } //for...
-
-  }
-  */
 
 }
