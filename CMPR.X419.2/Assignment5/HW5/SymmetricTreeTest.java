@@ -75,7 +75,7 @@ public class SymmetricTreeTest {
       int nullCoef = rnd.nextInt(10)+2;
       System.out.printf("n:%d, h:%d , max:%d, null:%d\n",counter,height,maxVal,nullCoef);
       random = TreeUtils.buildRandomIntTree(nullCoef, height, maxVal, rnd );
-      TreeUtils.dotTree(random,"random.dot");
+      //TreeUtils.dotTree(random,"random.dot");
       // Eliminating shorter than 4 trees since they
       // have high probability of symmetry
       assertTrue(!SymmetricTreeUtils.isSymmetric(random)||TreeUtils.getHeight(random)<4);

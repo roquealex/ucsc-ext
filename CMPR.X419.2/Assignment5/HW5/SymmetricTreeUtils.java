@@ -1,7 +1,7 @@
 // SymmetricTreeUtils.java
 public class SymmetricTreeUtils {
 
-  public static <T> boolean areMirroredTrees(Node<T> left, Node<T> right) {
+  private static <T> boolean areMirroredTrees(Node<T> left, Node<T> right) {
     if (left==null && right==null) {
       return true;
     } else if (left==null || right==null) {
