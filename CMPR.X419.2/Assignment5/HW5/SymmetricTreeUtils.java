@@ -21,7 +21,7 @@ public class SymmetricTreeUtils {
       return areMirroredTrees(root.left, root.right);
     } else {
       // Null tree is considered symmetric by
-      // extenssion of the 1 element case
+      // extension of the 1 element case
       return true;
     }
   }
