@@ -1,3 +1,4 @@
+// Fortune.java
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,9 +13,7 @@ public class Fortune {
   public static Pattern EMPTY_LINE = Pattern.compile("^\\s*$");
 
   public static void main(String[] s) {
-    //String filename = "test.txt";
-    String filename = "riddles";
-    //String filename = "out.txt";
+    String filename = "fortune.txt";
     ArrayList<String> quotes= new ArrayList<>();
     try {
       BufferedReader in
@@ -36,9 +35,7 @@ public class Fortune {
           buff.append(line);
           buff.append(END_OF_LINE);
         }
-        //System.out.println(line);
       }
-      //System.out.print(buff.toString());
     } catch (FileNotFoundException e) {
       System.err.printf("Filename %s does not exist\n",filename);
       System.exit(1);
@@ -52,9 +49,7 @@ public class Fortune {
     }
     Random rand = new Random(System.currentTimeMillis());
     // Select at random one:
-    //System.out.println(size);
     int selected = rand.nextInt(size);
-    //System.out.println(selected);
     System.out.print(quotes.get(selected));
   }
 }
