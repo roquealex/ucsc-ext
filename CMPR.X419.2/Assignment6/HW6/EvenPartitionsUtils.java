@@ -8,7 +8,7 @@ public class EvenPartitionsUtils {
     //System.out.println(last);
     int i = 0;
     // Get rid of leading zeros
-    while ((i < length) && s.charAt(i) == '0') i++;
+    //while ((i < length) && s.charAt(i) == '0') i++;
     printEvenPartitions(s.substring(i), s.substring(0,i));
   }
 
