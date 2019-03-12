@@ -2,7 +2,6 @@
 import org.junit.Test;
 import org.junit.Ignore;
 import static org.junit.Assert.assertEquals;
-//import java.util.Random;
 
 public class EvenPartitionsTest {
 
@@ -38,7 +37,7 @@ public class EvenPartitionsTest {
 
   @Test
   public void examples() {
-    System.out.println("Identity");
+    System.out.println("Examples");
     assertEquals(1, EvenPartitions.countEvenPartitions("10"));
     assertEquals(2, EvenPartitions.countEvenPartitions("22"));
     assertEquals(0, EvenPartitions.countEvenPartitions("333"));
@@ -52,13 +51,11 @@ public class EvenPartitionsTest {
     test = "345678";
     //1234
     //12, 34
-    EvenPartitionsUtils.printEvenPartitions(test);
     assertEquals(4, EvenPartitions.countEvenPartitions(test));
 
     test = "1234";
     //1234
     //12, 34
-    EvenPartitionsUtils.printEvenPartitions(test);
     assertEquals(2, EvenPartitions.countEvenPartitions(test));
 
     test = "2004";
@@ -71,9 +68,7 @@ public class EvenPartitionsTest {
     //2, 00, 4
     //2, 0, 04
     //2, 0, 0, 4
-    EvenPartitionsUtils.printEvenPartitions(test);
     assertEquals(8, EvenPartitions.countEvenPartitions(test));
-
 
     test = "434569278";
     // 16 partitions
@@ -93,16 +88,13 @@ public class EvenPartitionsTest {
     //4, 34, 5692, 78
     //4, 34, 56, 9278
     //4, 34, 56, 92, 78
-    EvenPartitionsUtils.printEvenPartitions(test);
     assertEquals(16, EvenPartitions.countEvenPartitions(test));
 
     test = "291567806543";
     // No partitions since last number is odd
-    EvenPartitionsUtils.printEvenPartitions(test);
     assertEquals(0, EvenPartitions.countEvenPartitions(test));
 
     test = "802243260";
-    EvenPartitionsUtils.printEvenPartitions(test);
     assertEquals(128, EvenPartitions.countEvenPartitions(test));
   }
 
