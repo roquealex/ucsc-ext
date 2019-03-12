@@ -52,16 +52,10 @@ public class Fortune {
     }
     Random rand = new Random(System.currentTimeMillis());
     // Select at random one:
-    System.out.println(size);
+    //System.out.println(size);
     int selected = rand.nextInt(size);
-    System.out.println(selected);
+    //System.out.println(selected);
     System.out.print(quotes.get(selected));
-    /*
-    for (String quote : quotes) {
-      System.out.print(quote);
-      System.out.println("=====================");
-    }
-    */
   }
 }
 
