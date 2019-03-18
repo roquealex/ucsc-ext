@@ -8,11 +8,17 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class CommonDictionary {
+public class CommonDictionary implements Dictionary {
   private HashSet<String> dictionary;
   private static final String inputFile = "words.txt.gz";
 
-  public CommonDictionary() {
+  private static final CommonDictionary INSTANCE = new CommonDictionary();
+
+  public static CommonDictionary getInstance() {
+    return INSTANCE;
+  }
+
+  private CommonDictionary() {
     dictionary = new HashSet<>(10000);
     try {
       InputStream gzipStream = new GZIPInputStream(new FileInputStream(inputFile));
@@ -40,6 +46,7 @@ public class CommonDictionary {
     }
   }
 
+  /*
   public static void main(String s[]) {
     CommonDictionary dic = new CommonDictionary();
     dic.show();
@@ -48,4 +55,7 @@ public class CommonDictionary {
     System.out.println(dic.contains("Dog"));
     System.out.println(dic.contains("bark"));
   }
+  */
+
+
 }
