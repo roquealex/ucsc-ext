@@ -26,10 +26,10 @@ public class CommonDictionary {
       System.err.println(e);
       System.exit(1);
     }
+  }
 
-    //dictionary.add("cat");
-    //dictionary.add("dog");
-    //dictionary.add("bird");
+  public boolean contains(String word) {
+    return dictionary.contains(word);
   }
 
   public void show() {
@@ -43,5 +43,9 @@ public class CommonDictionary {
   public static void main(String s[]) {
     CommonDictionary dic = new CommonDictionary();
     dic.show();
+    System.out.println(dic.contains("cat"));
+    System.out.println(dic.contains("dog"));
+    System.out.println(dic.contains("Dog"));
+    System.out.println(dic.contains("bark"));
   }
 }
