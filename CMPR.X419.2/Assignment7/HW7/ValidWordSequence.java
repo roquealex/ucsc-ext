@@ -1,4 +1,5 @@
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 public class ValidWordSequence {
   // Comparisson method
@@ -6,7 +7,7 @@ public class ValidWordSequence {
     if (d.contains(s)) return true;
     for (int i = 1 ; i < s.length() ; i++) {
       String pre = s.substring(0,i);
-      System.out.println(pre + " - " + s.substring(i));
+      //System.out.println(pre + " - " + s.substring(i));
       if (d.contains(pre) ) {
         String post = s.substring(i);
         if (isValidRec(post,d)) {
@@ -33,7 +34,7 @@ public class ValidWordSequence {
       for (int i = beginIdx+1 ; i < endIdx ; i++) {
         String pre = s.substring(beginIdx,i);
         String post = s.substring(i,endIdx);
-        System.out.println(pre + " - " + post);
+        //System.out.println(pre + " - " + post);
         if (d.contains(pre) ) {
           if (isValidDyn(s,d,i,endIdx,results)) {
             return setAndReturn(true,beginIdx,endIdx,results);
@@ -56,14 +57,14 @@ public class ValidWordSequence {
     boolean results[] = new boolean[len];
     for (int i = (len-1) ; i >= 0 ; i--) {
       String sub = s.substring(i);
-      System.out.println(sub);
+      //System.out.println(sub);
       if (d.contains(sub)) {
         results[i] = true;
       } else {
         for (int j = i+1 ; j < len ; j++) {
           if (results[j]) {
             String subsub = s.substring(i,j);
-            System.out.println(subsub);
+            //System.out.println(subsub);
             if (d.contains(subsub)) {
               results[i] = true;
               break;
@@ -72,19 +73,65 @@ public class ValidWordSequence {
         }
       }
     }
-    //return isValidDyn2(s, d, 0, s.length(),results);
     return results[0];
   }
 
+  public static class PerfInfo {
+    public PerfInfo(String name) {
+      this.name = name;
+    }
+    public String toCsv() {
+      return String.format("%s,%d,%d,%s",name,size,time,result?"TRUE":"FALSE");
+    }
+    public String name;
+    public int size;
+    public long time;
+    public boolean result;
+  }
+
+  public static boolean isValidProfiler(String s, Dictionary d,
+      BiFunction<String,Dictionary,Boolean> f) {
+    return isValidProfiler(s, d, f,null);
+  }
+  public static boolean isValidProfiler(String s, Dictionary d,
+      BiFunction<String,Dictionary,Boolean> f, PerfInfo perf) {
+    long start = System.nanoTime();
+    boolean result = f.apply(s,d);
+    long finish = System.nanoTime();
+    long timeElapsed = finish - start;
+    if (perf==null) {
+      System.out.println("Time elapsed "+timeElapsed);
+    } else {
+      perf.size = s.length();
+      perf.time = timeElapsed;
+      perf.result = result;
+    }
+    return result;
+  }
+
   public static void main(String s[]) {
-    Dictionary dic = CommonDictionary.getInstance();
+    int seed = 1;
+    FileDictionary dic = new FileDictionary("words.txt");
     dic.show();
-    //boolean b = isValidRec("catsundog",dic);
+    WordRandomizer wr = new WordRandomizer(dic,seed);
+
+    //System.out.println(wr.createRandomValid(10));
+    //System.out.println(wr.createRandomWord(10));
+    //System.out.println(wr.createRandomMix(10,10));
+
+    String str = wr.createRandomValid(1000);
+    //String str = wr.createRandomMix(1000,10);
+
+    System.out.println(str);
+    System.out.println(isValidProfiler(str,dic,ValidWordSequence::isValidRec));
+    System.out.println(isValidProfiler(str,dic,ValidWordSequence::isValid));
+    System.out.println(isValidProfiler(str,dic,ValidWordSequence::isValidSquare));
+    //System.out.println(isValidSquare(str,dic));
+
     /*
     boolean b = isValidRec(
     "catdogbirdfishwaterwindfiresnowsunmoonlightdarkphoneguitarrazorbookskateshoe",
     dic);
-    */
 
     boolean b = isValidRec(
     "moonlighteverlastingxdjdsfalsladhalhdglahdlgjahfdlkjghafldjkghalfjkhgakdfjh",
@@ -96,10 +143,12 @@ public class ValidWordSequence {
     String str = 
     //"moonlighteverlastingxdjdsfalsladhalhdglahdlgjahfdlkjghafldjkghalfjkhgakdfjh";
     "catdogbirdfishwaterwindfiresnowsunmoonlightdarkphoneguitarrazorbookskateshoe";
-    b = isValid(str, dic);
 
+    b = isValidRec(str,dic);
+    b = isValid(str, dic);
     b = isValidSquare(str, dic);
     System.out.println(b);
+    */
   }
 }
 

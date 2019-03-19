@@ -8,21 +8,28 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class CommonDictionary implements Dictionary {
+public class FileDictionary implements Dictionary {
   private HashSet<String> dictionary;
   private static final String inputFile = "words.txt.gz";
 
-  private static final CommonDictionary INSTANCE = new CommonDictionary();
+  //private static final FileDictionary INSTANCE = new FileDictionary();
 
-  public static CommonDictionary getInstance() {
-    return INSTANCE;
-  }
-
-  private CommonDictionary() {
+  public FileDictionary(String filename) {
     dictionary = new HashSet<>(10000);
+    int extIdx = filename.lastIndexOf('.');
+    boolean gzip = false;
+    if ( extIdx >= 0) {
+      String ext = filename.substring(extIdx);
+      gzip = ext.equals(".gz");
+      System.out.println("Found compress "+gzip);
+    }
     try {
-      InputStream gzipStream = new GZIPInputStream(new FileInputStream(inputFile));
-      BufferedReader reader = new BufferedReader(new InputStreamReader(gzipStream,"UTF-8"));
+      //InputStream istream = new GZIPInputStream(new FileInputStream(inputFile));
+      InputStream istream = new FileInputStream(filename);
+      if (gzip) {
+        istream = new GZIPInputStream(istream);
+      }
+      BufferedReader reader = new BufferedReader(new InputStreamReader(istream,"UTF-8"));
 
       String line = null;
       while ((line = reader.readLine()) != null) {
@@ -34,10 +41,12 @@ public class CommonDictionary implements Dictionary {
     }
   }
 
+  @Override
   public boolean contains(String word) {
     return dictionary.contains(word);
   }
 
+  @Override
   public void show() {
     Iterator<String> it = dictionary.iterator();
     while (it.hasNext()) {
@@ -46,9 +55,14 @@ public class CommonDictionary implements Dictionary {
     }
   }
 
+  public HashSet<String> getHashSet() {
+    return dictionary;
+  }
+
   /*
   public static void main(String s[]) {
-    CommonDictionary dic = new CommonDictionary();
+    FileDictionary dic = new FileDictionary("words.txt.gz");
+    //FileDictionary dic = new FileDictionary("words.txt");
     dic.show();
     System.out.println(dic.contains("cat"));
     System.out.println(dic.contains("dog"));
@@ -56,6 +70,5 @@ public class CommonDictionary implements Dictionary {
     System.out.println(dic.contains("bark"));
   }
   */
-
 
 }
