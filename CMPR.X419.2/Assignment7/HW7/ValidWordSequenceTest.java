@@ -1,6 +1,7 @@
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.ArrayList;
+import java.io.*;
 
 public class ValidWordSequenceTest {
 
@@ -33,11 +34,20 @@ public class ValidWordSequenceTest {
       System.out.println("Time elapsed "+timeElapsed);
     } else {
       perf.wordSize = s.length();
-      perf.wordSize = s.length();
+      perf.setSize = d.size();
       perf.time = timeElapsed;
       perf.result = result;
     }
     return result;
+  }
+
+  public static class FuncInfo{
+    public FuncInfo(String name, BiFunction<String,Dictionary,Boolean> func) {
+      this.func = func;
+      info = new PerfInfo(name);
+    }
+    public BiFunction<String,Dictionary,Boolean> func;
+    public PerfInfo info;
   }
 
   public static void main(String s[]) {
@@ -50,18 +60,66 @@ public class ValidWordSequenceTest {
     //System.out.println(wr.createRandomWord(10));
     //System.out.println(wr.createRandomMix(10,10));
 
-    String str = wr.createRandomValid(1000);
+    //String str = wr.createRandomValid(1000);
     //String str = wr.createRandomMix(3500,10);
+    
+    String str = wr.createRandomValid(200);
+    //String str = wr.createRandomMix(10000,10);
 
     System.out.println(str);
 
     ArrayList<BiFunction<String,Dictionary,Boolean>> funcs = new ArrayList<>();
     funcs.add(ValidWordSequence::isValidRec);
-    funcs.add(ValidWordSequence::isValid);
+    funcs.add(ValidWordSequence::isValidLinSpace);
+    //funcs.add(ValidWordSequence::isValid);
     funcs.add(ValidWordSequence::isValidSquare);
     for(BiFunction<String,Dictionary,Boolean> func : funcs) {
       System.out.println(isValidProfiler(str,dic,func));
     }
+
+
+    ArrayList<FuncInfo> funcList = new ArrayList<>();
+    funcList.add(new FuncInfo("isValidRec",ValidWordSequence::isValidRec));
+    funcList.add(new FuncInfo("isValidLinSpace",ValidWordSequence::isValidLinSpace));
+    funcList.add(new FuncInfo("isValidSquare",ValidWordSequence::isValidSquare));
+    // Print Writer:
+    //
+    PrintWriter out;
+    try {
+      out = new PrintWriter(new BufferedWriter(new FileWriter("out.csv")));
+      out.println("name,wordSize,setSize,time,result");
+
+      int total = 200;
+      int rep = 10;
+      for (int i = 1 ; i <= total ; i++) {
+        for (int j = 0 ; j < rep ; j++) {
+          System.out.printf("%d words\n",i);
+          String testStr = wr.createRandomValid(i);
+          for(FuncInfo func : funcList) {
+            boolean result = isValidProfiler(testStr,dic,func.func,func.info);
+            System.out.println(result);
+            out.println(func.info.toCsv());
+          }
+        }
+      }
+
+      for (int i = 1 ; i <= total ; i++) {
+        for (int j = 0 ; j < rep ; j++) {
+          System.out.printf("%d words\n",i);
+          String mixStr = wr.createRandomMix(i,10);
+          for(FuncInfo func : funcList) {
+            boolean result = isValidProfiler(mixStr,dic,func.func,func.info);
+            System.out.println(result);
+            out.println(func.info.toCsv());
+          }
+        }
+      }
+
+      out.close();
+    } catch (IOException e) {
+      System.exit(1);
+    }
+
     //System.out.println(isValidProfiler(str,dic,ValidWordSequence::isValidRec));
     //System.out.println(isValidProfiler(str,dic,ValidWordSequence::isValid));
     //System.out.println(isValidProfiler(str,dic,ValidWordSequence::isValidSquare));

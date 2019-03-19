@@ -1,6 +1,7 @@
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class ValidWordSequence {
   // Comparisson method recursive
@@ -17,51 +18,101 @@ public class ValidWordSequence {
     }
     return false;
   }
-  
-  // Dynamic: Saves in a bidimentional array the solution of the subproblem
-  public static boolean isValid(String s, Dictionary d) {
-    Boolean results[][] = new Boolean[s.length()][s.length()];
-    return isValidDyn(s, d, 0, s.length(),results);
+
+  public static boolean isValidLinSpace(String s, Dictionary d) {
+    Boolean results[] = new Boolean[s.length()];
+    return isValidDynLin(s, d, 0, s.length(),results);
   }
 
   // beginIdx inclusive
   // endIdx exclusive
-  private static boolean isValidDyn(String s, Dictionary d, int beginIdx, int endIdx, Boolean[][] results) {
-    if (results[beginIdx][endIdx-1]!=null) {
-      return (results[beginIdx][endIdx-1].booleanValue());
+  private static boolean isValidDynLin(String s, Dictionary d, int beginIdx, int endIdx, Boolean[] results) {
+    if (results[beginIdx]!=null) {
+      return (results[beginIdx].booleanValue());
     } else {
       String sub = s.substring(beginIdx,endIdx);
-      if (d.contains(sub)) return setAndReturn(true,beginIdx,endIdx,results);
+      if (d.contains(sub)) return setAndReturnLin(true,beginIdx,endIdx,results);
       for (int i = beginIdx+1 ; i < endIdx ; i++) {
         String pre = s.substring(beginIdx,i);
         String post = s.substring(i,endIdx);
         //System.out.println(pre + " - " + post);
         if (d.contains(pre) ) {
-          if (isValidDyn(s,d,i,endIdx,results)) {
-            return setAndReturn(true,beginIdx,endIdx,results);
+          if (isValidDynLin(s,d,i,endIdx,results)) {
+            return setAndReturnLin(true,beginIdx,endIdx,results);
           }
         }
       }
     }
-    //return false;
-    return setAndReturn(false,beginIdx,endIdx,results);
+    return setAndReturnLin(false,beginIdx,endIdx,results);
   }
-  private static boolean setAndReturn(boolean result, int beginIdx, int endIdx, Boolean[][] results) {
+
+  private static boolean setAndReturnLin(boolean result, int beginIdx, int endIdx, Boolean[] results) {
+    assert(results[beginIdx]==null);
+    //assert(false);
+    results[beginIdx] = new Boolean(result);
+    return result;
+  }
+ 
+
+  
+  // Dynamic: Saves in a bidimentional array the solution of the subproblem
+  public static boolean isValid(String s, Dictionary d) {
+    Boolean results[][] = new Boolean[s.length()][s.length()];
+    return isValidDynBi(s, d, 0, s.length(),results);
+  }
+
+  // beginIdx inclusive
+  // endIdx exclusive
+  private static boolean isValidDynBi(String s, Dictionary d, int beginIdx, int endIdx, Boolean[][] results) {
+    if (results[beginIdx][endIdx-1]!=null) {
+      return (results[beginIdx][endIdx-1].booleanValue());
+    } else {
+      String sub = s.substring(beginIdx,endIdx);
+      if (d.contains(sub)) return setAndReturnBi(true,beginIdx,endIdx,results);
+      for (int i = beginIdx+1 ; i < endIdx ; i++) {
+        String pre = s.substring(beginIdx,i);
+        String post = s.substring(i,endIdx);
+        //System.out.println(pre + " - " + post);
+        if (d.contains(pre) ) {
+          if (isValidDynBi(s,d,i,endIdx,results)) {
+            return setAndReturnBi(true,beginIdx,endIdx,results);
+          }
+        }
+      }
+    }
+    return setAndReturnBi(false,beginIdx,endIdx,results);
+  }
+
+  private static boolean setAndReturnBi(boolean result, int beginIdx, int endIdx, Boolean[][] results) {
     assert(results[beginIdx][endIdx-1]==null);
     //assert(false);
     results[beginIdx][endIdx-1] = new Boolean(result);
     return result;
   }
   
+  // Linked list 
+  // Time elapsed 102518587255
+  // It doesn't seem to be very different to use anything to save.
   public static boolean isValidSquare(String s, Dictionary d) {
     int len = s.length();
     boolean results[] = new boolean[len];
+    //ArrayList<Integer> solution = new ArrayList<>();
     for (int i = (len-1) ; i >= 0 ; i--) {
       String sub = s.substring(i);
       //System.out.println(sub);
       if (d.contains(sub)) {
         results[i] = true;
+        //solution.add(i);
       } else {
+        /*
+        for (int j = solution.size()-1; j >= 0 ; j--) {
+          String subsub = s.substring(i,solution.get(j));
+          if (d.contains(subsub)) {
+            solution.add(i);
+            break;
+          }
+        }
+        */
         for (int j = i+1 ; j < len ; j++) {
           if (results[j]) {
             String subsub = s.substring(i,j);
@@ -72,9 +123,12 @@ public class ValidWordSequence {
             }
           }
         }
+        /*
+        */
       }
     }
     return results[0];
+    //return solution.get(solution.size()-1)==0;
   }
 
   /*
