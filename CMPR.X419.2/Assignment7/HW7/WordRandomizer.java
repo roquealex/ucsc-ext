@@ -9,11 +9,10 @@ public class WordRandomizer {
   String[] validWords;
   Random rnd;
 
-  public WordRandomizer(FileDictionary dic,int seed) {
-    HashSet<String> set = dic.getHashSet();
-    int size = set.size();
+  public WordRandomizer(Dictionary dic,int seed) {
+    int size = dic.size();
     validWords = new String[size];
-    Iterator<String> it = set.iterator();
+    Iterator<String> it = dic.iterator();
     int i = 0 ;
     while(it.hasNext()) {
       String nextStr = it.next();
@@ -23,8 +22,8 @@ public class WordRandomizer {
     rnd = new Random(seed);
   }
 
-  public String createRandomValid(int maxSize) {
-    int count = rnd.nextInt(maxSize)+1;
+  public String createRandomValid(int count) {
+    //int count = rnd.nextInt(maxSize)+1;
     Optional<StringBuffer> sb = rnd.ints(count, 0, validWords.length)
       .mapToObj(x -> new StringBuffer(validWords[x]))
       .reduce((x,y) -> x.append(y));
@@ -41,11 +40,11 @@ public class WordRandomizer {
     return str;
   }
 
-  public String createRandomMix(int maxSize, int maxRndWordSize) {
-    int count = rnd.nextInt(maxSize)+1;
+  public String createRandomMix(int count, int maxSize) {
+    //int count = rnd.nextInt(maxSize)+1;
     StringBuffer sb =
       rnd.ints(count, -1*validWords.length, validWords.length)
-      .mapToObj(x -> (x>=0)?validWords[x]:createRandomWord(maxRndWordSize))
+      .mapToObj(x -> (x>=0)?validWords[x]:createRandomWord(maxSize))
       .reduce(new StringBuffer(),(x,y) -> x.append(y),(x,y) -> x.append(y));
     return sb.toString();
   }
