@@ -80,7 +80,7 @@ public class ValidWordSequenceTest {
 
     ArrayList<FuncInfo> funcList = new ArrayList<>();
     funcList.add(new FuncInfo("isValidRec",ValidWordSequence::isValidRec));
-    funcList.add(new FuncInfo("isValidLinSpace",ValidWordSequence::isValidLinSpace));
+    funcList.add(new FuncInfo("isValidnew",ValidWordSequence::isValidNew));
     funcList.add(new FuncInfo("isValidSquare",ValidWordSequence::isValidSquare));
     // Print Writer:
     //
@@ -89,7 +89,7 @@ public class ValidWordSequenceTest {
       out = new PrintWriter(new BufferedWriter(new FileWriter("out.csv")));
       out.println("name,wordSize,setSize,time,result");
 
-      int total = 200;
+      int total = 100;
       int rep = 10;
       for (int i = 1 ; i <= total ; i++) {
         for (int j = 0 ; j < rep ; j++) {
@@ -98,6 +98,7 @@ public class ValidWordSequenceTest {
           for(FuncInfo func : funcList) {
             boolean result = isValidProfiler(testStr,dic,func.func,func.info);
             System.out.println(result);
+            assert(result);
             out.println(func.info.toCsv());
           }
         }
@@ -111,6 +112,7 @@ public class ValidWordSequenceTest {
             boolean result = isValidProfiler(mixStr,dic,func.func,func.info);
             System.out.println(result);
             out.println(func.info.toCsv());
+            assert(!result || i < 20);
           }
         }
       }

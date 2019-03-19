@@ -54,6 +54,55 @@ public class ValidWordSequence {
   }
  
 
+  // Dynamic: Saves in a bidimentional array the solution of the subproblem
+  public static boolean isValidNew(String s, Dictionary d) {
+    Boolean results[][] = new Boolean[s.length()][s.length()];
+    return isValidDynNew(s, d, 0, s.length(),results);
+  }
+
+  // beginIdx inclusive
+  // endIdx exclusive
+  private static boolean isValidDynNew(String s, Dictionary d, int beginIdx, int endIdx, Boolean[][] results) {
+    //String sub = s.substring(beginIdx,endIdx);
+    //if (d.contains(sub)) return true;
+    if (substringIsInDictionary(s, d, beginIdx, endIdx, results)) return true;
+    for (int i = beginIdx+1 ; i < endIdx ; i++) {
+      //String pre = s.substring(beginIdx,i);
+      //if (d.contains(pre) ) {
+      if (substringIsInDictionary(s, d, beginIdx, i, results)) {
+        if (isValidDynNew(s,d,i,endIdx,results)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  // beginIdx inclusive
+  // endIdx exclusive
+  private static boolean substringIsInDictionary(String s, Dictionary d, int beginIdx, int endIdx, Boolean[][] results) {
+    if (results[beginIdx][endIdx-1]==null) {
+      String sub = s.substring(beginIdx,endIdx);
+      boolean result = d.contains(sub);
+      results[beginIdx][endIdx-1] = new Boolean(result);
+      return result;
+    } else {
+      boolean result = results[beginIdx][endIdx-1].booleanValue();
+      return result;
+    }
+  }
+
+  /*
+  private static boolean setAndReturnNew(boolean result, int beginIdx, int endIdx, Boolean[][] results) {
+    assert(results[beginIdx][endIdx-1]==null);
+    //assert(false);
+    results[beginIdx][endIdx-1] = new Boolean(result);
+    return result;
+  }
+  */
+  
+
+
   
   // Dynamic: Saves in a bidimentional array the solution of the subproblem
   public static boolean isValid(String s, Dictionary d) {
