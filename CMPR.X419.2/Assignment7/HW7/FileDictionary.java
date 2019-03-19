@@ -55,20 +55,18 @@ public class FileDictionary implements Dictionary {
     }
   }
 
+  @Override
+  public int size() {
+    return dictionary.size();
+  }
+
+  @Override
+  public Iterator<String> iterator() {
+    return dictionary.iterator();
+  }
+
   public HashSet<String> getHashSet() {
     return dictionary;
   }
-
-  /*
-  public static void main(String s[]) {
-    FileDictionary dic = new FileDictionary("words.txt.gz");
-    //FileDictionary dic = new FileDictionary("words.txt");
-    dic.show();
-    System.out.println(dic.contains("cat"));
-    System.out.println(dic.contains("dog"));
-    System.out.println(dic.contains("Dog"));
-    System.out.println(dic.contains("bark"));
-  }
-  */
 
 }
