@@ -1,5 +1,11 @@
 // ValidWordSequenceTest.java
-import java.util.Optional;
+import org.junit.Test;
+import org.junit.BeforeClass;
+import org.junit.AfterClass;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+
 import java.util.function.BiFunction;
 import java.util.ArrayList;
 import java.io.*;
@@ -46,15 +52,16 @@ public class ValidWordSequenceTest {
     return result;
   }
 
-  private PrintWriter out;
-  private Dictionary dic;
-  private WordRandomizer wr;
-  private ArrayList<FuncInfo> funcList;
+  private static PrintWriter out;
+  private static Dictionary dic;
+  private static WordRandomizer wr;
+  private static ArrayList<FuncInfo> funcList;
 
   public static final int TOTAL = 200;
   public static final int REP = 10;
 
-  public void setupTests() throws IOException {
+  @BeforeClass
+  public static void setupTests() throws IOException {
     int seed = 1;
     out = new PrintWriter(new BufferedWriter(new FileWriter("out.csv")));
     out.println("name,wordSize,setSize,time,result");
@@ -67,22 +74,24 @@ public class ValidWordSequenceTest {
     funcList.add(new FuncInfo("isValidSquare",ValidWordSequence::isValidSquare));
   }
   
+  @Test
   public void testEmpty() {
     System.out.println("Test Empty");
     String testStr = null;
     for(FuncInfo func : funcList) {
       boolean result = isValidProfiler(testStr,dic,func.func,null);
       System.out.println(result);
-      assert(!result);
+      assertFalse(result);
     }
     testStr = "";
     for(FuncInfo func : funcList) {
       boolean result = isValidProfiler(testStr,dic,func.func,null);
       System.out.println(result);
-      assert(!result);
+      assertFalse(result);
     }
   }
 
+  @Test
   public void testValid() {
     for (int i = 1 ; i <= TOTAL ; i++) {
       for (int j = 0 ; j < REP ; j++) {
@@ -91,13 +100,14 @@ public class ValidWordSequenceTest {
         for(FuncInfo func : funcList) {
           boolean result = isValidProfiler(testStr,dic,func.func,func.info);
           System.out.println(result);
-          assert(result);
+          assertTrue(result);
           out.println(func.info.toCsv());
         }
       }
     }
   }
 
+  @Test
   public void testRandom() {
     for (int i = 1 ; i <= TOTAL ; i++) {
       for (int j = 0 ; j < REP ; j++) {
@@ -110,7 +120,7 @@ public class ValidWordSequenceTest {
           System.out.println(result);
           out.println(func.info.toCsv());
           if (!first) {
-            assert(result==prevResult);
+            assertEquals(prevResult,result);
           } else {
             first = false;
           }
@@ -120,10 +130,12 @@ public class ValidWordSequenceTest {
     }
   }
 
-  public void cleanupTests() /*throws IOException*/ {
+  @AfterClass
+  public static void cleanupTests() /*throws IOException*/ {
     out.close();
   }
  
+  /*
   public static void main(String s[]) throws Exception {
 
     ValidWordSequenceTest test = new ValidWordSequenceTest();
@@ -134,5 +146,7 @@ public class ValidWordSequenceTest {
     test.cleanupTests();
 
   }
+  */
+
 }
 
