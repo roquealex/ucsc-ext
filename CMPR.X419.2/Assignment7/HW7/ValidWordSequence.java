@@ -31,12 +31,8 @@ public class ValidWordSequence {
   // beginIdx inclusive
   // endIdx exclusive
   private static boolean isValidDyn(String s, Dictionary d, int beginIdx, int endIdx, Boolean[][] results) {
-    //String sub = s.substring(beginIdx,endIdx);
-    //if (d.contains(sub)) return true;
     if (substringIsInDictionary(s, d, beginIdx, endIdx, results)) return true;
     for (int i = beginIdx+1 ; i < endIdx ; i++) {
-      //String pre = s.substring(beginIdx,i);
-      //if (d.contains(pre) ) {
       if (substringIsInDictionary(s, d, beginIdx, i, results)) {
         if (isValidDyn(s,d,i,endIdx,results)) {
           return true;
@@ -67,14 +63,12 @@ public class ValidWordSequence {
     boolean results[] = new boolean[len];
     for (int i = (len-1) ; i >= 0 ; i--) {
       String sub = s.substring(i);
-      //System.out.println(sub);
       if (d.contains(sub)) {
         results[i] = true;
       } else {
         for (int j = i+1 ; j < len ; j++) {
           if (results[j]) {
             String subsub = s.substring(i,j);
-            //System.out.println(subsub);
             if (d.contains(subsub)) {
               results[i] = true;
               break;
