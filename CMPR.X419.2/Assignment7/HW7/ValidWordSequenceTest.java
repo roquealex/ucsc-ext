@@ -70,7 +70,7 @@ public class ValidWordSequenceTest {
     wr = new WordRandomizer(dic,seed);
     funcList = new ArrayList<>();
     funcList.add(new FuncInfo("isValidRec",ValidWordSequence::isValidRec));
-    funcList.add(new FuncInfo("isValidnew",ValidWordSequence::isValidNew));
+    funcList.add(new FuncInfo("isValid",ValidWordSequence::isValid));
     funcList.add(new FuncInfo("isValidSquare",ValidWordSequence::isValidSquare));
   }
   
