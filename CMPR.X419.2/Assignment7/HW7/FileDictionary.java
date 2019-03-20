@@ -21,7 +21,7 @@ public class FileDictionary implements Dictionary {
     if ( extIdx >= 0) {
       String ext = filename.substring(extIdx);
       gzip = ext.equals(".gz");
-      System.out.println("Found compress "+gzip);
+      //System.out.println("Found compress "+gzip);
     }
     try {
       //InputStream istream = new GZIPInputStream(new FileInputStream(inputFile));

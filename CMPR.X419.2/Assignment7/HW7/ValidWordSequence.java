@@ -6,6 +6,7 @@ import java.util.LinkedList;
 public class ValidWordSequence {
   // Comparisson method recursive
   public static boolean isValidRec(String s, Dictionary d) {
+    if (s==null || s.length()==0) return false;
     if (d.contains(s)) return true;
     for (int i = 1 ; i < s.length() ; i++) {
       String pre = s.substring(0,i);
@@ -56,6 +57,7 @@ public class ValidWordSequence {
 
   // Dynamic: Saves in a bidimentional array the solution of the subproblem
   public static boolean isValidNew(String s, Dictionary d) {
+    if (s==null || s.length()==0) return false;
     Boolean results[][] = new Boolean[s.length()][s.length()];
     return isValidDynNew(s, d, 0, s.length(),results);
   }
@@ -139,29 +141,16 @@ public class ValidWordSequence {
     return result;
   }
   
-  // Linked list 
-  // Time elapsed 102518587255
-  // It doesn't seem to be very different to use anything to save.
   public static boolean isValidSquare(String s, Dictionary d) {
+    if (s==null || s.length()==0) return false;
     int len = s.length();
     boolean results[] = new boolean[len];
-    //ArrayList<Integer> solution = new ArrayList<>();
     for (int i = (len-1) ; i >= 0 ; i--) {
       String sub = s.substring(i);
       //System.out.println(sub);
       if (d.contains(sub)) {
         results[i] = true;
-        //solution.add(i);
       } else {
-        /*
-        for (int j = solution.size()-1; j >= 0 ; j--) {
-          String subsub = s.substring(i,solution.get(j));
-          if (d.contains(subsub)) {
-            solution.add(i);
-            break;
-          }
-        }
-        */
         for (int j = i+1 ; j < len ; j++) {
           if (results[j]) {
             String subsub = s.substring(i,j);
@@ -172,12 +161,9 @@ public class ValidWordSequence {
             }
           }
         }
-        /*
-        */
       }
     }
     return results[0];
-    //return solution.get(solution.size()-1)==0;
   }
 
   /*

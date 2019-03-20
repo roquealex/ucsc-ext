@@ -19,10 +19,21 @@ public class ValidWordSequenceTest {
     public boolean result;
   }
 
+  public static class FuncInfo{
+    public FuncInfo(String name, BiFunction<String,Dictionary,Boolean> func) {
+      this.func = func;
+      info = new PerfInfo(name);
+    }
+    public BiFunction<String,Dictionary,Boolean> func;
+    public PerfInfo info;
+  }
+
+  /*
   public static boolean isValidProfiler(String s, Dictionary d,
       BiFunction<String,Dictionary,Boolean> f) {
     return isValidProfiler(s, d, f,null);
   }
+  */
 
   public static boolean isValidProfiler(String s, Dictionary d,
       BiFunction<String,Dictionary,Boolean> f, PerfInfo perf) {
@@ -41,20 +52,99 @@ public class ValidWordSequenceTest {
     return result;
   }
 
-  public static class FuncInfo{
-    public FuncInfo(String name, BiFunction<String,Dictionary,Boolean> func) {
-      this.func = func;
-      info = new PerfInfo(name);
+  private PrintWriter out;
+  private Dictionary dic;
+  private WordRandomizer wr;
+  private ArrayList<FuncInfo> funcList;
+
+  public static final int TOTAL = 200;
+  public static final int REP = 10;
+
+  public void setupTests() throws IOException {
+    int seed = 1;
+    out = new PrintWriter(new BufferedWriter(new FileWriter("out.csv")));
+    out.println("name,wordSize,setSize,time,result");
+    dic = new FileDictionary("English3000.txt");
+    //dic.show();
+    wr = new WordRandomizer(dic,seed);
+    funcList = new ArrayList<>();
+    funcList.add(new FuncInfo("isValidRec",ValidWordSequence::isValidRec));
+    funcList.add(new FuncInfo("isValidnew",ValidWordSequence::isValidNew));
+    funcList.add(new FuncInfo("isValidSquare",ValidWordSequence::isValidSquare));
+  }
+  
+  public void testEmpty() {
+    System.out.println("Test Empty");
+    String testStr = null;
+    for(FuncInfo func : funcList) {
+      boolean result = isValidProfiler(testStr,dic,func.func,null);
+      System.out.println(result);
+      assert(!result);
     }
-    public BiFunction<String,Dictionary,Boolean> func;
-    public PerfInfo info;
+    testStr = "";
+    for(FuncInfo func : funcList) {
+      boolean result = isValidProfiler(testStr,dic,func.func,null);
+      System.out.println(result);
+      assert(!result);
+    }
   }
 
-  public static void main(String s[]) {
-    int seed = 1;
-    Dictionary dic = new FileDictionary("English3000.txt");
-    dic.show();
-    WordRandomizer wr = new WordRandomizer(dic,seed);
+  public void testValid() {
+    for (int i = 1 ; i <= TOTAL ; i++) {
+      for (int j = 0 ; j < REP ; j++) {
+        String testStr = wr.createRandomValid(i);
+        System.out.printf("%d words\n",i);
+        for(FuncInfo func : funcList) {
+          boolean result = isValidProfiler(testStr,dic,func.func,func.info);
+          System.out.println(result);
+          assert(result);
+          out.println(func.info.toCsv());
+        }
+      }
+    }
+  }
+
+  public void testRandom() {
+    for (int i = 1 ; i <= TOTAL ; i++) {
+      for (int j = 0 ; j < REP ; j++) {
+        String testStr = wr.createRandomMix(i,10);
+        System.out.printf("%d words\n",i);
+        //System.out.printf("%d words %s\n",i,testStr);
+        boolean first = true;
+        boolean prevResult = false;
+        for(FuncInfo func : funcList) {
+          boolean result = isValidProfiler(testStr,dic,func.func,func.info);
+          System.out.println(result);
+          //assert(result);
+          out.println(func.info.toCsv());
+          if (!first) {
+            assert(result==prevResult);
+          } else {
+            first = false;
+          }
+          prevResult = result;
+        }
+      }
+    }
+  }
+
+  public void cleanupTests() /*throws IOException*/ {
+    out.close();
+  }
+ 
+
+  public static void main(String s[]) throws Exception {
+
+    ValidWordSequenceTest test = new ValidWordSequenceTest();
+    test.setupTests();
+    test.testEmpty();
+    test.testValid();
+    test.testRandom();
+    test.cleanupTests();
+
+    //Dictionary dic = new FileDictionary("English3000.txt");
+    //dic.show();
+    //WordRandomizer wr = new WordRandomizer(dic,seed);
 
     //System.out.println(wr.createRandomValid(10));
     //System.out.println(wr.createRandomWord(10));
@@ -63,6 +153,7 @@ public class ValidWordSequenceTest {
     //String str = wr.createRandomValid(1000);
     //String str = wr.createRandomMix(3500,10);
     
+    /*
     String str = wr.createRandomValid(200);
     //String str = wr.createRandomMix(10000,10);
 
@@ -121,6 +212,8 @@ public class ValidWordSequenceTest {
     } catch (IOException e) {
       System.exit(1);
     }
+
+    */
 
     //System.out.println(isValidProfiler(str,dic,ValidWordSequence::isValidRec));
     //System.out.println(isValidProfiler(str,dic,ValidWordSequence::isValid));
