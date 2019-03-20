@@ -1,3 +1,4 @@
+// FileDictionary.java
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.zip.GZIPInputStream;
@@ -12,8 +13,6 @@ public class FileDictionary implements Dictionary {
   private HashSet<String> dictionary;
   private static final String inputFile = "words.txt.gz";
 
-  //private static final FileDictionary INSTANCE = new FileDictionary();
-
   public FileDictionary(String filename) {
     dictionary = new HashSet<>(10000);
     int extIdx = filename.lastIndexOf('.');
@@ -24,7 +23,6 @@ public class FileDictionary implements Dictionary {
       //System.out.println("Found compress "+gzip);
     }
     try {
-      //InputStream istream = new GZIPInputStream(new FileInputStream(inputFile));
       InputStream istream = new FileInputStream(filename);
       if (gzip) {
         istream = new GZIPInputStream(istream);
@@ -63,10 +61,6 @@ public class FileDictionary implements Dictionary {
   @Override
   public Iterator<String> iterator() {
     return dictionary.iterator();
-  }
-
-  public HashSet<String> getHashSet() {
-    return dictionary;
   }
 
 }

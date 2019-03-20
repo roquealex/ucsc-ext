@@ -1,4 +1,4 @@
-import java.util.HashSet;
+// WordRandomizer.java
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Optional;
@@ -23,7 +23,6 @@ public class WordRandomizer {
   }
 
   public String createRandomValid(int count) {
-    //int count = rnd.nextInt(maxSize)+1;
     Optional<StringBuffer> sb = rnd.ints(count, 0, validWords.length)
       .mapToObj(x -> new StringBuffer(validWords[x]))
       .reduce((x,y) -> x.append(y));
@@ -41,7 +40,6 @@ public class WordRandomizer {
   }
 
   public String createRandomMix(int count, int maxSize) {
-    //int count = rnd.nextInt(maxSize)+1;
     StringBuffer sb =
       rnd.ints(count, -1*validWords.length, validWords.length)
       .mapToObj(x -> (x>=0)?validWords[x]:createRandomWord(maxSize))
@@ -55,24 +53,4 @@ public class WordRandomizer {
     }
   }
 
-  /*
-  public static void main(String s[]) {
-    FileDictionary dic = new FileDictionary("words.txt.gz");
-    dic.show();
-    WordRandomizer wr = new WordRandomizer(dic,1000);
-    wr.show();
-    System.out.println("Randoms:");
-    System.out.println(wr.createRandomValid(10));
-    System.out.println(wr.createRandomValid(10));
-    System.out.println(wr.createRandomValid(10));
-    System.out.println(wr.createRandomWord(10));
-    System.out.println(wr.createRandomWord(10));
-    System.out.println(wr.createRandomWord(10));
-    System.out.println(wr.createRandomMix(10, 10));
-    System.out.println(wr.createRandomMix(10, 10));
-    System.out.println(wr.createRandomMix(10, 10));
-  }
-  */
-
 }
-
