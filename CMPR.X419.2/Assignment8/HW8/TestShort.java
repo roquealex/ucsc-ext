@@ -3,7 +3,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import java.util.PriorityQueue;
-public class Test {
+public class TestShort {
 
   public static class WordDistance implements Comparable<WordDistance> {
     public int distance;
