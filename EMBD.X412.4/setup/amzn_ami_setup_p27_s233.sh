@@ -2,12 +2,13 @@
 
 #ec2-user
 
-echo "#Userdata generated:" >> ~/.bashrc
+sudo -u ec2-user echo "#Userdata generated:" >> ~/.bashrc
 
 # Install wget and java
 echo Install wget and java
 sudo yum -y update
 sudo yum -y install wget
+sudo yum -y install git
 sudo yum -y install java-1.8.0-openjdk-devel
 sudo rm -f /usr/lib/jvm/jdk
 sudo ln -s $(ls -tdr1 /usr/lib/jvm/java-1.8.0-openjdk-1.8* | sort -n | tail -1) /usr/lib/jvm/jdk
