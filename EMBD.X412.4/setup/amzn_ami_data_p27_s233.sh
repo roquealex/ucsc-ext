@@ -1,8 +1,8 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 #ec2-user
 
-sudo -u ec2-user echo "#Userdata generated:" >> ~/.bashrc
+sudo -u ec2-user echo "#Userdata generated:" >> ~ec2-user/.bashrc
 
 # Install wget and java
 echo Install wget and java
@@ -37,11 +37,8 @@ echo "Use a Linux editor such as vi to install the export line (below) into your
 #-----
 #export JAVA_HOME=/usr/lib/jvm/jdk
 sudo -u ec2-user \
-echo "export JAVA_HOME=/usr/lib/jvm/jdk" >> ~/.bashrc
+echo "export JAVA_HOME=/usr/lib/jvm/jdk" >> ~ec2-user/.bashrc
 #-----
-
-# Execute the bashrc file
-#source ~/.bashrc 
 
 # Download Spark to the ec2-user's home directory
 pushd ~
@@ -61,18 +58,18 @@ popd
 
 #-----
 sudo -u ec2-user \
-echo 'export SPARK_HOME=/opt/spark' >> ~/.bashrc
+echo 'export SPARK_HOME=/opt/spark' >> ~ec2-user/.bashrc
 sudo -u ec2-user \
-echo 'PATH=$PATH:$SPARK_HOME/bin' >> ~/.bashrc
+echo 'PATH=$PATH:$SPARK_HOME/bin' >> ~ec2-user/.bashrc
 sudo -u ec2-user \
-echo 'export PATH' >> ~/.bashrc
+echo 'export PATH' >> ~ec2-user/.bashrc
 
 echo "PySpark - Jupyter setup"
 sudo -u ec2-user \
-echo 'export PYSPARK_DRIVER_PYTHON=jupyter' >> ~/.bashrc
+echo 'export PYSPARK_DRIVER_PYTHON=jupyter' >> ~ec2-user/.bashrc
 sudo -u ec2-user \
-echo "export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8080'" >> ~/.bashrc
-#echo 'export PYSPARK_PYTHON=python3' >> ~/.bashrc
+echo "export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8080'" >> ~ec2-user/.bashrc
+#echo 'export PYSPARK_PYTHON=python3' >> ~ec2-user/.bashrc
 
 # This is the link to basemap:
 #https://svwh.dl.sourceforge.net/project/matplotlib/matplotlib-toolkits/basemap-1.0.7/basemap-1.0.7.tar.gz
@@ -81,11 +78,11 @@ echo "export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8080'" >> 
 #sudo amazon-linux-extras -y mate-desktop
 amazon-linux-extras install -y mate-desktop1.x
 sudo -u ec2-user \
-echo '#!/bin/bash' > ~/.Xclients
+echo '#!/bin/bash' > ~ec2-user/.Xclients
 sudo -u ec2-user \
-echo 'exec "$(type -p mate-session)"' >> ~/.Xclients
+echo 'exec "$(type -p mate-session)"' >> ~ec2-user/.Xclients
 sudo -u ec2-user \
-chmod 755 ~/.Xclients
+chmod 755 ~ec2-user/.Xclients
 
 # Installing basemap and dependencies
 yum -y install gcc-c++
