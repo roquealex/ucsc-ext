@@ -6,41 +6,37 @@ sudo -u ec2-user echo "#Userdata generated:" >> ~/.bashrc
 
 # Install wget and java
 echo Install wget and java
-sudo yum -y update
-sudo yum -y install wget
-sudo yum -y install git
-sudo yum -y install java-1.8.0-openjdk-devel
-sudo rm -f /usr/lib/jvm/jdk
-sudo ln -s $(ls -tdr1 /usr/lib/jvm/java-1.8.0-openjdk-1.8* | sort -n | tail -1) /usr/lib/jvm/jdk
+yum -y update
+yum -y install wget
+yum -y install git
+yum -y install java-1.8.0-openjdk-devel
+rm -f /usr/lib/jvm/jdk
+ln -s $(ls -tdr1 /usr/lib/jvm/java-1.8.0-openjdk-1.8* | sort -n | tail -1) /usr/lib/jvm/jdk
 
 #Install my stuff
-sudo yum -y install tigervnc-server
-sudo yum -y install xterm
-#sudo yum -y install metacity
-#sudo yum -y install matchbox-window-manager
-sudo yum -y install links
-sudo yum -y install gcc
-sudo yum -y install vim-X11
-#sudo yum -y install gnome-terminal
+yum -y install tigervnc-server
+yum -y install xterm
+#yum -y install metacity
+#yum -y install matchbox-window-manager
+yum -y install links
+yum -y install gcc
+yum -y install vim-X11
+#yum -y install gnome-terminal
 
-# Python3 and libraries:
-#sudo yum -y install python3
-#Python36
-#sudo amazon-linux-extras install -y epel
-#sudo yum -y install python36 python36-devel python36-pip
-sudo yum -y install python2-pip
-sudo pip install numpy
-sudo pip install pandas
-sudo pip install matplotlib
-sudo pip install astral
-sudo pip install calmap
-sudo pip install jupyter
+yum -y install python2-pip
+pip install numpy
+pip install pandas
+pip install matplotlib
+pip install astral
+pip install calmap
+pip install jupyter
 
 # Use a Linux editor such as vi to install the export line (below) into your ~/.bashrc:
 echo "Use a Linux editor such as vi to install the export line (below) into your ~/.bashrc:"
 #vi ~/.bashrc
 #-----
 #export JAVA_HOME=/usr/lib/jvm/jdk
+sudo -u ec2-user \
 echo "export JAVA_HOME=/usr/lib/jvm/jdk" >> ~/.bashrc
 #-----
 
@@ -54,22 +50,27 @@ wget http://apache.mirrors.ionfish.org/spark/spark-2.3.3/spark-2.3.3-bin-hadoop2
 #wget https://www-us.apache.org/dist/spark/spark-2.4.1/spark-2.4.1-bin-hadoop2.7.tgz
 
 # Unpack Spark in the /opt directory
-sudo tar zxvf $(ls -tdr1 spark-*.tgz | tail -1) -C /opt
+tar zxvf $(ls -tdr1 spark-*.tgz | tail -1) -C /opt
 popd
 
 # Create a symbolic link to make it easier to access
 pushd /opt
-sudo rm -f /opt/spark
-sudo ln -fs $(ls -tdr1 /opt/spark-* | tail -1) /opt/spark
+rm -f /opt/spark
+ln -fs $(ls -tdr1 /opt/spark-* | tail -1) /opt/spark
 popd
 
 #-----
+sudo -u ec2-user \
 echo 'export SPARK_HOME=/opt/spark' >> ~/.bashrc
+sudo -u ec2-user \
 echo 'PATH=$PATH:$SPARK_HOME/bin' >> ~/.bashrc
+sudo -u ec2-user \
 echo 'export PATH' >> ~/.bashrc
 
 echo "PySpark - Jupyter setup"
+sudo -u ec2-user \
 echo 'export PYSPARK_DRIVER_PYTHON=jupyter' >> ~/.bashrc
+sudo -u ec2-user \
 echo "export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8080'" >> ~/.bashrc
 #echo 'export PYSPARK_PYTHON=python3' >> ~/.bashrc
 
@@ -78,13 +79,16 @@ echo "export PYSPARK_DRIVER_PYTHON_OPTS='notebook --no-browser --port=8080'" >> 
 
 # Mate desktop
 #sudo amazon-linux-extras -y mate-desktop
-sudo amazon-linux-extras install -y mate-desktop1.x
+amazon-linux-extras install -y mate-desktop1.x
+sudo -u ec2-user \
 echo '#!/bin/bash' > ~/.Xclients
+sudo -u ec2-user \
 echo 'exec "$(type -p mate-session)"' >> ~/.Xclients
+sudo -u ec2-user \
 chmod 755 ~/.Xclients
 
 # Installing basemap and dependencies
-sudo yum -y install gcc-c++
+yum -y install gcc-c++
 
 #sudo pip3 install pillow
 ## Requires geos to be compiled
