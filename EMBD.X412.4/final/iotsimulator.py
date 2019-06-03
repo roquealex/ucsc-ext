@@ -21,34 +21,95 @@ except Exception as ex:
     sys.exit(1)
 
 msgKey = "json"
+
+
+
 msgs = [
 """
-pepe pecas
-pica papas
-con un pico
+{
+    "type" : "pws",
+    "id" : "ALAMEDA",
+    "ts" : "2019-06-02 14:25:00",
+    "payload" : {
+        "WindSpeed" : 20.0,
+        "WindDirection" : 45
+    }
+}
 """
 ,
 """
-She sells sea-shells on the sea-shore.
-The shells she sells are sea-shells, I'm sure.
-For if she sells sea-shells on the sea-shore
-Then I'm sure she sells sea-shore shells.
+{
+    "type" : "pws",
+    "id" : "ALAMEDA",
+    "ts" : "2019-06-02 14:27:00",
+    "payload" : {
+        "WindSpeed" : 20.0,
+        "WindDirection" : 50
+    }
+}
 """
 ,
 """
-Betty Botter bought a bit of butter.
-The butter Betty Botter bought was a bit bitter
-And made her batter bitter.
-But a bit of better butter makes better batter.
-So Betty Botter bought a bit of better butter
-Making Betty Botter's bitter batter better
-The following twister won the "grand prize" in a contest in Games Magazine in 1979:[5]
+{
+    "type" : "pws",
+    "id" : "ALAMEDA",
+    "ts" : "2019-06-02 14:29:00",
+    "payload" : {
+        "WindSpeed" : 25.0,
+        "WindDirection" : 55
+    }
+}
 """
 ,
 """
-Shep Schwab shopped at Scott's Schnapps shop;
-One shot of Scott's Schnapps stopped Schwab's watch.
+{
+    "type" : "pws",
+    "id" : "ALAMEDA",
+    "ts" : "2019-06-02 14:30:00",
+    "payload" : {
+        "WindSpeed" : 21.0,
+        "WindDirection" : 45
+    }
+}
 """
+,
+"""
+{
+    "type" : "pws",
+    "id" : "ALAMEDA",
+    "ts" : "2019-06-02 14:32:00",
+    "payload" : {
+        "WindSpeed" : 20.0,
+        "WindDirection" : 50
+    }
+}
+"""
+,
+"""
+{
+    "type" : "pws",
+    "id" : "ALAMEDA",
+    "ts" : "2019-06-02 14:35:00",
+    "payload" : {
+        "WindSpeed" : 16.0,
+        "WindDirection" : 45
+    }
+}
+"""
+,
+"""
+{
+    "type" : "pws",
+    "id" : "ALAMEDA",
+    "ts" : "2019-06-02 14:37:00",
+    "payload" : {
+        "WindSpeed" : 18.0,
+        "WindDirection" : 40
+    }
+}
+"""
+,
+
 ]
 
 

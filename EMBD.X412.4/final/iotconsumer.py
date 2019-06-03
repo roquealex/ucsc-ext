@@ -94,7 +94,7 @@ if __name__ == "__main__":
     # window average:
     #dfCount = dfFlat.groupBy(window(col("ts"), "5 minutes"),col("id")).count()
 
-    dfAgg = dfFlat.groupBy(window(col("ts"), "5 minutes"),col("id")).agg(avg("payload.WindSpeed"))
+    dfAgg = dfFlat.groupBy(window(col("ts"), "5 minutes"),col("id")).agg(avg("payload.WindSpeed"),count(lit(1)))
 
     #query = dfCount.writeStream \
     #query = dfString.writeStream \
