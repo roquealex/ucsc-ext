@@ -27,9 +27,9 @@ msgKey = "json"
 msgs = [
 """
 {
+    "guid" : "ALAMEDA",
     "type" : "pws",
-    "id" : "ALAMEDA",
-    "ts" : "2019-06-02 14:25:00",
+    "eventTime" : "2019-06-02 14:25:00",
     "payload" : {
         "WindSpeed" : 20.0,
         "WindDirection" : 45
@@ -39,9 +39,9 @@ msgs = [
 ,
 """
 {
+    "guid" : "ALAMEDA",
     "type" : "pws",
-    "id" : "ALAMEDA",
-    "ts" : "2019-06-02 14:27:00",
+    "eventTime" : "2019-06-02 14:27:00",
     "payload" : {
         "WindSpeed" : 20.0,
         "WindDirection" : 50
@@ -51,9 +51,9 @@ msgs = [
 ,
 """
 {
+    "guid" : "ALAMEDA",
     "type" : "pws",
-    "id" : "ALAMEDA",
-    "ts" : "2019-06-02 14:29:00",
+    "eventTime" : "2019-06-02 14:29:00",
     "payload" : {
         "WindSpeed" : 25.0,
         "WindDirection" : 55
@@ -63,9 +63,9 @@ msgs = [
 ,
 """
 {
+    "guid" : "ALAMEDA",
     "type" : "pws",
-    "id" : "ALAMEDA",
-    "ts" : "2019-06-02 14:30:00",
+    "eventTime" : "2019-06-02 14:30:00",
     "payload" : {
         "WindSpeed" : 21.0,
         "WindDirection" : 45
@@ -75,9 +75,9 @@ msgs = [
 ,
 """
 {
+    "guid" : "ALAMEDA",
     "type" : "pws",
-    "id" : "ALAMEDA",
-    "ts" : "2019-06-02 14:32:00",
+    "eventTime" : "2019-06-02 14:32:00",
     "payload" : {
         "WindSpeed" : 20.0,
         "WindDirection" : 50
@@ -87,9 +87,9 @@ msgs = [
 ,
 """
 {
+    "guid" : "ALAMEDA",
     "type" : "pws",
-    "id" : "ALAMEDA",
-    "ts" : "2019-06-02 14:35:00",
+    "eventTime" : "2019-06-02 14:35:00",
     "payload" : {
         "WindSpeed" : 16.0,
         "WindDirection" : 45
@@ -99,9 +99,9 @@ msgs = [
 ,
 """
 {
+    "guid" : "ALAMEDA",
     "type" : "pws",
-    "id" : "ALAMEDA",
-    "ts" : "2019-06-02 14:37:00",
+    "eventTime" : "2019-06-02 14:37:00",
     "payload" : {
         "WindSpeed" : 18.0,
         "WindDirection" : 40
