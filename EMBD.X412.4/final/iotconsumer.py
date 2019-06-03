@@ -73,14 +73,14 @@ if __name__ == "__main__":
 
     #schema = StructType() \
     #    .add("type", StringType()) \
-    #    .add("id", StringType()) \
-    #    .add("ts", TimestampType()) \
+    #    .add("guid", StringType()) \
+    #    .add("eventTime", TimestampType()) \
     #    .add("payload", StringType())
 
     schema = StructType() \
         .add("type", StringType()) \
-        .add("id", StringType()) \
-        .add("ts", TimestampType()) \
+        .add("guid", StringType()) \
+        .add("eventTime", TimestampType()) \
         .add("payload", StructType().add("WindSpeed",DoubleType()).add("WindDirection",DoubleType())  )
         #.add("payload", StringType())
 
@@ -92,9 +92,9 @@ if __name__ == "__main__":
     #events.select(from_json("a", schema).alias("c"))
 
     # window average:
-    #dfCount = dfFlat.groupBy(window(col("ts"), "5 minutes"),col("id")).count()
+    #dfCount = dfFlat.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).count()
 
-    dfAgg = dfFlat.groupBy(window(col("ts"), "5 minutes"),col("id")).agg(avg("payload.WindSpeed"),count(lit(1)))
+    dfAgg = dfFlat.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).agg(avg("payload.WindSpeed"),count(lit(1)))
 
     #query = dfCount.writeStream \
     #query = dfString.writeStream \
