@@ -51,6 +51,15 @@ if __name__ == "__main__":
         .appName("Stage example") \
         .getOrCreate()
 
+    # Sensors have to be registered, for now there is a CSV with the info we need from them
+    pwsInfoDF = spark.read \
+        .format("csv") \
+        .option("header","true") \
+        .load("pwsInfo.csv")
+
+    #pwsInfoDF.show()
+    #sys.exit(0);
+
     #rdd = spark.sparkContext.parallelize([1, 2, 3, 4])
     #col = rdd.map(lambda x : 2*x).collect()
 
@@ -77,41 +86,84 @@ if __name__ == "__main__":
     # Define the genericSchema for my high level JSON (data is still a string):
     # complete genericSchema for reading:
     genericSchema = StructType() \
-        .add("type", StringType()) \
         .add("guid", StringType()) \
+        .add("destination", StringType()) \
         .add("eventTime", TimestampType()) \
         .add("payload", StructType() \
             .add("format",StringType()) \
-            .add("data",StructType() \
-                .add("WindSpeed",DoubleType()) \
-                .add("WindDirection",DoubleType()) \
-            ) \
+            .add("data",StringType()) \
         )
+
+#            .add("data",StructType() \
+#                .add("WindSpeed",DoubleType()) \
+#                .add("WindDirection",DoubleType()) \
+#            ) \
 
     # Filter only the json keys (only format suported anyway),
     # apply generic schema and make the structure flat again
     jsonDF = stringDF \
         .where(col("keyStr")=="json") \
-        .select(from_json(col("valStr"), genericSchema).alias("data"))
+        .select(from_json(col("valStr"), genericSchema).alias("data")) \
+        .select(col("data.*"))
 
-    flatDF = jsonDF.select(col("data.*"))
+    pwsReadingSchema = StructType() \
+        .add("WindSpeed",DoubleType()) \
+        .add("WindDirection",DoubleType())
+
+    pwsReadingDF = jsonDF \
+        .where(col("payload.format")=="urn:windchaser:pws:reading") \
+        .withColumn("data",from_json(col("payload.data"), pwsReadingSchema)) \
+        .drop("payload")
+
+    # To keep:
+    #    .withColumn("format",col("payload.format")) \
+
+    #flatDF = jsonDF.select(col("data.*"))
     #events.select(from_json("a", genericSchema).alias("c"))
 
     # window average:
     #dfCount = flatDF.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).count()
 
-    aggDF = flatDF.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).agg(avg("payload.data.WindSpeed"),count(lit(1)))
+    #>aggDF = flatDF.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).agg(avg("payload.data.WindSpeed"),count(lit(1)))
 
+    #>>>aggDF = flatDF.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).agg(avg("data.WindSpeed"),count(lit(1)))
+
+
+    # Processing of devices:
+    deviceReadingSchema = StructType() \
+        .add("lat",DoubleType()) \
+        .add("lon",DoubleType())
+
+    deviceReadingDF = jsonDF \
+        .where(col("payload.format")=="urn:windchaser:device:reading") \
+        .withColumn("data",from_json(col("payload.data"), deviceReadingSchema)) \
+        .drop("payload")
+
+    # Original really bad:
+    #testDF = deviceReadingDF.join(pwsInfoDF, (col("data.lat") - pwsInfoDF.lat) < lit(1.0), "inner")
+
+    # Find all the devices around a sensor with a given radious (join based on distance)
+    nearByDF = deviceReadingDF.join(
+        pwsInfoDF,
+        hypot(col("data.lat") - pwsInfoDF.lat, col("data.lon") - pwsInfoDF.lon ) <= lit(0.02),
+        "inner")
+
+    #test1DF = testDF.withColumn("math", pow(col("data.lat") - col("lat"),2.0) )
+    #test1DF = testDF.withColumn("math",
+    #        hypot(col("data.lat") - col("lat"), col("data.lon") - col("lon") ) )#<= lit(0.01)  )
+    
 
     #query = dfCount.writeStream \
     #query = dfString.writeStream \
-    #query = flatDF.writeStream \
-    query = aggDF.writeStream \
+    #query = aggDF.writeStream \
+    #query = pwsReadingDF.writeStream \
+    #query = deviceReadingDF.writeStream \
+    query = nearByDF.writeStream \
         .format("console") \
         .option("truncate", "false") \
-        .outputMode("complete") \
         .start()
 
+        #.outputMode("complete") \
     query.awaitTermination()
             
 
