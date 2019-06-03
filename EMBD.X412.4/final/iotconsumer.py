@@ -115,6 +115,8 @@ if __name__ == "__main__":
         .withColumn("data",from_json(col("payload.data"), pwsReadingSchema)) \
         .drop("payload")
 
+    windowLength = "5 minutes"
+
     # To keep:
     #    .withColumn("format",col("payload.format")) \
 
@@ -126,8 +128,13 @@ if __name__ == "__main__":
 
     #>aggDF = flatDF.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).agg(avg("payload.data.WindSpeed"),count(lit(1)))
 
-    #>>>aggDF = flatDF.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).agg(avg("data.WindSpeed"),count(lit(1)))
+    aggDF = pwsReadingDF.groupBy(window(col("eventTime"), windowLength),col("guid")).agg(avg("data.WindSpeed"),count(lit(1)))
 
+    query = aggDF.writeStream \
+        .format("console") \
+        .option("truncate", "false") \
+        .outputMode("complete") \
+        .start()
 
     # Processing of devices:
     deviceReadingSchema = StructType() \
@@ -143,7 +150,7 @@ if __name__ == "__main__":
     #testDF = deviceReadingDF.join(pwsInfoDF, (col("data.lat") - pwsInfoDF.lat) < lit(1.0), "inner")
 
     # Find all the devices around a sensor with a given radious (join based on distance)
-    nearByDF = deviceReadingDF.join(
+    nearByDevicesDF = deviceReadingDF.withColumnRenamed("guid","deviceGuid").join(
         pwsInfoDF,
         hypot(col("data.lat") - pwsInfoDF.lat, col("data.lon") - pwsInfoDF.lon ) <= lit(0.02),
         "inner")
@@ -153,18 +160,30 @@ if __name__ == "__main__":
     #        hypot(col("data.lat") - col("lat"), col("data.lon") - col("lon") ) )#<= lit(0.01)  )
     
 
+    # Calculate in the given window how many different devices were close to the PWS
+    # Note: countDistinct is not supported in streaming, the approx version is supported
+    nearByDevicesWindowDF = nearByDevicesDF \
+        .groupBy(window(col("eventTime"), windowLength),col("guid")) \
+        .agg(approxCountDistinct("deviceGuid"))
+
     #query = dfCount.writeStream \
     #query = dfString.writeStream \
-    #query = aggDF.writeStream \
     #query = pwsReadingDF.writeStream \
     #query = deviceReadingDF.writeStream \
-    query = nearByDF.writeStream \
+    #query = nearByDF.writeStream \
+    #query = aggDF.writeStream \
+
+    nearByDevicesQuery = nearByDevicesWindowDF.writeStream \
         .format("console") \
         .option("truncate", "false") \
+        .outputMode("complete") \
         .start()
 
         #.outputMode("complete") \
-    query.awaitTermination()
+    #nearByDevicesQuery.awaitTermination()
+
+    # Wait for all streams
+    spark.streams.awaitAnyTermination()
             
 
 
