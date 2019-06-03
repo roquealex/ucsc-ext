@@ -68,10 +68,15 @@ if __name__ == "__main__":
     #dfString = kafkaDF.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
     #dfString = kafkaDF.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
 
-    # Define the schema for my high level JSON:
 
-    # complete schema for reading:
-    schema = StructType() \
+    # Select only the key and val columns, convert from UTF-8 back to string
+    stringDF = kafkaDF.selectExpr(
+        "CAST(key AS STRING) AS keyStr",
+        "CAST(value AS STRING) AS valStr")
+
+    # Define the genericSchema for my high level JSON (data is still a string):
+    # complete genericSchema for reading:
+    genericSchema = StructType() \
         .add("type", StringType()) \
         .add("guid", StringType()) \
         .add("eventTime", TimestampType()) \
@@ -83,13 +88,14 @@ if __name__ == "__main__":
             ) \
         )
 
-
-    jsonDF = kafkaDF.select( \
-        col("key").cast("string"),
-        from_json(col("value").cast("string"), schema).alias("data"))
+    # Filter only the json keys (only format suported anyway),
+    # apply generic schema and make the structure flat again
+    jsonDF = stringDF \
+        .where(col("keyStr")=="json") \
+        .select(from_json(col("valStr"), genericSchema).alias("data"))
 
     flatDF = jsonDF.select(col("data.*"))
-    #events.select(from_json("a", schema).alias("c"))
+    #events.select(from_json("a", genericSchema).alias("c"))
 
     # window average:
     #dfCount = flatDF.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).count()
