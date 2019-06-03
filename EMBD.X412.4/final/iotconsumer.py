@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     #for x in col :
     #    print x
-    df = spark \
+    kafkaDF = spark \
         .readStream \
         .format("kafka") \
         .option("kafka.bootstrap.servers", "localhost:9092") \
@@ -65,18 +65,12 @@ if __name__ == "__main__":
 
 # not needed:
 #        .option("startingOffsets", "earliest") \
-    #dfString = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
-    dfString = df.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
-    #dfString.
+    #dfString = kafkaDF.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+    #dfString = kafkaDF.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
 
     # Define the schema for my high level JSON:
 
-    #schema = StructType() \
-    #    .add("type", StringType()) \
-    #    .add("guid", StringType()) \
-    #    .add("eventTime", TimestampType()) \
-    #    .add("payload", StringType())
-
+    # complete schema for reading:
     schema = StructType() \
         .add("type", StringType()) \
         .add("guid", StringType()) \
@@ -88,25 +82,25 @@ if __name__ == "__main__":
                 .add("WindDirection",DoubleType()) \
             ) \
         )
-        #.add("payload", StringType())
 
-    dfJson = df.select( \
+
+    jsonDF = kafkaDF.select( \
         col("key").cast("string"),
         from_json(col("value").cast("string"), schema).alias("data"))
 
-    dfFlat = dfJson.select(col("data.*"))
+    flatDF = jsonDF.select(col("data.*"))
     #events.select(from_json("a", schema).alias("c"))
 
     # window average:
-    #dfCount = dfFlat.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).count()
+    #dfCount = flatDF.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).count()
 
-    dfAgg = dfFlat.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).agg(avg("payload.data.WindSpeed"),count(lit(1)))
+    aggDF = flatDF.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).agg(avg("payload.data.WindSpeed"),count(lit(1)))
 
 
     #query = dfCount.writeStream \
     #query = dfString.writeStream \
-    #query = dfFlat.writeStream \
-    query = dfAgg.writeStream \
+    #query = flatDF.writeStream \
+    query = aggDF.writeStream \
         .format("console") \
         .option("truncate", "false") \
         .outputMode("complete") \
