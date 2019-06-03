@@ -31,8 +31,11 @@ msgs = [
     "type" : "pws",
     "eventTime" : "2019-06-02 14:25:00",
     "payload" : {
-        "WindSpeed" : 20.0,
-        "WindDirection" : 45
+         "format": "urn:windchaser:pws:reading", 
+         "data": {
+            "WindSpeed" : 20.0,
+            "WindDirection" : 45
+         }
     }
 }
 """
@@ -43,8 +46,11 @@ msgs = [
     "type" : "pws",
     "eventTime" : "2019-06-02 14:27:00",
     "payload" : {
-        "WindSpeed" : 20.0,
-        "WindDirection" : 50
+         "format": "urn:windchaser:pws:reading", 
+         "data": {
+            "WindSpeed" : 20.0,
+            "WindDirection" : 50
+        }
     }
 }
 """
