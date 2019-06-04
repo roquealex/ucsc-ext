@@ -12,6 +12,10 @@ import numpy as np
 import pandas as pd
 from kafka import KafkaProducer
 
+###########################
+# Functions
+###########################
+
 def randDevice() :
     baseGuid = "0-ZZZ123"
     #randInt = random.randrange(0, 9)
@@ -21,7 +25,7 @@ def randDevice() :
     return guid
 
 ###########################
-# PWS sim data
+# PWS sim data class
 ###########################
 
 # Stores info relevant to the simulation
@@ -94,7 +98,7 @@ class PwsSimData :
 
         return msg
 
-    # Simulates devices showing up close to the sensor due to increase in wind
+    # Simulates kiters showing up close to the sensor due to increase in wind reading
     def evalDevices(self) :
         if (self.lastWindWindSpeedMPH > self.maxSpeed) :
             if (
@@ -156,8 +160,6 @@ class PwsSimData :
         return msgList
 
 
-
-
     # To debug print all the contents
     def toString(self):
         msg = ""
@@ -185,6 +187,8 @@ msgKey = "json"
 broker = 'localhost:9092'
 topic = 'iotmsgs'
 brokerList = [broker]
+# The PWS update will be every minute fixed, devices is configurable (min 1)
+deviceUpdatePerMin = 2
 
 pwsInfo = pd.read_csv("pwsInfo.csv")
 
@@ -237,23 +241,22 @@ while True :
     except Exception as ex:
         print 'Ex when posting:', str(ex)
 
-    try:
-        for pws in pwsList :
-            #msgVal = pws.randomReading()
-            msgList = pws.randomDevices()
-            for msgVal in pws.randomDevices() :
-                print msgVal;
-                msgKeyBytes = msgKey.encode(encoding='UTF-8',errors='strict')
-                msgValBytes = msgVal.encode(encoding='UTF-8',errors='strict')
-                producer.send(topic, key=msgKeyBytes, value=msgValBytes)
-        producer.flush()
-        print('Device messages published successfully.')
-    except Exception as ex:
-        print 'Ex when posting:', str(ex)
+    for i in range(deviceUpdatePerMin) :
+        try:
+            for pws in pwsList :
+                #msgVal = pws.randomReading()
+                msgList = pws.randomDevices()
+                for msgVal in pws.randomDevices() :
+                    print msgVal;
+                    msgKeyBytes = msgKey.encode(encoding='UTF-8',errors='strict')
+                    msgValBytes = msgVal.encode(encoding='UTF-8',errors='strict')
+                    producer.send(topic, key=msgKeyBytes, value=msgValBytes)
+            producer.flush()
+            print('Device messages published successfully.')
+        except Exception as ex:
+            print 'Ex when posting:', str(ex)
 
 
-    time.sleep(30)
-
-
+        time.sleep(60/deviceUpdatePerMin)
 
 
