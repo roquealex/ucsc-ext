@@ -40,16 +40,13 @@ if __name__ == "__main__":
 
     #sc.setLogLevel("WARN")
 
-    #rdd = sc.parallelize([1, 2, 3, 4])
-    #col = rdd.map(lambda x : 2*x).collect()
-
-    #for x in col :
-    #    print x
-
     spark = SparkSession.builder \
         .master("local[*]") \
         .appName("Stage example") \
         .getOrCreate()
+
+    #spark.sparkContext.setLogLevel("ERROR")
+    spark.sparkContext.setLogLevel("WARN")
 
     # Sensors have to be registered, for now there is a CSV with the info we need from them
     pwsInfoDF = spark.read \
@@ -107,8 +104,9 @@ if __name__ == "__main__":
         .select(col("data.*"))
 
     pwsReadingSchema = StructType() \
-        .add("WindSpeed",DoubleType()) \
-        .add("WindDirection",DoubleType())
+        .add("WindDirectionDegrees",DoubleType()) \
+        .add("WindSpeedMPH",DoubleType()) \
+        .add("WindSpeedGustMPH",DoubleType())
 
     pwsReadingDF = jsonDF \
         .where(col("payload.format")=="urn:windchaser:pws:reading") \
@@ -128,7 +126,31 @@ if __name__ == "__main__":
 
     #>aggDF = flatDF.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).agg(avg("payload.data.WindSpeed"),count(lit(1)))
 
-    aggDF = pwsReadingDF.groupBy(window(col("eventTime"), windowLength),col("guid")).agg(avg("data.WindSpeed"),count(lit(1)))
+    # Calculate the following window aggregations:
+    #
+    # avgWindSpeedMPH :
+    #     Average of WindSpeedMPH in the time window
+    #
+    # avgWindDirectionDegrees :
+    #     Average of WindSpeedDegrees based on decomposing angles into x and y
+    #     component and averaging them and calculate back the angle, a simple
+    #     average will give bad results when the wind direction fluctuates
+    #     around north (some readings 0 some around 360).
+    #
+    # maxWindSpeedGustMPH :
+    #     In case of the WindSpeedGustMPH we want to aggregate it as the
+    #     maximum reading from the sensor during the window
+    aggDF = pwsReadingDF \
+        .withColumn("WindDirRads",radians("data.WindDirectionDegrees")) \
+        .withColumn("WindDirX",cos("WindDirRads")) \
+        .withColumn("WindDirY",sin("WindDirRads")) \
+        .groupBy(window(col("eventTime"), windowLength),col("guid")) \
+        .agg(
+            avg("data.WindSpeedMPH").alias("avgWindSpeedMPH"),
+            avg("data.WindDirectionDegrees").alias("avgDir"),
+            ( (degrees(atan2(avg("WindDirY"),avg("WindDirX"))) + lit(360)) % lit(360)).alias("avgWindDirectionDegrees"),
+            max("data.WindSpeedGustMPH").alias("maxWindSpeedGustMPH"),
+            count(lit(1)).alias("cnt"))
 
     query = aggDF.writeStream \
         .format("console") \

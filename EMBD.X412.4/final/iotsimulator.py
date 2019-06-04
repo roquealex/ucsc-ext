@@ -26,14 +26,15 @@ msgKey = "json"
 msgs = [
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0001",
+    "guid" : "USA-CA-ALAMEDA-0062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:25:00",
     "payload" : {
         "format": "urn:windchaser:pws:reading", 
         "data": {
-            "WindSpeed" : 20.0,
-            "WindDirection" : 45
+            "WindSpeedMPH" : 20.0,
+            "WindDirectionDegrees" : 45,
+            "WindSpeedGustMPH": 21.0
         }
     }
 }
@@ -41,14 +42,15 @@ msgs = [
 ,
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0001",
+    "guid" : "USA-CA-ALAMEDA-0062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:27:00",
     "payload" : {
         "format": "urn:windchaser:pws:reading", 
         "data": {
-            "WindSpeed" : 20.0,
-            "WindDirection" : 50
+            "WindSpeedMPH" : 20.0,
+            "WindDirectionDegrees" : 50,
+            "WindSpeedGustMPH": 23.0
         }
     }
 }
@@ -116,14 +118,15 @@ msgs = [
 ,
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0001",
+    "guid" : "USA-CA-ALAMEDA-0062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:29:00",
     "payload" : {
          "format": "urn:windchaser:pws:reading", 
          "data": {
-            "WindSpeed" : 25.0,
-            "WindDirection" : 55
+            "WindSpeedMPH" : 25.0,
+            "WindDirectionDegrees" : 55,
+            "WindSpeedGustMPH": 27.0
         }
     }
 }
@@ -131,14 +134,15 @@ msgs = [
 ,
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0001",
+    "guid" : "USA-CA-ALAMEDA-0062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:30:00",
     "payload" : {
          "format": "urn:windchaser:pws:reading", 
          "data": {
-            "WindSpeed" : 21.0,
-            "WindDirection" : 45
+            "WindSpeedMPH" : 21.0,
+            "WindDirectionDegrees" : 45,
+            "WindSpeedGustMPH": 27.0
          }
     }
 }
@@ -146,14 +150,15 @@ msgs = [
 ,
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0001",
+    "guid" : "USA-CA-ALAMEDA-0062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:32:00",
     "payload" : {
         "format": "urn:windchaser:pws:reading", 
         "data": {
-            "WindSpeed" : 20.0,
-            "WindDirection" : 50
+            "WindSpeedMPH" : 20.0,
+            "WindDirectionDegrees" : 50,
+            "WindSpeedGustMPH": 23.0
         }
     }
 }
@@ -161,14 +166,15 @@ msgs = [
 ,
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0001",
+    "guid" : "USA-CA-ALAMEDA-0062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:35:00",
     "payload" : {
         "format": "urn:windchaser:pws:reading", 
         "data": {
-            "WindSpeed" : 16.0,
-            "WindDirection" : 45
+            "WindSpeedMPH" : 16.0,
+            "WindDirectionDegrees" : 3,
+            "WindSpeedGustMPH": 20.1
         }
     }
 }
@@ -176,14 +182,15 @@ msgs = [
 ,
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0001",
+    "guid" : "USA-CA-ALAMEDA-0062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:37:00",
     "payload" : {
         "format": "urn:windchaser:pws:reading", 
         "data": {
-            "WindSpeed" : 18.0,
-            "WindDirection" : 40
+            "WindSpeedMPH" : 18.0,
+            "WindDirectionDegrees" : 355,
+            "WindSpeedGustMPH": 19.5
         }
     }
 }
