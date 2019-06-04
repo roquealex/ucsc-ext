@@ -15,12 +15,13 @@ And trackers similar to this:
 https://woosports.com/
 
 The project will correlate realtime the weather data with the number of
-people whowing to practice the sport close to the sensor, this will help other
+people showing to practice the sport close to the sensor, this will help other
 people to find out if the conditions are good. Data will be stored for the
 development of better weather models.
 
-Project currently does not include any notifications but could be imporved to
-do so. For instance notify suscribers when the wind in some area passes some treshold or when the ammount of people on the water is more than a treshold
+Project currently does not include any notifications but could be improved to
+do so. For instance notify subscribers when the wind in some area passes some
+threshold or when the amount of people on the water is more than a threshold
 
 ### Dependencies
 
@@ -47,29 +48,29 @@ implemented:
    weather. The amount of info in this demo is restricted to the wind
    information only. Updated every minute for this demo.
 
- * urn:windchaser:device:reading : This is a device giving its GPS lattitude
+ * urn:windchaser:device:reading : This is a device giving its GPS latitude
    and longitude readings. Updated N times per minute for this demo.
 
 ## Streaming Processing : iotconsumer.py
 
 This project relies only on Spark Structured Streaming, it is connected to
 kafka using the topic iotmsgs for this demo. All the messages go in the same
-topic and will be difernetiated by the format.
+topic and will be differentiated by the format.
 
 Two sinks are currently implemented. Both of them use a window size of 5 min
 but it is configurable. Both sink to console for this demo but they could be
-modified to use a distrubuted DB.
+modified to use a distributed DB.
 
 One of the streams will get different aggregations (average) in the range of
 the 5 min.
 
 The other stream will try to find from the devices updates how many people is
-close to a sensor so it will aggregate this informetion per window and per
+close to a sensor so it will aggregate this information per window and per
 sensor. The sensor coordinates are stored in a CSV now but they could be stored
 in a fancier DB. The registry should be done by another JSON message indicating
 the coordinates of the sensor.
 
-# Simulators : iotsimulator.py and iotrandsim.py
+### Simulators : iotsimulator.py and iotrandsim.py
 
 There are 2 simulators, the first one listed uses a prerecorded sequence of
 messages that show the capabilities of the processing engine.
@@ -80,11 +81,11 @@ have to come from the database so the GUID for PWS are not randomly generated.
 Once a sensor detects some increase in the wind is possible for people to show
 up to the spot close to the PWS. This is modeled in the random simulator but
 it may randomly happen. Once devices start to show close to the sensor they
-will produce updates until the wind drops to some treshold. The GUID of the 
+will produce updates until the wind drops to some threshold. The GUID of the 
 devices are randomly generated but once a GUID is assigned it will keep
 producing data close to the sensor.
 
-The random simulator ir real time so user needs to wait one minute to see
+The random simulator in real time so user needs to wait one minute to see
 another update from the list of PWS and a fraction of it for the devices.
 
 Both simulators are stand alone and don't have to be piped. They rely on the
