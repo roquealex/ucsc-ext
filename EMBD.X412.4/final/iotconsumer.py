@@ -1,8 +1,6 @@
-
 """
- Processes direct stream from kafka, '\n' delimited text directly received
-   every 2 seconds.
- Usage: kafka-direct-iotmsg.py <broker_list> <topic>
+ Processes stream from kafka using spark structured streaming
+ Usage: iotconsumer.py <broker_list> <msg_topic>
 
  To run this on your local machine, you need to setup Kafka and create a
    producer first, see:
@@ -11,10 +9,10 @@
  and then run the example
     `$ bin/spark-submit --jars \
       external/kafka-assembly/target/scala-*/spark-streaming-kafka-assembly-*.jar \
-      kafka-direct-iotmsg.py \
+      iotconsumer.py \
       localhost:9092 iotmsgs`
 """
-#from __future__ import print_function
+from __future__ import print_function
 
 import sys
 import re
@@ -24,26 +22,25 @@ from pyspark.sql import SparkSession
 #from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 
-from operator import add
+#from operator import add
 
 from pyspark.sql.types import *
 from pyspark.sql.functions import *
 
 if __name__ == "__main__":
-    #if len(sys.argv) != 3:
-    #    print("Usage: kafka-direct-iotmsg.py <broker_list> <topic>", file=sys.stderr)
-    #    exit(-1)
+    if len(sys.argv) != 3:
+        print("Usage: iotconsumer.py <broker_list> <msg_topic>", file=sys.stderr)
+        exit(-1)
 
-    #sc = SparkContext(appName="PythonStreamingDirectKafkaWordCount")
-    #ssc = StreamingContext(sc, 2)
+    windowLength = "5 minutes"
 
-
-    #sc.setLogLevel("WARN")
+    brokers, topic = sys.argv[1:]
 
     spark = SparkSession.builder \
-        .master("local[*]") \
-        .appName("Stage example") \
+        .appName("Kafka Structured Streaming processing of wind app") \
         .getOrCreate()
+
+    #    .master("local[*]") \
 
     #spark.sparkContext.setLogLevel("ERROR")
     spark.sparkContext.setLogLevel("WARN")
@@ -55,32 +52,30 @@ if __name__ == "__main__":
         .load("pwsInfo.csv")
 
     #pwsInfoDF.show()
-    #sys.exit(0);
 
-    #rdd = spark.sparkContext.parallelize([1, 2, 3, 4])
-    #col = rdd.map(lambda x : 2*x).collect()
-
-    #for x in col :
-    #    print x
     kafkaDF = spark \
         .readStream \
         .format("kafka") \
-        .option("kafka.bootstrap.servers", "localhost:9092") \
-        .option("subscribe", "iotmsgs") \
+        .option("kafka.bootstrap.servers", brokers) \
+        .option("subscribe", topic) \
         .load()
 
-# not needed:
-#        .option("startingOffsets", "earliest") \
-    #dfString = kafkaDF.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
-    #dfString = kafkaDF.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+#        .option("kafka.bootstrap.servers", "localhost:9092") \
 
+
+    # not needed, but possible to use:
+    #    .option("startingOffsets", "earliest") \
+
+    #################################################
+    # Generic JSON processing 
+    #################################################
 
     # Select only the key and val columns, convert from UTF-8 back to string
     stringDF = kafkaDF.selectExpr(
         "CAST(key AS STRING) AS keyStr",
         "CAST(value AS STRING) AS valStr")
 
-    # Define the genericSchema for my high level JSON (data is still a string):
+    # Define the genericSchema for the high level JSON (data is still a string):
     # complete genericSchema for reading:
     genericSchema = StructType() \
         .add("guid", StringType()) \
@@ -103,28 +98,24 @@ if __name__ == "__main__":
         .select(from_json(col("valStr"), genericSchema).alias("data")) \
         .select(col("data.*"))
 
+    #################################################
+    # PWS processing 
+    #################################################
+
+    # Schema for the data portion of a PWS reading
     pwsReadingSchema = StructType() \
         .add("WindDirectionDegrees",DoubleType()) \
         .add("WindSpeedMPH",DoubleType()) \
         .add("WindSpeedGustMPH",DoubleType())
 
+    # Apply the schema to "payload.data" only for pws:reading messages
     pwsReadingDF = jsonDF \
         .where(col("payload.format")=="urn:windchaser:pws:reading") \
         .withColumn("data",from_json(col("payload.data"), pwsReadingSchema)) \
         .drop("payload")
 
-    windowLength = "5 minutes"
-
-    # To keep:
+    # To keep format:
     #    .withColumn("format",col("payload.format")) \
-
-    #flatDF = jsonDF.select(col("data.*"))
-    #events.select(from_json("a", genericSchema).alias("c"))
-
-    # window average:
-    #dfCount = flatDF.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).count()
-
-    #>aggDF = flatDF.groupBy(window(col("eventTime"), "5 minutes"),col("guid")).agg(avg("payload.data.WindSpeed"),count(lit(1)))
 
     # Calculate the following window aggregations:
     #
@@ -140,7 +131,7 @@ if __name__ == "__main__":
     # maxWindSpeedGustMPH :
     #     In case of the WindSpeedGustMPH we want to aggregate it as the
     #     maximum reading from the sensor during the window
-    aggDF = pwsReadingDF \
+    pwsReadingStatsDF = pwsReadingDF \
         .withColumn("WindDirRads",radians("data.WindDirectionDegrees")) \
         .withColumn("WindDirX",cos("WindDirRads")) \
         .withColumn("WindDirY",sin("WindDirRads")) \
@@ -152,11 +143,17 @@ if __name__ == "__main__":
             max("data.WindSpeedGustMPH").alias("maxWindSpeedGustMPH"),
             count(lit(1)).alias("cnt"))
 
-    query = aggDF.writeStream \
+    # Sink the stats to console, for now using complete but update with a
+    # watermark could be used
+    pwsReadingStatsQuery = pwsReadingStatsDF.writeStream \
         .format("console") \
         .option("truncate", "false") \
         .outputMode("complete") \
         .start()
+
+    #################################################
+    # Device processing 
+    #################################################
 
     # Processing of devices:
     deviceReadingSchema = StructType() \
@@ -168,10 +165,7 @@ if __name__ == "__main__":
         .withColumn("data",from_json(col("payload.data"), deviceReadingSchema)) \
         .drop("payload")
 
-    # Original really bad:
-    #testDF = deviceReadingDF.join(pwsInfoDF, (col("data.lat") - pwsInfoDF.lat) < lit(1.0), "inner")
-
-    # Find all the devices around a sensor with a given radious (join based on distance)
+    # Find all the devices around a sensor with a given radius (join 2 sets based on distance)
     nearByDevicesDF = deviceReadingDF.withColumnRenamed("guid","deviceGuid").join(
         pwsInfoDF,
         hypot(col("data.lat") - pwsInfoDF.lat, col("data.lon") - pwsInfoDF.lon ) <= lit(0.02),
@@ -188,27 +182,14 @@ if __name__ == "__main__":
         .groupBy(window(col("eventTime"), windowLength),col("guid")) \
         .agg(approxCountDistinct("deviceGuid"))
 
-    #query = dfCount.writeStream \
-    #query = dfString.writeStream \
-    #query = pwsReadingDF.writeStream \
-    #query = deviceReadingDF.writeStream \
-    #query = nearByDF.writeStream \
-    #query = aggDF.writeStream \
-
     nearByDevicesQuery = nearByDevicesWindowDF.writeStream \
         .format("console") \
         .option("truncate", "false") \
         .outputMode("complete") \
         .start()
 
-        #.outputMode("complete") \
     #nearByDevicesQuery.awaitTermination()
 
     # Wait for all streams
     spark.streams.awaitAnyTermination()
             
-
-
-
-
-
