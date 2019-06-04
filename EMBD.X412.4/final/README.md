@@ -1,3 +1,5 @@
+# The Internet of Things: Big Data Processing and Analytics
+
 ## Final Project
 
 ### Introduction
@@ -33,7 +35,9 @@ sudo pip install kafka-python
 sudo pip install pandas
 ~~~
 
-And was tested only with python 2.7 and spark 3.3
+And was tested only with python 2.7 and spark 2.3.3
+
+Instructions to run are listed at the end of this document.
 
 ### Messaging
 
@@ -75,7 +79,6 @@ the coordinates of the sensor.
 There are 2 simulators, the first one listed uses a prerecorded sequence of
 messages that show the capabilities of the processing engine.
 
-
 The second one is a more timing accurate random message generator. The PWS used
 have to come from the database so the GUID for PWS are not randomly generated.
 Once a sensor detects some increase in the wind is possible for people to show
@@ -92,6 +95,100 @@ Both simulators are stand alone and don't have to be piped. They rely on the
 library kafka-python. The consumer will filter out anything that doesn't have
 the key 'json' so using raw text will have no impact.
 
+### Instructions To Run
+
+It is recommended to run the project in this order and in this number of
+terminals:
+
+#### Terminal 1:
+
+Run Kafka:
+
+~~~
+#stop:
+bin/kafka-server-stop.sh
+bin/zookeeper-server-stop.sh
+pkill -9 java
+pkill -9 python
+
+#launch:
+KAFKA_HEAP_OPTS="-Xmx32M" \
+./bin/zookeeper-server-start.sh config/zookeeper.properties > \
+ /tmp/zookeeper.log & 
+
+KAFKA_HEAP_OPTS="-Xmx200M" \
+./bin/kafka-server-start.sh config/server.properties > \
+ /tmp/kafka.log 2>&1 &
+~~~
+
+#### Terminal 2:
+
+Start apache-streaming processor. Keep in mind all the analytics is done in
+windows of 5 minutes.
+
+~~~
+spark-submit \
+    --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.3 \
+    iotconsumer.py \
+    localhost:9092 iotmsgs
+~~~
+
+It is recomended to wait for 'Batch: 0' outputs before running the simulator.
+
+#### Terminal 3:
+
+Run the random simulator, it is using real-time delays so it will take several
+minutes to get good data for the streaming processing. There is no need to use
+pipes since it relies on a Kafka library.
+
+~~~
+./iotrandsim.py localhost:9092 iotmsgs
+~~~
+
+The PWSs will start close to the wind speed that will trigger devices to show
+up but it is possible that the wind randomly goes down and this will not happen
+soon. To increase the likelihood of devices showing up increase the number of
+PWS but this decreases readability of the analytics (tables grow). Or simply
+rerun.
+
+If this text is seen on the first update: Device messages published
+successfully. Preceded by a urn:windchaser:device:reading json it means random
+devices are updating.
+
+
+OR
+
+Run the focused scenario, similarly it doesn?t require pipes but broker and
+topic are hard coded:
+
+~~~
+./iotsimulator.py
+~~~
+
+If everything is fine this is the result:
+
+~~~
++------------------------------------------+--------------------+------------------+------+-----------------+-------------------+---+
+|window                                    |guid                |avgWindSpeedMPH   |avgDir|avgWindDirDegrees|maxWindSpeedGustMPH|cnt|
++------------------------------------------+--------------------+------------------+------+-----------------+-------------------+---+
+|[2019-06-02 14:30:00, 2019-06-02 14:35:00]|US-CA-FOSTERCITY-007|18.0              |90.0  |90.0             |20.0               |1  |
+|[2019-06-02 14:25:00, 2019-06-02 14:30:00]|US-CA-ALAMEDA-062   |21.666666666666668|50.0  |50.0             |27.0               |3  |
+|[2019-06-02 14:25:00, 2019-06-02 14:30:00]|US-CA-FOSTERCITY-007|16.0              |90.0  |90.0             |18.0               |1  |
+|[2019-06-02 14:30:00, 2019-06-02 14:35:00]|US-CA-ALAMEDA-062   |20.5              |47.5  |47.5             |27.0               |2  |
+|[2019-06-02 14:35:00, 2019-06-02 14:40:00]|US-CA-ALAMEDA-062   |17.0              |179.0 |359.0            |20.1               |2  |
++------------------------------------------+--------------------+------------------+------+-----------------+-------------------+---+
+
+-------------------------------------------
+Batch: 2
+-------------------------------------------
++------------------------------------------+--------------------+-----------+
+|window                                    |guid                |deviceCount|
++------------------------------------------+--------------------+-----------+
+|[2019-06-02 14:30:00, 2019-06-02 14:35:00]|US-CA-FOSTERCITY-007|2          |
+|[2019-06-02 14:25:00, 2019-06-02 14:30:00]|US-CA-ALAMEDA-062   |3          |
+|[2019-06-02 14:30:00, 2019-06-02 14:35:00]|US-CA-ALAMEDA-062   |1          |
++------------------------------------------+--------------------+-----------+
+~~~
 
 
 
