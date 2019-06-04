@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# Roque Arcudia
+
 from kafka import KafkaProducer
 import sys
 
