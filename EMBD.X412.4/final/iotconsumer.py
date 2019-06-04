@@ -131,7 +131,7 @@ if __name__ == "__main__":
     # avgWindSpeedMPH :
     #     Average of WindSpeedMPH in the time window
     #
-    # avgWindDirectionDegrees :
+    # avgWindDirDegrees :
     #     Average of WindSpeedDegrees based on decomposing angles into x and y
     #     component and averaging them and calculate back the angle, a simple
     #     average will give bad results when the wind direction fluctuates
@@ -148,7 +148,7 @@ if __name__ == "__main__":
         .agg(
             avg("data.WindSpeedMPH").alias("avgWindSpeedMPH"),
             avg("data.WindDirectionDegrees").alias("avgDir"),
-            ( (degrees(atan2(avg("WindDirY"),avg("WindDirX"))) + lit(360)) % lit(360)).alias("avgWindDirectionDegrees"),
+            ( (degrees(atan2(avg("WindDirY"),avg("WindDirX"))) + lit(360)) % lit(360)).alias("avgWindDirDegrees"),
             max("data.WindSpeedGustMPH").alias("maxWindSpeedGustMPH"),
             count(lit(1)).alias("cnt"))
 
