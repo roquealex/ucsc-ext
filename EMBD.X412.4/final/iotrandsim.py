@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Modified by Roque Arcudia
+# Roque Arcudia
 
 import sys
 import os
@@ -178,14 +178,25 @@ class PwsSimData :
 
 
 ###########################
+# Arguments
+###########################
+if len(sys.argv) != 3:
+    print "Usage: iotrandsim.py <broker_list> <msg_topic>"
+    exit(-1)
+
+broker, topic = sys.argv[1:]
+
+# Hard coded:
+#broker = 'localhost:9092'
+#topic = 'iotmsgs'
+
+###########################
 # Parameters
 ###########################
 
 # Number of PWS to simulate (max 9)
 pwsNumber = 3
 msgKey = "json"
-broker = 'localhost:9092'
-topic = 'iotmsgs'
 brokerList = [broker]
 # The PWS update will be every minute fixed, devices is configurable (min 1)
 deviceUpdatePerMin = 2
