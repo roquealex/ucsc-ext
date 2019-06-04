@@ -34,7 +34,7 @@ msgs = [
 {
     "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:25:00",
+    "eventTime" : "2019-06-02T14:25:00.000000Z",
     "payload" : {
         "format": "urn:windchaser:pws:reading", 
         "data": {
@@ -50,7 +50,7 @@ msgs = [
 {
     "guid" : "US-CA-FOSTERCITY-007",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:25:00",
+    "eventTime" : "2019-06-02T14:25:00.000000Z",
     "payload" : {
         "format": "urn:windchaser:pws:reading", 
         "data": {
@@ -66,7 +66,7 @@ msgs = [
 {
     "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:27:00",
+    "eventTime" : "2019-06-02T14:27:00.000000Z",
     "payload" : {
         "format": "urn:windchaser:pws:reading", 
         "data": {
@@ -82,7 +82,7 @@ msgs = [
 {
     "guid" : "USER0001",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:28:10",
+    "eventTime" : "2019-06-02T14:28:10.000000Z",
     "payload" : {
         "format": "urn:windchaser:device:reading", 
         "data": {
@@ -97,7 +97,7 @@ msgs = [
 {
     "guid" : "USER0001",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:28:20",
+    "eventTime" : "2019-06-02T14:28:20.000000Z",
     "payload" : {
         "format": "urn:windchaser:device:reading", 
         "data": {
@@ -112,7 +112,7 @@ msgs = [
 {
     "guid" : "USER0002",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:28:20",
+    "eventTime" : "2019-06-02T14:28:20.000000Z",
     "payload" : {
         "format": "urn:windchaser:device:reading", 
         "data": {
@@ -127,7 +127,7 @@ msgs = [
 {
     "guid" : "USER0004",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:28:20",
+    "eventTime" : "2019-06-02T14:28:20.000000Z",
     "payload" : {
         "format": "urn:windchaser:device:reading", 
         "data": {
@@ -142,7 +142,7 @@ msgs = [
 {
     "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:29:00",
+    "eventTime" : "2019-06-02T14:29:00.000000Z",
     "payload" : {
          "format": "urn:windchaser:pws:reading", 
          "data": {
@@ -158,7 +158,7 @@ msgs = [
 {
     "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:30:00",
+    "eventTime" : "2019-06-02T14:30:00.000000Z",
     "payload" : {
          "format": "urn:windchaser:pws:reading", 
          "data": {
@@ -174,7 +174,7 @@ msgs = [
 {
     "guid" : "US-CA-FOSTERCITY-007",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:30:00",
+    "eventTime" : "2019-06-02T14:30:00.000000Z",
     "payload" : {
         "format": "urn:windchaser:pws:reading", 
         "data": {
@@ -190,7 +190,7 @@ msgs = [
 {
     "guid" : "USER0004",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:30:20",
+    "eventTime" : "2019-06-02T14:30:20.000000Z",
     "payload" : {
         "format": "urn:windchaser:device:reading", 
         "data": {
@@ -205,7 +205,7 @@ msgs = [
 {
     "guid" : "USER0005",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:30:20",
+    "eventTime" : "2019-06-02T14:30:20.000000Z",
     "payload" : {
         "format": "urn:windchaser:device:reading", 
         "data": {
@@ -220,7 +220,7 @@ msgs = [
 {
     "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:32:00",
+    "eventTime" : "2019-06-02T14:32:00.000000Z",
     "payload" : {
         "format": "urn:windchaser:pws:reading", 
         "data": {
@@ -236,7 +236,7 @@ msgs = [
 {
     "guid" : "USER0005",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:32:20",
+    "eventTime" : "2019-06-02T14:32:20.000000Z",
     "payload" : {
         "format": "urn:windchaser:device:reading", 
         "data": {
@@ -251,7 +251,7 @@ msgs = [
 {
     "guid" : "USER0006",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:32:20",
+    "eventTime" : "2019-06-02T14:32:20.000000Z",
     "payload" : {
         "format": "urn:windchaser:device:reading", 
         "data": {
@@ -266,7 +266,7 @@ msgs = [
 {
     "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:35:00",
+    "eventTime" : "2019-06-02T14:35:00.000000Z",
     "payload" : {
         "format": "urn:windchaser:pws:reading", 
         "data": {
@@ -282,7 +282,7 @@ msgs = [
 {
     "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
-    "eventTime" : "2019-06-02 14:37:00",
+    "eventTime" : "2019-06-02T14:37:00.000000Z",
     "payload" : {
         "format": "urn:windchaser:pws:reading", 
         "data": {
