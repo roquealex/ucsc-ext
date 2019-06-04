@@ -22,11 +22,17 @@ except Exception as ex:
 
 msgKey = "json"
 
+#3rd Ave Channel
+#Station ID: KCAFOSTE7
+#Lat: 37.57Lon: -122.28
+
+#US-CA-ALAMEDA-062
+#US-CA-FOSTERCITY-007
 
 msgs = [
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0062",
+    "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:25:00",
     "payload" : {
@@ -42,7 +48,23 @@ msgs = [
 ,
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0062",
+    "guid" : "US-CA-FOSTERCITY-007",
+    "destination" : "A012",
+    "eventTime" : "2019-06-02 14:25:00",
+    "payload" : {
+        "format": "urn:windchaser:pws:reading", 
+        "data": {
+            "WindDirectionDegrees" : 90,
+            "WindSpeedMPH" : 16.0,
+            "WindSpeedGustMPH": 18.0
+        }
+    }
+}
+"""
+,
+"""
+{
+    "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:27:00",
     "payload" : {
@@ -118,7 +140,7 @@ msgs = [
 ,
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0062",
+    "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:29:00",
     "payload" : {
@@ -134,7 +156,7 @@ msgs = [
 ,
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0062",
+    "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:30:00",
     "payload" : {
@@ -150,7 +172,53 @@ msgs = [
 ,
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0062",
+    "guid" : "US-CA-FOSTERCITY-007",
+    "destination" : "A012",
+    "eventTime" : "2019-06-02 14:30:00",
+    "payload" : {
+        "format": "urn:windchaser:pws:reading", 
+        "data": {
+            "WindDirectionDegrees" : 90,
+            "WindSpeedMPH" : 18.0,
+            "WindSpeedGustMPH": 20.0
+        }
+    }
+}
+"""
+,
+"""
+{
+    "guid" : "USER0004",
+    "destination" : "A012",
+    "eventTime" : "2019-06-02 14:30:20",
+    "payload" : {
+        "format": "urn:windchaser:device:reading", 
+        "data": {
+            "lat" : 37.78,
+            "lon" : -122.285
+        }
+    }
+}
+"""
+,
+"""
+{
+    "guid" : "USER0005",
+    "destination" : "A012",
+    "eventTime" : "2019-06-02 14:30:20",
+    "payload" : {
+        "format": "urn:windchaser:device:reading", 
+        "data": {
+            "lat" : 37.571,
+            "lon" : -122.289
+        }
+    }
+}
+"""
+,
+"""
+{
+    "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:32:00",
     "payload" : {
@@ -166,7 +234,37 @@ msgs = [
 ,
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0062",
+    "guid" : "USER0005",
+    "destination" : "A012",
+    "eventTime" : "2019-06-02 14:32:20",
+    "payload" : {
+        "format": "urn:windchaser:device:reading", 
+        "data": {
+            "lat" : 37.572,
+            "lon" : -122.288
+        }
+    }
+}
+"""
+,
+"""
+{
+    "guid" : "USER0006",
+    "destination" : "A012",
+    "eventTime" : "2019-06-02 14:32:20",
+    "payload" : {
+        "format": "urn:windchaser:device:reading", 
+        "data": {
+            "lat" : 37.571,
+            "lon" : -122.279
+        }
+    }
+}
+"""
+,
+"""
+{
+    "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:35:00",
     "payload" : {
@@ -182,7 +280,7 @@ msgs = [
 ,
 """
 {
-    "guid" : "USA-CA-ALAMEDA-0062",
+    "guid" : "US-CA-ALAMEDA-062",
     "destination" : "A012",
     "eventTime" : "2019-06-02 14:37:00",
     "payload" : {
