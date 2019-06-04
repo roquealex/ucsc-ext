@@ -7,10 +7,15 @@
  http://kafka.apache.org/documentation.html#quickstart
 
  and then run the example
-    `$ bin/spark-submit --jars \
-      external/kafka-assembly/target/scala-*/spark-streaming-kafka-assembly-*.jar \
-      iotconsumer.py \
-      localhost:9092 iotmsgs`
+    `$ spark-submit \
+       --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.3 \
+       iotconsumer.py \
+       localhost:9092 iotmsgs`
+
+    spark-submit \
+       --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.3 \
+       iotconsumer.py \
+       localhost:9092 iotmsgs
 """
 from __future__ import print_function
 
@@ -67,7 +72,7 @@ if __name__ == "__main__":
     #    .option("startingOffsets", "earliest") \
 
     #################################################
-    # Generic JSON processing 
+    # Generic JSON Processing 
     #################################################
 
     # Select only the key and val columns, convert from UTF-8 back to string
@@ -99,7 +104,7 @@ if __name__ == "__main__":
         .select(col("data.*"))
 
     #################################################
-    # PWS processing 
+    # Personal Weather Station Processing 
     #################################################
 
     # Schema for the data portion of a PWS reading
@@ -131,6 +136,7 @@ if __name__ == "__main__":
     # maxWindSpeedGustMPH :
     #     In case of the WindSpeedGustMPH we want to aggregate it as the
     #     maximum reading from the sensor during the window
+    #
     pwsReadingStatsDF = pwsReadingDF \
         .withColumn("WindDirRads",radians("data.WindDirectionDegrees")) \
         .withColumn("WindDirX",cos("WindDirRads")) \
@@ -152,7 +158,7 @@ if __name__ == "__main__":
         .start()
 
     #################################################
-    # Device processing 
+    # Device Processing 
     #################################################
 
     # Processing of devices:
@@ -180,7 +186,7 @@ if __name__ == "__main__":
     # Note: countDistinct is not supported in streaming, the approx version is supported
     nearByDevicesWindowDF = nearByDevicesDF \
         .groupBy(window(col("eventTime"), windowLength),col("guid")) \
-        .agg(approxCountDistinct("deviceGuid"))
+        .agg(approxCountDistinct("deviceGuid").alias("deviceCount"))
 
     nearByDevicesQuery = nearByDevicesWindowDF.writeStream \
         .format("console") \
@@ -192,4 +198,4 @@ if __name__ == "__main__":
 
     # Wait for all streams
     spark.streams.awaitAnyTermination()
-            
+
