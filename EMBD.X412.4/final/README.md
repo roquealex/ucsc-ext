@@ -1,12 +1,12 @@
 # The Internet of Things: Big Data Processing and Analytics
 
-## Final Project
+## Final Project: WindChaser App
 
 ### Introduction
 
 This project is the simplified infrastructure of WindChaser a system that
-connects Personal Weather Stations with real time GPS recording from wind
-sports (Kiteboarding or wind surfing).
+connects Personal Weather Stations with real time GPS recording for wind
+sports enthusiasts (Kiteboarding or wind surfing).
 
 PWS are similar to this product:
 
@@ -16,7 +16,7 @@ And trackers similar to this:
 
 https://woosports.com/
 
-The project will correlate realtime the weather data with the number of
+The project will correlate in realtime the weather data with the number of
 people showing to practice the sport close to the sensor, this will help other
 people to find out if the conditions are good. Data will be stored for the
 development of better weather models.
