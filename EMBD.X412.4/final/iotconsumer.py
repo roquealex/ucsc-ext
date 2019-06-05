@@ -12,19 +12,13 @@
        iotconsumer.py \
        localhost:9092 iotmsgs`
 
-    spark-submit \
-       --packages org.apache.spark:spark-sql-kafka-0-10_2.11:2.3.3 \
-       iotconsumer.py \
-       localhost:9092 iotmsgs
 """
 from __future__ import print_function
 
 import sys
 import re
 
-#from pyspark import SparkContext
 from pyspark.sql import SparkSession
-#from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
 
 #from operator import add
@@ -91,10 +85,6 @@ if __name__ == "__main__":
             .add("data",StringType()) \
         )
 
-#            .add("data",StructType() \
-#                .add("WindSpeed",DoubleType()) \
-#                .add("WindDirection",DoubleType()) \
-#            ) \
 
     # Filter only the json keys (only format suported anyway),
     # apply generic schema and make the structure flat again
@@ -144,10 +134,11 @@ if __name__ == "__main__":
         .groupBy(window(col("eventTime"), windowLength),col("guid")) \
         .agg(
             avg("data.WindSpeedMPH").alias("avgWindSpeedMPH"),
-            avg("data.WindDirectionDegrees").alias("avgDir"),
             ( (degrees(atan2(avg("WindDirY"),avg("WindDirX"))) + lit(360)) % lit(360)).alias("avgWindDirDegrees"),
             max("data.WindSpeedGustMPH").alias("maxWindSpeedGustMPH"),
             count(lit(1)).alias("cnt"))
+    # cnt not required but good for debug
+     
 
     # Sink the stats to console, for now using complete but update with a
     # watermark could be used
@@ -177,10 +168,6 @@ if __name__ == "__main__":
         hypot(col("data.lat") - pwsInfoDF.lat, col("data.lon") - pwsInfoDF.lon ) <= lit(0.02),
         "inner")
 
-    #test1DF = testDF.withColumn("math", pow(col("data.lat") - col("lat"),2.0) )
-    #test1DF = testDF.withColumn("math",
-    #        hypot(col("data.lat") - col("lat"), col("data.lon") - col("lon") ) )#<= lit(0.01)  )
-    
 
     # Calculate in the given window how many different devices were close to the PWS
     # Note: countDistinct is not supported in streaming, the approx version is supported
